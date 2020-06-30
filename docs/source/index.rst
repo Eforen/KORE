@@ -20,6 +20,14 @@ Indices and tables
 * :ref:`search`
 
 .. toctree::
+    :maxdepth: 1
+    :caption: Module Documentation
+
+    modules/keyboard
+    modules/screen
+    modules/terminal
+
+.. toctree::
     :maxdepth: 2
     :numbered:
     :caption: KS++ Documentation

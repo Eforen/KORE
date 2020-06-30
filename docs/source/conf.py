@@ -1,10 +1,12 @@
-import sphinx_rtd_theme
-
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+import sys
+import os
+import sphinx_rtd_theme
 
 # -- Path setup --------------------------------------------------------------
 
@@ -15,6 +17,7 @@ import sphinx_rtd_theme
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -30,6 +33,11 @@ author = 'KORE Developers'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'KerboscriptLexer',
+    'KASMLexer',
+    'KVMLexer',
+    'KPPLexer',
+    'sphinx_tabs.tabs',
     'sphinx_rtd_theme',
 ]
 
@@ -49,6 +57,11 @@ exclude_patterns = []
 #
 #html_theme = 'alabaster'
 html_theme = "sphinx_rtd_theme"
+
+if html_theme == 'sphinx_rtd_theme':
+    import sphinx_rtd_theme
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+    html_style = 'css/kos_theme.css'  # adjusts the read_the_docs CSS theme a tad.
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
