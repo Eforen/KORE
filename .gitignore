@@ -1,5 +1,5 @@
 # Dont keep the compiled Docs
-*
+docs/build/*
 
 # Keep the gitignore itself
 !.gitignore 
