@@ -1,0 +1,5 @@
+# Dont keep the compiled Docs
+*
+
+# Keep the gitignore itself
+!.gitignore 
