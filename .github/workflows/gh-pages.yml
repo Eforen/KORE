@@ -27,7 +27,7 @@ jobs:
       with:
         docs-folder: "docs/"
     # Runs a single command using the runners shell
-    - name: Run a one-line script
+    - name: Disable Jekyll
       run: touch docs/build/html/.nojekyll
       
 
