@@ -11,7 +11,7 @@ For those familiar with x84 or x64 assembly architecture you may find some defre
 * The Register are intended to be used most because they are more preformant.
 
 Data Types
-------------------------------
+==============================
 The registers, memory and operations use the following data types:
 
 +------------------------+--------+--------------+
@@ -38,7 +38,7 @@ Notes:
 * Addresses are 32 bits. A single step is a single byte thus the address 0x00000003 would refrence the 3rd byte, where 0x00000004 would refrence the 4th byte.
 
 Registers and Stack
-------------------------------
+==============================
 
 There are 16 Registers if you want to see them check the `Architecture Specification <../architecture/structure.html#map-of-registers>`_, 16 64-bit "general-purpose" registers;
 the low-order 32, 16, and 8 bits of each register can be accessed independently under other names, as shown in the `Map of Registers <../architecture/structure.html#map-of-registers>`_
@@ -49,7 +49,7 @@ Using these extra registers can have unexpected behavior.
 
 
 Addressing Mode
-------------------------------
+==============================
 
 Register :math:`R_2 \leftarrow R_2 + R_1`
 
@@ -74,3 +74,65 @@ Immediate :math:`R_1 \leftarrow R_1 + 69`
 .. code-block:: kasm
 
     ADI 69, R1
+
+Instructions
+==============================
+
+Data Transfer Instructions
+------------------------------
+
+.. list-table:: Key
+    :widths: 10 50
+    :header-rows: 1
+
+    * - Placeholder
+      - Denotes
+    * - s
+      - immediate, register, or memory Address
+    * - d
+      - a register or memory address
+    * - r
+      - a register
+    * - imm
+      - immediate
+
+Most transfers use the mov instruction which works between to registers or between registers and a memory address.
+
+.. note::
+    Data Transfers from one memory address to another memory address is not supported.
+    If you need to do this a register or the stack would need to be used instead.
+
+.. list-table:: Data transfer instructions
+    :widths: 50 50
+    :header-rows: 0
+
+    * - mov [b|w|l|q] s,d
+      - move s to d
+    * - movs [bw|bl|bq|wl|wq|lq] s,d
+      - move with sign extension
+    * - movz [bw|bl|bq|wl|wq] s,d
+      - move with zero extension
+    * - movabsq imm, r
+      - move absolute quad word (64-bits)
+    * - pushq s
+      - push onto the stack
+    * - popq s
+      - pop from the stack stack
+
+.. note::
+    It may be desirable at a later point in time to make some instructions for direct memory to memory mov ops to increase preformance of memcopy commands if users are using that frequently.
+
+.. warning::
+    Remember that the stack must stay 8 byte aligned at all times thus remember to pad your data if you need to push less then 8 byte.
+
+Integer Arithmetic and Logical Operations
+-----------------------------------------
+
+Condition Codes
+-----------------------------------------
+
+Flow Control Transfers
+-----------------------------------------
+
+Floating Point Arithmetic
+-----------------------------------------
