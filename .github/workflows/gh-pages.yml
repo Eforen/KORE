@@ -33,7 +33,7 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Disable Jekyll
-      run: touch $GITHUB_WORKSPACE/docs/build/html/.nojekyll
+      run: sudo touch $GITHUB_WORKSPACE/docs/build/html/.nojekyll
       
 
     # Upload Artifacts could make PDF or something
