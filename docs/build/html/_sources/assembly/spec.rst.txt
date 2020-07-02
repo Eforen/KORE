@@ -43,11 +43,6 @@ Registers and Stack
 There are 16 Registers if you want to see them check the `Architecture Specification <../architecture/structure.html#map-of-registers>`_, 16 64-bit "general-purpose" registers;
 the low-order 32, 16, and 8 bits of each register can be accessed independently under other names, as shown in the `Map of Registers <../architecture/structure.html#map-of-registers>`_
 
-In principle, almost any register can be used to hold any data, but some have special or restricted uses.
-Using these extra registers can have unexpected behavior.
-
-
-
 Addressing Mode
 ------------------------------
 

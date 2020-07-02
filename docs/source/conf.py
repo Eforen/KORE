@@ -39,6 +39,7 @@ extensions = [
     'KPPLexer',
     'sphinx_tabs.tabs',
     'sphinx_rtd_theme',
+    'sphinx.ext.intersphinx',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -61,7 +62,7 @@ html_theme = "sphinx_rtd_theme"
 if html_theme == 'sphinx_rtd_theme':
     import sphinx_rtd_theme
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-    html_style = 'css/kos_theme.css'  # adjusts the read_the_docs CSS theme a tad.
+    html_style = 'css/kore_theme.css'  # adjusts the read_the_docs CSS theme a tad.
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

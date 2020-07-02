@@ -1,0 +1,1 @@
+python -m http.server -d "%~dp0\build\html"
