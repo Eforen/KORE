@@ -26,6 +26,10 @@ jobs:
     - uses: Eforen/sphinx-action@master
       with:
         docs-folder: "docs/"
+    # Runs a single command using the runners shell
+    - name: Run a one-line script
+      run: touch docs/build/html/.nojekyll
+      
 
     # Upload Artifacts could make PDF or something
     - uses: actions/upload-artifact@v1
