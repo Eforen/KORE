@@ -26,10 +26,10 @@ jobs:
     - uses: Eforen/sphinx-action@master
       with:
         docs-folder: "docs/"
-        
+
     # Runs a single command using the runners shell
     - name: Check Sphinx Results
-      run: ls $GITHUB_WORKSPACE
+      run: ls $GITHUB_WORKSPACE/docs/build/html/
 
     # Runs a single command using the runners shell
     - name: Disable Jekyll
