@@ -28,7 +28,7 @@ jobs:
         docs-folder: "docs/"
     # Runs a single command using the runners shell
     - name: Disable Jekyll
-      run: echo "" > docs/build/html/.nojekyll
+      run: touch $GITHUB_WORKSPACE/docs/build/html/.nojekyll
       
 
     # Upload Artifacts could make PDF or something
