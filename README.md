@@ -1,7 +1,7 @@
-KORE (Kerbal Operations Runtime Engine)
+KORE (Kerbo Operations Runtime Engine)
 ========
 
-KORE (Kerbal Operations Runtime Engine) is designed to be an entire Rocketry Architecture Platform this the goal is to make a platform that will not only avoid lockin (Only being able to be in KSP) but also provide a way for users to play with and/or learn any level of computing from highlevel programing to vm code to to direct assembly or even binary mechine code if desired.
+KORE (Kerbo Operations Runtime Engine) is designed to be an entire Rocketry Architecture Platform this the goal is to make a platform that will not only avoid lockin (Only being able to be in KSP) but also provide a way for users to play with and/or learn any level of computing from highlevel programing to vm code to to direct assembly or even binary mechine code if desired.
 
 Features
 --------
