@@ -87,14 +87,18 @@ Data Transfer Instructions
 
     * - Placeholder
       - Denotes
-    * - s
+    * - *s*
       - immediate, register, or memory Address
-    * - d
+    * - *d*
       - a register or memory address
-    * - r
+    * - *m*
+      - a memory address
+    * - *r*
       - a register
-    * - imm
+    * - *imm*
       - immediate
+    * - *l*
+      - label, program line number, or memory address
 
 Most transfers use the mov instruction which works between to registers or between registers and a memory address.
 
@@ -128,8 +132,152 @@ Most transfers use the mov instruction which works between to registers or betwe
 Integer Arithmetic and Logical Operations
 -----------------------------------------
 
+.. list-table:: Arithmetic instructions
+    :widths: 50 50
+    :header-rows: 0
+
+    * - lea [b|wl|q] m, r
+      - load effective address of m into r
+    * - inc[b|w|l|q] d
+      - d = d + 1
+    * - dec[b|w|l|q] d
+      - d = d - 1
+    * - neg[b|w|l|q] d
+      - d = -d
+    * - not[b|w|l|q] d
+      - d = ~d(bitwise complement)
+    * - add[b|w|l|q] s, d
+      - d = d + s
+    * - sub[b|w|l|q] s, d
+      - d = d - s
+    * - imul[b|w|l|q] s, r
+      - r = r * s (throws away high-order half of the result)
+    * - xor[b|w|l|q] s, d
+      - d = d ∧ s (bitwise)
+    * - or[b|w|l|q] s, d
+      - d = d | s (bitwise)
+    * - and[b|w|l|q] s,d
+      - d = d & s (bitwise)
+    * - idivl s
+      - signed division of edx by s, place quotient in eax, and remainder in edx
+    * - divl s
+      - unsigned division of edx by s, place quotient in eax, and remainder in edx
+    * - cltd
+      - sign extend eax into edx
+    * - idivq s
+      - signed devision of rdx by s, place quotient in rdx, and remainder in rdx
+    * - divq s
+      - unsigned devision of rdx by s, place quotient in rdx, and remainder in rdx
+    * - clto
+      - sign extend rax into rdx
+    * - sal[b|w|l|q] imm, d
+      - d = d << imm (left shift)
+    * - sar[b|w|l|q] imm, d
+      - d = d >> imm (arithmetic right shift)
+    * - shr[b|w|l|q] imm, d
+      - d = d >> imm (logical right shift)
+
+.. note::
+    A very common trick is to zero a register by using xor on itself.
+
+.. note::
+    When data is loaded into a register it zeros out the high order bits of the register.
+    If a signed operation is performed on a low order register its high order bits will be zeroed except for the sign bit.
+
+.. warning::
+    Multiplication of two n-byte values has the potential to result in 2n-byte.
+    The imul instruction simply discards the high-order half of the result, so it still fits in n bytes.
+    This is common in many programming languages.
+
 Condition Codes
 -----------------------------------------
+
+Almost all arithmetic instructions set processor condition codes based on their result.
+
+.. list-table:: The Condition Codes
+    :widths: 50 50
+    :header-rows: 0
+
+    * - ZF
+      - result was Zero
+    * - CF
+      - result caused carry out of most significant bit
+    * - SF
+      - result was negative (Sign bit was set)
+    * - OF
+      - result caused overflow
+
+In general, compilers usually set the condition codes using one of the following instructions,
+which do not change any register:
+
+.. list-table:: Conditional Instructions
+    :widths: 50 50
+    :header-rows: 0
+
+    * - cmp[b|w|l|q] s2, s1
+      - set flags based on s1 - s2
+    * - test[b|w|l|q] s2, s1
+      - set flags based on s1 & s2 (logical and)
+
+In the following instructions cc will stand for any of the condition codes that come after the instructions.
+
+.. list-table:: Condition Sensitive Instructions
+    :widths: 50 50
+    :header-rows: 0
+
+    * - j\ *cc* *l*
+      - transfers control to *l* if the specified *cc* evaluates to true
+    * - set\ *cc* *d*
+      - sets the single byte destination *d* to 1 or 0 according to whether the specified *cc* evaluates to true
+    * - cmov\ *cc* s, d
+      - instructions perform mov only if the specified *cc* holds.
+    * - cmovs\ *cc* s, d
+      - instructions perform movs only if the specified *cc* holds.
+    * - cmovz\ *cc* s, d
+      - instructions perform movz only if the specified *cc* holds.
+    * - cmovabsq\ *cc* s, d
+      - instructions perform movabsq only if the specified *cc* holds.
+
+.. list-table:: Condition Codes
+    :widths: 25 25 50
+    :header-rows: 1
+
+    * - e
+      - **ZF**
+      - equal to zero
+    * - ne
+      - **˜ZF**
+      - not equal to zero
+    * - n
+      - **SF**
+      - negitive
+    * - nn
+      - **˜SF**
+      - not negative
+    * - g
+      - **˜(SF xor OF) & ˜ZF**
+      - greater (>) (signed sensitive)
+    * - ge
+      - **˜(SF xor OF)**
+      - greater or equal (>=) (signed sensitive)
+    * - l
+      - **SF xor OF**
+      - less (<) (signed sensitive)
+    * - le
+      - **(SF xor OF) | ZF**
+      - less or equal (<=) (signed sensitive)
+    * - a
+      - **˜CF & ˜ZF**
+      - above (abs >) (not signed sensitive)
+    * - ae
+      - **˜CF**
+      - above or equal (abs >=) (not signed sensitive)
+    * - b
+      - **CF**
+      - below (abs <) (not signed sensitive)
+    * - be
+      - **CF | ZF**
+      - below or equal (abs <) (not signed sensitive)
 
 Flow Control Transfers
 -----------------------------------------
