@@ -242,6 +242,9 @@ In the following instructions cc will stand for any of the condition codes that 
     :widths: 25 25 50
     :header-rows: 1
 
+    * - cc
+      - condition tested
+      - meaning after cmp
     * - e
       - **ZF**
       - equal to zero
