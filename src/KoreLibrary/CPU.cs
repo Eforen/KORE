@@ -42,20 +42,22 @@ namespace Kore
             IP = 6
         }
 
+        protected ulong[] registers = new ulong[7];
+
         #region R?X Register
         /// <summary>
         /// Set Register R?X to ulong value
         /// </summary>
         /// <param name="register">Which R?X should be set</param>W
         /// <param name="value">What value to place in register. Converted to non signed ulong Irelivent of the type it actually is.</param>
-        public void setRX(Register register, ulong value) { }
+        public void setRX(Register register, ulong value) { registers[(int)register] = value; }
 
         /// <summary>
         /// Get Register R?X to ulong value
         /// </summary>
         /// <param name="register">Which R?X should be returned</param>
         /// <returns>The Register Value as a ulong no mater what the actual value is.</returns>
-        public ulong getRX(Register register) { return 0; }
+        public ulong getRX(Register register) { return registers[(int)register]; }
         #endregion // End of R?X Register
 
         #region E?X Register
@@ -64,14 +66,14 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which E?X should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed uint Irelivent of the type it actually is.</param>
-        public void setEX(Register register, uint value) { }
+        public void setEX(Register register, uint value) { registers[(int)register] = value; }
 
         /// <summary>
         /// Get Register E?X to uint value
         /// </summary>
         /// <param name="register">Which E?X should be returned</param>
         /// <returns>The Register Value as a uint no mater what the actual value is.</returns>
-        public uint getEX(Register register) { return 0; }
+        public uint getEX(Register register) { return (uint)(registers[(int)register] & 0xFFFFFFFF); }
         #endregion // End of E?X Register
 
         #region ?X Register
@@ -80,14 +82,14 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which ?X should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed ushort Irelivent of the type it actually is.</param>
-        public void setX(Register register, ushort value) { }
+        public void setX(Register register, ushort value) { registers[(int)register] = value; }
 
         /// <summary>
         /// Get Register ?X to ushort value
         /// </summary>
         /// <param name="register">Which ?X should be returned</param>
         /// <returns>The Register Value as a ushort no mater what the actual value is.</returns>
-        public ushort getX(Register register) { return 0; }
+        public ushort getX(Register register) { return (ushort)(registers[(int)register] & 0xFFFF); }
         #endregion // End of ?X Register
 
         #region ?H Register
@@ -96,14 +98,14 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which ?H should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed byte Irelivent of the type it actually is.</param>
-        public void setH(Register register, byte value) { }
+        public void setH(Register register, byte value) { registers[(int)register] = (ushort) (value << 2); }
 
         /// <summary>
         /// Get Register ?H to byte value
         /// </summary>
         /// <param name="register">Which ?H should be returned</param>
         /// <returns>The Register Value as a byte no mater what the actual value is.</returns>
-        public byte getH(Register register) { return 0; }
+        public byte getH(Register register) { return (byte)((registers[(int)register] >> 2) & 0xFF); }
         #endregion // End of ?H Register
         #region ?L Register
         /// <summary>
@@ -111,14 +113,14 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which ?L should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed byte Irelivent of the type it actually is.</param>
-        public void setL(Register register, byte value) { }
+        public void setL(Register register, byte value) { registers[(int)register] = value; }
 
         /// <summary>
         /// Get Register ?L to byte value
         /// </summary>
         /// <param name="register">Which ?L should be returned</param>
         /// <returns>The Register Value as a byte no mater what the actual value is.</returns>
-        public byte getL(Register register) { return 0; }
+        public byte getL(Register register) { return (byte)(registers[(int)register] & 0x00FF); }
         #endregion // End of ?L Register
         #endregion // End of Register Handling
     }
