@@ -311,5 +311,207 @@ namespace KoreTests
             cpu.setL(r, target2);
             Assert.AreEqual(target2, cpu.getL(r));
         }
+
+        // Uses Arrays because of a quark of NUnit TestCase
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0x29928a0bac818116 })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0xec8525bd287984a6 })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0x1811dc85da0d217e })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0x842843ad1907db58 })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0xea2b62db634c485f })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0x204f36cfdc6aff52 })]
+
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0x29928a0bac818116 })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0xec8525bd287984a6 })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0x1811dc85da0d217e })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0x842843ad1907db58 })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0xea2b62db634c485f })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0x204f36cfdc6aff52 })]
+
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0x29928a0bac818116 })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0xec8525bd287984a6 })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0x1811dc85da0d217e })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0x842843ad1907db58 })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0xea2b62db634c485f })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0x204f36cfdc6aff52 })]
+
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0x29928a0bac818116 })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0xec8525bd287984a6 })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0x1811dc85da0d217e })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0x842843ad1907db58 })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0xea2b62db634c485f })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0x204f36cfdc6aff52 })]
+
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0x29928a0bac818116 })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0xec8525bd287984a6 })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0x1811dc85da0d217e })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0x842843ad1907db58 })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0xea2b62db634c485f })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0x204f36cfdc6aff52 })]
+
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0x29928a0bac818116 })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0xec8525bd287984a6 })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0x1811dc85da0d217e })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0x842843ad1907db58 })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0xea2b62db634c485f })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0x204f36cfdc6aff52 })]
+
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0x29928a0bac818116 })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0xec8525bd287984a6 })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0x1811dc85da0d217e })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0x842843ad1907db58 })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0xea2b62db634c485f })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0x204f36cfdc6aff52 })]
+        public void TestRegisterZeroing(Kore.CPU.Register r, ulong[] data)
+        {
+            ulong startExpectation = (ulong)data[0], tLong = (ulong)data[1];
+
+            ulong target = startExpectation;
+
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            // Reset and check zeroing out EX
+            target = 0;
+            cpu.setRX(r, tLong);
+            target = tLong;
+            Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
+            cpu.setEX(r, 0);
+            target = target & 0xFF_FF_FF_FF_00_00_00_00u;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            // Reset and check zeroing out X
+            target = 0;
+            cpu.setRX(r, tLong);
+            target = tLong;
+            Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
+            cpu.setX(r, 0);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_00u;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            // Reset and check zeroing out H
+            target = 0;
+            cpu.setRX(r, tLong);
+            target = tLong;
+            Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
+            cpu.setH(r, 0);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            // Reset and check zeroing out L
+            target = 0;
+            cpu.setRX(r, tLong);
+            target = tLong;
+            Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
+            cpu.setL(r, 0);
+            target = target & 0xFF_FF_FF_FF_FF_FF_FF_00u;
+            Assert.AreEqual(target, cpu.getRX(r));
+        }
+
+
+        // Uses Arrays because of a quark of NUnit TestCase
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0x952d2a4c42c3b899u, 0x29928a0bu, 0x2992u, 0x95u, 0x92u })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0x374814b7cc672d12u, 0xec8525bdu, 0xec85u, 0x37u, 0x85u })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0xff43757f49b222f1u, 0x1811dc85u, 0x1811u, 0xffu, 0x11u })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0xba9d3e0c4cd68b66u, 0x842843adu, 0x8428u, 0xbau, 0x28u })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0xf03ed33799359b5du, 0xea2b62dbu, 0xea2bu, 0xf0u, 0x2bu })]
+        [TestCase(Kore.CPU.Register.A, new ulong[] { 0, (ulong)0x742c59eb74b11a06u, 0x204f36cfu, 0x204fu, 0x74u, 0x4fu })]
+
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0x952d2a4c42c3b899u, 0x29928a0bu, 0x2992u, 0x95u, 0x92u })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0x374814b7cc672d12u, 0xec8525bdu, 0xec85u, 0x37u, 0x85u })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0xff43757f49b222f1u, 0x1811dc85u, 0x1811u, 0xffu, 0x11u })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0xba9d3e0c4cd68b66u, 0x842843adu, 0x8428u, 0xbau, 0x28u })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0xf03ed33799359b5du, 0xea2b62dbu, 0xea2bu, 0xf0u, 0x2bu })]
+        [TestCase(Kore.CPU.Register.B, new ulong[] { 0, (ulong)0x742c59eb74b11a06u, 0x204f36cfu, 0x204fu, 0x74u, 0x4fu })]
+
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0x952d2a4c42c3b899u, 0x29928a0bu, 0x2992u, 0x95u, 0x92u })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0x374814b7cc672d12u, 0xec8525bdu, 0xec85u, 0x37u, 0x85u })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0xff43757f49b222f1u, 0x1811dc85u, 0x1811u, 0xffu, 0x11u })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0xba9d3e0c4cd68b66u, 0x842843adu, 0x8428u, 0xbau, 0x28u })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0xf03ed33799359b5du, 0xea2b62dbu, 0xea2bu, 0xf0u, 0x2bu })]
+        [TestCase(Kore.CPU.Register.BP, new ulong[] { 0, (ulong)0x742c59eb74b11a06u, 0x204f36cfu, 0x204fu, 0x74u, 0x4fu })]
+
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0x952d2a4c42c3b899u, 0x29928a0bu, 0x2992u, 0x95u, 0x92u })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0x374814b7cc672d12u, 0xec8525bdu, 0xec85u, 0x37u, 0x85u })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0xff43757f49b222f1u, 0x1811dc85u, 0x1811u, 0xffu, 0x11u })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0xba9d3e0c4cd68b66u, 0x842843adu, 0x8428u, 0xbau, 0x28u })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0xf03ed33799359b5du, 0xea2b62dbu, 0xea2bu, 0xf0u, 0x2bu })]
+        [TestCase(Kore.CPU.Register.C, new ulong[] { 0, (ulong)0x742c59eb74b11a06u, 0x204f36cfu, 0x204fu, 0x74u, 0x4fu })]
+
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0x952d2a4c42c3b899u, 0x29928a0bu, 0x2992u, 0x95u, 0x92u })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0x374814b7cc672d12u, 0xec8525bdu, 0xec85u, 0x37u, 0x85u })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0xff43757f49b222f1u, 0x1811dc85u, 0x1811u, 0xffu, 0x11u })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0xba9d3e0c4cd68b66u, 0x842843adu, 0x8428u, 0xbau, 0x28u })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0xf03ed33799359b5du, 0xea2b62dbu, 0xea2bu, 0xf0u, 0x2bu })]
+        [TestCase(Kore.CPU.Register.D, new ulong[] { 0, (ulong)0x742c59eb74b11a06u, 0x204f36cfu, 0x204fu, 0x74u, 0x4fu })]
+
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0x952d2a4c42c3b899u, 0x29928a0bu, 0x2992u, 0x95u, 0x92u })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0x374814b7cc672d12u, 0xec8525bdu, 0xec85u, 0x37u, 0x85u })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0xff43757f49b222f1u, 0x1811dc85u, 0x1811u, 0xffu, 0x11u })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0xba9d3e0c4cd68b66u, 0x842843adu, 0x8428u, 0xbau, 0x28u })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0xf03ed33799359b5du, 0xea2b62dbu, 0xea2bu, 0xf0u, 0x2bu })]
+        [TestCase(Kore.CPU.Register.IP, new ulong[] { 0, (ulong)0x742c59eb74b11a06u, 0x204f36cfu, 0x204fu, 0x74u, 0x4fu })]
+
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0x952d2a4c42c3b899u, 0x29928a0bu, 0x2992u, 0x95u, 0x92u })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0x374814b7cc672d12u, 0xec8525bdu, 0xec85u, 0x37u, 0x85u })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0xff43757f49b222f1u, 0x1811dc85u, 0x1811u, 0xffu, 0x11u })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0xba9d3e0c4cd68b66u, 0x842843adu, 0x8428u, 0xbau, 0x28u })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0xf03ed33799359b5du, 0xea2b62dbu, 0xea2bu, 0xf0u, 0x2bu })]
+        [TestCase(Kore.CPU.Register.SP, new ulong[] { 0, (ulong)0x742c59eb74b11a06u, 0x204f36cfu, 0x204fu, 0x74u, 0x4fu })]
+        public void TestRegisterConversion(Kore.CPU.Register r, ulong[] data)
+        {
+            ulong startExpectation = (ulong) data[0], tLong = (ulong) data[1];
+            uint tInt = (uint) data[2];
+            ushort tShort = (ushort) data[3];
+            byte tHigh = (byte) data[4];
+            byte tLow = (byte) data[5];
+
+            ulong target = startExpectation;
+
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setRX(r, tLong);
+            target = tLong;
+            Assert.AreEqual(tLong, cpu.getRX(r));
+
+            cpu.setEX(r, tInt);
+            target = target & 0xFF_FF_FF_FF_00_00_00_00u & tInt;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setX(r, tShort);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_00u & tShort;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setH(r, tHigh);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu & (ushort)((ushort)(tHigh) << 2);
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setL(r, tLow);
+            target = target & 0xFF_FF_FF_FF_FF_FF_FF_00u & tLow;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            //Back up again just in case
+            cpu.setL(r, tLow);
+            // Don't change target because should stay the same
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setEX(r, tHigh);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu & (ushort)((ushort)(tHigh) << 2);
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setEX(r, tShort);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_00u & tShort;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setEX(r, tInt);
+            target = target & 0xFF_FF_FF_FF_00_00_00_00u & tInt;
+            Assert.AreEqual(target, cpu.getRX(r));
+
+            cpu.setRX(r, tLong);
+            target = tLong;
+            Assert.AreEqual(tLong, cpu.getRX(r));
+
+            cpu.setRX(r, 0);
+            target = 0;
+            Assert.AreEqual(tLong, cpu.getRX(r));
+        }
     }
 }
