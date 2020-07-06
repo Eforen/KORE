@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using System;
+using System.Linq;
 
 namespace KoreTests
 {
@@ -376,7 +378,7 @@ namespace KoreTests
             Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
             cpu.setEX(r, 0);
             target = target & 0xFF_FF_FF_FF_00_00_00_00u;
-            Assert.AreEqual(target, cpu.getRX(r));
+            Assert.AreEqual(target, cpu.getRX(r), "E"+Enum.GetName(typeof(Kore.CPU.Register),r)+ "X Register zero out not working correctly");
 
             // Reset and check zeroing out X
             target = 0;
@@ -385,7 +387,7 @@ namespace KoreTests
             Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
             cpu.setX(r, 0);
             target = target & 0xFF_FF_FF_FF_FF_FF_00_00u;
-            Assert.AreEqual(target, cpu.getRX(r));
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register zero out not working correctly");
 
             // Reset and check zeroing out H
             target = 0;
@@ -394,7 +396,7 @@ namespace KoreTests
             Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
             cpu.setH(r, 0);
             target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu;
-            Assert.AreEqual(target, cpu.getRX(r));
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "H Register zero out not working correctly");
 
             // Reset and check zeroing out L
             target = 0;
@@ -403,7 +405,7 @@ namespace KoreTests
             Assert.AreEqual(target, cpu.getRX(r)); // Insure state is as expected
             cpu.setL(r, 0);
             target = target & 0xFF_FF_FF_FF_FF_FF_FF_00u;
-            Assert.AreEqual(target, cpu.getRX(r));
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "L Register zero out not working correctly");
         }
 
 
@@ -470,48 +472,48 @@ namespace KoreTests
 
             cpu.setRX(r, tLong);
             target = tLong;
-            Assert.AreEqual(tLong, cpu.getRX(r));
+            Assert.AreEqual(tLong, cpu.getRX(r), "R" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register not working correctly");
 
             cpu.setEX(r, tInt);
-            target = target & 0xFF_FF_FF_FF_00_00_00_00u & tInt;
-            Assert.AreEqual(target, cpu.getRX(r));
+            target = target & 0xFF_FF_FF_FF_00_00_00_00u | tInt;
+            Assert.AreEqual(target, cpu.getRX(r), "E" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register not working correctly");
 
             cpu.setX(r, tShort);
-            target = target & 0xFF_FF_FF_FF_FF_FF_00_00u & tShort;
-            Assert.AreEqual(target, cpu.getRX(r));
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_00u | tShort;
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register not working correctly");
 
             cpu.setH(r, tHigh);
-            target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu & (ushort)((ushort)(tHigh) << 2);
-            Assert.AreEqual(target, cpu.getRX(r));
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu | (ushort)((ushort)(tHigh) << 8);
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "H Register not working correctly");
 
             cpu.setL(r, tLow);
-            target = target & 0xFF_FF_FF_FF_FF_FF_FF_00u & tLow;
-            Assert.AreEqual(target, cpu.getRX(r));
+            target = target & 0xFF_FF_FF_FF_FF_FF_FF_00u | tLow;
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "L Register not working correctly");
 
             //Back up again just in case
             cpu.setL(r, tLow);
             // Don't change target because should stay the same
-            Assert.AreEqual(target, cpu.getRX(r));
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "L Register not working correctly");
 
-            cpu.setEX(r, tHigh);
-            target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu & (ushort)((ushort)(tHigh) << 2);
-            Assert.AreEqual(target, cpu.getRX(r));
+            cpu.setH(r, tHigh);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_FFu | (ulong)(tHigh << 8);
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "H Register not working correctly");
 
-            cpu.setEX(r, tShort);
-            target = target & 0xFF_FF_FF_FF_FF_FF_00_00u & tShort;
-            Assert.AreEqual(target, cpu.getRX(r));
+            cpu.setX(r, tShort);
+            target = target & 0xFF_FF_FF_FF_FF_FF_00_00u | tShort;
+            Assert.AreEqual(target, cpu.getRX(r), "" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register not working correctly");
 
             cpu.setEX(r, tInt);
-            target = target & 0xFF_FF_FF_FF_00_00_00_00u & tInt;
-            Assert.AreEqual(target, cpu.getRX(r));
+            target = target & 0xFF_FF_FF_FF_00_00_00_00u | tInt;
+            Assert.AreEqual(target, cpu.getRX(r), "E" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register not working correctly");
 
             cpu.setRX(r, tLong);
             target = tLong;
-            Assert.AreEqual(tLong, cpu.getRX(r));
+            Assert.AreEqual(target, cpu.getRX(r), "R" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register not working correctly");
 
             cpu.setRX(r, 0);
             target = 0;
-            Assert.AreEqual(tLong, cpu.getRX(r));
+            Assert.AreEqual(target, cpu.getRX(r), "R" + Enum.GetName(typeof(Kore.CPU.Register), r) + "X Register zero out not working correctly");
         }
     }
 }

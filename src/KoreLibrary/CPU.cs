@@ -66,7 +66,7 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which E?X should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed uint Irelivent of the type it actually is.</param>
-        public void setEX(Register register, uint value) { registers[(int)register] = value; }
+        public void setEX(Register register, uint value) { registers[(int)register] = registers[(int)register] & 0xFF_FF_FF_FF_00_00_00_00 | value; }
 
         /// <summary>
         /// Get Register E?X to uint value
@@ -82,7 +82,7 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which ?X should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed ushort Irelivent of the type it actually is.</param>
-        public void setX(Register register, ushort value) { registers[(int)register] = value; }
+        public void setX(Register register, ushort value) { registers[(int)register] = (registers[(int)register] & 0xFF_FF_FF_FF_FF_FF_00_00) | value; }
 
         /// <summary>
         /// Get Register ?X to ushort value
@@ -98,14 +98,18 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which ?H should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed byte Irelivent of the type it actually is.</param>
-        public void setH(Register register, byte value) { registers[(int)register] = (ushort) (value << 2); }
+        public void setH(Register register, byte value) {
+            ushort conv = value;
+            conv = (ushort) (conv << 8);
+            registers[(int)register] = (registers[(int)register] & 0xFF_FF_FF_FF_FF_FF_00_FF) | conv;
+        }
 
         /// <summary>
         /// Get Register ?H to byte value
         /// </summary>
         /// <param name="register">Which ?H should be returned</param>
         /// <returns>The Register Value as a byte no mater what the actual value is.</returns>
-        public byte getH(Register register) { return (byte)((registers[(int)register] >> 2) & 0xFF); }
+        public byte getH(Register register) { return (byte)((registers[(int)register] >> 8) & 0xFF); }
         #endregion // End of ?H Register
         #region ?L Register
         /// <summary>
@@ -113,7 +117,7 @@ namespace Kore
         /// </summary>
         /// <param name="register">Which ?L should be set</param>
         /// <param name="value">What value to place in register. Converted to non signed byte Irelivent of the type it actually is.</param>
-        public void setL(Register register, byte value) { registers[(int)register] = value; }
+        public void setL(Register register, byte value) { registers[(int)register] = (registers[(int)register] & 0xFF_FF_FF_FF_FF_FF_FF_00) | value; }
 
         /// <summary>
         /// Get Register ?L to byte value
