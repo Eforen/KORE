@@ -1,0 +1,1 @@
+msbuild src\KorePlatform.sln
