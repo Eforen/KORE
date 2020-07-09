@@ -43,6 +43,22 @@ namespace KoreTests
             }
         }
 
+        [Test]
+        public void VonNeumannLoop()
+        {
+            //TODO: Add interrupt Capabilities here somewhere
+            //The processor should complete a single step of the loop in a clock pulse
+
+            // Step 1: Fetch Instruction
+            // Step 2: Decode Instruction
+            // Step 3: Read Source Operands [This step may include interaction with the Main Bus]
+            // Step 3.up: put command and address on the bus
+            // Step 3.down: pull the data off the bus and clear it
+            // Step 4: Execute
+            // Step 5: Write Destination Operand
+            // Step 6: Move PC to next position +4 or jump location
+        }
+
         [Test, Ignore("Not made yet")]
         public void bin_add_addi()
         {
