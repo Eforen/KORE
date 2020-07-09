@@ -43,11 +43,13 @@ namespace KoreTests
             }
         }
 
-        [Test]
+        [Test, Ignore("Not made yet")]
         public void VonNeumannLoop()
         {
             //TODO: Add interrupt Capabilities here somewhere
             //The processor should complete a single step of the loop in a clock pulse
+            byte[] add_addi_bin = new byte[] { 0x93, 0x0E, 0x50, 0x00, 0x13, 0x0F, 0x50, 0x02, 0xB3, 0x0F, 0xDF, 0x01 };
+            ram.store(add_addi_bin, 0, (ulong)add_addi_bin.Length, 0);
 
             // Step 1: Fetch Instruction
             // Step 2: Decode Instruction
