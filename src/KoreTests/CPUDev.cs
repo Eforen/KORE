@@ -204,5 +204,45 @@ namespace KoreTests
         {
             
         }
+
+        [Test, Explicit]
+        public void GenerateDataMasks()
+        {
+            byte BIT_COUNT = 64;
+            //0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111, // 64, 0x40 = -1, 0xFF_FF_FF_FF_FF_FF_FF_FF
+            //                                                                                                                                 XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX_XXXXXXXX
+            string resultHigh = "\t\t/// <summary>\n\t\t/// Used to get the top ith bits  \n\t\t/// </summary>\n\t\tprivate readonly ulong[] dataMaskHigh = {\n\t\t\t0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000, // High 0, 0x0\n";
+            string resultLow  = "\t\t/// <summary>\n\t\t/// Used to get the bottom ith bits\n\t\t/// </summary>\n\t\tprivate readonly ulong[] dataMaskLow = {\n\t\t\t0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000, //  Low 0, 0x0\n";
+            for (int i = 1; i <= BIT_COUNT; i++)
+            {
+                resultHigh += "\t\t\t0b";
+                resultLow += "\t\t\t0b";
+
+                for (int c = 1; c <= BIT_COUNT; c++)
+                {
+                    if (c % 8 == 1 && c != 1)
+                    {
+                        resultHigh += "_";
+                        resultLow += "_";
+                    }
+
+                    resultHigh += c < i ? "1": "0";
+                    resultLow += (BIT_COUNT - c) < i ? "1" : "0";
+                }
+
+                if (i != BIT_COUNT)
+                {
+                    resultHigh += ",";
+                    resultLow += ",";
+                }
+                resultHigh += " // High " + i + ", 0x" + Convert.ToString(i, 16) + "\n";
+                resultLow += " // Low " + i + ", 0x" + Convert.ToString(i, 16) + "\n";
+            }
+            resultHigh += "\t\t};";
+            resultLow += "\t\t};";
+            Console.WriteLine(resultHigh);
+            Console.WriteLine();
+            Console.WriteLine(resultLow);
+        }
     }
 }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kore", "KoreLibrary\Kore.csproj", "{3B46AD76-BBB2-4293-B0BD-D61AB39A411E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoreLibrary", "KoreLibrary\KoreLibrary.csproj", "{3B46AD76-BBB2-4293-B0BD-D61AB39A411E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoreTests", "KoreTests\KoreTests.csproj", "{4E11C8C8-B1A3-4EE2-9518-98DAC99F0D80}"
 EndProject
