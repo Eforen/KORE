@@ -43,12 +43,19 @@ namespace KoreTests
             }
         }
 
-        [Test, Ignore("Not made yet")]
+        // add_addi_bin contains the following instructions:
+        // main:
+        // .  addi x29, x0, 5   // Add 5 and 0, and store the value to x29.
+        // .  addi x30, x0, 37  // Add 37 and 0, and store the value to x30.
+        // .  add x31, x30, x29 // x31 should contain 42 (0x2a).
+        //                                           00    01    02    03    04    05    06    07    08    09    10    11
+        readonly byte[] add_addi_bin = new byte[] { 0x93, 0x0E, 0x50, 0x00, 0x13, 0x0F, 0x50, 0x02, 0xB3, 0x0F, 0xDF, 0x01 };
+
+        [Test]
         public void VonNeumannLoop()
         {
             //TODO: Add interrupt Capabilities here somewhere
             //The processor should complete a single step of the loop in a clock pulse
-            byte[] add_addi_bin = new byte[] { 0x93, 0x0E, 0x50, 0x00, 0x13, 0x0F, 0x50, 0x02, 0xB3, 0x0F, 0xDF, 0x01 };
             ram.store(add_addi_bin, 0, (ulong)add_addi_bin.Length, 0);
 
             // Step 1: Fetch Instruction
@@ -59,20 +66,33 @@ namespace KoreTests
             // Step 4: Execute
             // Step 5: Write Destination Operand
             // Step 6: Move PC to next position +4 or jump location
+
+            Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Off);
+            cpu.turnOn();
+            Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Init);
+            bus.tick();
+            for (int i = 0; i < 100; i++)
+            {
+                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Fetch);
+                bus.tick();
+                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Decode);
+                bus.tick();
+                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Read);
+                bus.tick();
+                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Exec);
+                bus.tick();
+                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Write);
+                bus.tick();
+                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.MovPC);
+                bus.tick();
+                cpu.registers.getR(Kore.RegisterFile.Register.PC);
+            }
         }
 
         [Test, Ignore("Not made yet")]
         public void bin_add_addi()
         {
-            // add_addi_bin contains the following instructions:
-            // main:
-            // .  addi x29, x0, 5   // Add 5 and 0, and store the value to x29.
-            // .  addi x30, x0, 37  // Add 37 and 0, and store the value to x30.
-            // .  add x31, x30, x29 // x31 should contain 42 (0x2a).
-            //                                 00    01    02    03    04    05    06    07    08    09    10    11
-            byte[] add_addi_bin = new byte[] { 0x93, 0x0E, 0x50, 0x00, 0x13, 0x0F, 0x50, 0x02, 0xB3, 0x0F, 0xDF, 0x01 };
-
-            // Run the above code
+            // Run the add_addi_bin code
 
             // Get value of register x29 it should contain 0x05 (5)
             Assert.AreEqual(0x05, cpu.registers.getR(Kore.RegisterFile.Register.x29));
