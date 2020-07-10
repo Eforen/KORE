@@ -67,25 +67,25 @@ namespace KoreTests
             // Step 5: Write Destination Operand
             // Step 6: Move PC to next position +4 or jump location
 
-            Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Off);
+            Assert.AreEqual(Kore.CPU.Cycle.Off, cpu.state);
             cpu.turnOn();
-            Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Init);
+            Assert.AreEqual(Kore.CPU.Cycle.Init, cpu.state);
             bus.tick();
-            for (int i = 0; i < 100; i++)
+            for (int i = 1; i <= 100; i++)
             {
-                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Fetch);
+                Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
                 bus.tick();
-                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Decode);
+                Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
                 bus.tick();
-                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Read);
+                Assert.AreEqual(Kore.CPU.Cycle.Read, cpu.state);
                 bus.tick();
-                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Exec);
+                Assert.AreEqual(Kore.CPU.Cycle.Exec, cpu.state);
                 bus.tick();
-                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.Write);
+                Assert.AreEqual(Kore.CPU.Cycle.Write, cpu.state);
                 bus.tick();
-                Assert.AreEqual(cpu.state, Kore.CPU.Cycle.MovPC);
+                Assert.AreEqual(Kore.CPU.Cycle.MovPC, cpu.state);
                 bus.tick();
-                cpu.registers.getR(Kore.RegisterFile.Register.PC);
+                Assert.AreEqual(i*4, cpu.registers.getR(Kore.RegisterFile.Register.PC)); 
             }
         }
 
