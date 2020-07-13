@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Kore.RiscISA;
 
 namespace Kore
 {
@@ -17,7 +18,7 @@ namespace Kore
             this.alu = new ALU64();
 
             this.MemorySize = MemorySize;
-            this.registers.setR(RegisterFile.Register.sp, MemorySize - 1);
+            this.registers.setR(Register.sp, MemorySize - 1);
 
             this.state = Cycle.Off;
         }
@@ -101,7 +102,7 @@ namespace Kore
                     state = Cycle.MovPC;
                     break;
                 case Cycle.MovPC:
-                    registers.setR(RegisterFile.Register.PC, registers.getR(RegisterFile.Register.PC)+0x04u);
+                    registers.setR(Register.PC, registers.getR(Register.PC)+0x04u);
 
                     state = Cycle.Fetch;
                     break;

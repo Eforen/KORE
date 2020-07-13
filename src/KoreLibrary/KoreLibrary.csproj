@@ -45,9 +45,11 @@
     <Compile Include="CPU.cs" />
     <Compile Include="MainBus.cs" />
     <Compile Include="MainBusComponent.cs" />
+    <Compile Include="MiscUtilities.cs" />
     <Compile Include="RamController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterFile.cs" />
+    <Compile Include="RiscISA.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
