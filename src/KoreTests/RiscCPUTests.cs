@@ -90,10 +90,32 @@ namespace KoreTests
             }
         }
 
-        [Test, Ignore("Not made yet")]
+        [Test]
         public void bin_add_addi()
         {
             // Run the add_addi_bin code
+            ram.store(add_addi_bin, 0, (ulong)add_addi_bin.Length, 0);
+
+            Assert.AreEqual(Kore.CPU.Cycle.Off, cpu.state);
+            cpu.turnOn();
+            Assert.AreEqual(Kore.CPU.Cycle.Init, cpu.state);
+            bus.tick();
+            for (int i = 1; i <= 3; i++)
+            {
+                Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+                bus.tick();
+                Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
+                bus.tick();
+                Assert.AreEqual(Kore.CPU.Cycle.Read, cpu.state);
+                bus.tick();
+                Assert.AreEqual(Kore.CPU.Cycle.Exec, cpu.state);
+                bus.tick();
+                Assert.AreEqual(Kore.CPU.Cycle.Write, cpu.state);
+                bus.tick();
+                Assert.AreEqual(Kore.CPU.Cycle.MovPC, cpu.state);
+                bus.tick();
+                Assert.AreEqual(i * 4, cpu.registers.getR(Register.PC));
+            }
 
             // Get value of register x29 it should contain 0x05 (5)
             Assert.AreEqual(0x05, cpu.registers.getR(Register.x29));
@@ -104,48 +126,61 @@ namespace KoreTests
         }
 
         [Test]
-        public void Instruction_R_Type_Struct()
+        public void Instruction_R_Type_CPU()
         {
             //  add x31, x30, x29 // x31 should contain 42 (0x2a).
             //                             00    01    02    03  
             byte[] add_bin = new byte[] { 0xB3, 0x0F, 0xDF, 0x01 };
             ulong add01 = Kore.Utility.Misc.toDWords(add_bin)[0];
 
+            // Set Registers
+            cpu.registers.setR(Register.x29, 5);
+            cpu.registers.setR(Register.x30, 37);
+
             //              0b0000000000000
             Assert.AreEqual(0b00000001_11011111_00001111_10110011, add01);
 
-            Kore.RiscISA.Instruction.RType inst = new Kore.RiscISA.Instruction.RType();
+            // Place program in CPU Ram
+            ram.store(add_bin, 0, (ulong)add_bin.Length, 0);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
-            Assert.AreEqual(Register.x0, inst.rd);
-            Assert.AreEqual(0, inst.func3);
-            Assert.AreEqual(Register.x0, inst.rs1);
-            Assert.AreEqual(Register.x0, inst.rs2);
+            Assert.AreEqual(Kore.CPU.Cycle.Off, cpu.state);
+            cpu.turnOn();
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+            bus.tick();
+            // Should now have encoded instruction
+            Assert.AreEqual(add01, cpu.currentInstruction);
 
-            inst.Decode(add01);
-            Assert.AreEqual(add01, inst.Encode());
+            Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
+            bus.tick();
+            // Should now have decoded instruction
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADD, inst.opcode);
-            Assert.AreEqual(Register.x31, inst.rd);
-            Assert.AreEqual(0b000, inst.func3);
-            Assert.AreEqual(Register.x30, inst.rs1);
-            Assert.AreEqual(Register.x29, inst.rs2);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADD, cpu.currentRType.opcode);
+            Assert.AreEqual(Register.x31, cpu.currentRType.rd);
+            Assert.AreEqual(0b000, cpu.currentRType.func3);
+            Assert.AreEqual(Register.x30, cpu.currentRType.rs1);
+            Assert.AreEqual(Register.x29, cpu.currentRType.rs2);
+
+            Kore.RiscISA.Instruction.RType hold = cpu.currentRType;
+
+            bus.tick();
+            bus.tick();
+            bus.tick();
+            bus.tick();
+            Assert.AreEqual(37+5, cpu.registers.getR(Register.x31));
+            Assert.AreEqual(0x4, cpu.registers.getR(Register.PC));
         }
 
         [Test]
-        public void Instruction_R_Type_CPU()
-        {
-            Assert.Fail("Test not coded.");
-        }
-
-        [Test]
-        public void Instruction_I_Type_Struct()
+        public void Instruction_I_Type_CPU()
         {
             // .  addi x29, x0, 5   // Add 5 and 0, and store the value to x29.
             // .  addi x30, x0, 37  // Add 37 and 0, and store the value to x30.
-            //                                00    01    02    03  
+            //                              00    01    02    03    04    05    06    07  
+            byte[] addi_bin = new byte[] { 0x93, 0x0E, 0x50, 0x00, 0x13, 0x0F, 0x50, 0x02 };
             byte[] addi01_bin = new byte[] { 0x93, 0x0E, 0x50, 0x00 };
             byte[] addi02_bin = new byte[] { 0x13, 0x0F, 0x50, 0x02 };
+
             ulong addi01 = Kore.Utility.Misc.toDWords(addi01_bin)[0]; // 0b0000_0000_0000_0 101_00 00_0 000_00 10_1001
             ulong addi02 = Kore.Utility.Misc.toDWords(addi02_bin)[0]; // 0b0000_0010_0101_0 000_00 00_1 111_00 01_0011
 
@@ -153,38 +188,57 @@ namespace KoreTests
             Assert.AreEqual(0b00000000_01010000_00001110_10010011, addi01);
             Assert.AreEqual(0b00000010_01010000_00001111_00010011, addi02);
 
-            Kore.RiscISA.Instruction.IType inst = new Kore.RiscISA.Instruction.IType();
+            // Place program in CPU Ram
+            ram.store(addi_bin, 0, (ulong)addi_bin.Length, 0);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
-            Assert.AreEqual(Register.x0, inst.rd);
-            Assert.AreEqual(0, inst.func3);
-            Assert.AreEqual(Register.x0, inst.rs1);
-            Assert.AreEqual(0, inst.imm);
+            Assert.AreEqual(Kore.CPU.Cycle.Off, cpu.state);
+            cpu.turnOn();
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+            bus.tick();
+            // Should now have encoded instruction
+            Assert.AreEqual(addi01, cpu.currentInstruction);
 
-            inst.Decode(addi01);
-            Assert.AreEqual(addi01, inst.Encode());
+            Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
+            bus.tick();
+            // Should now have decoded instruction
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, inst.opcode);
-            Assert.AreEqual(Register.x29, inst.rd);
-            Assert.AreEqual(0b000, inst.func3);
-            Assert.AreEqual(Register.x0, inst.rs1);
-            Assert.AreEqual(0b00000000_0101, inst.imm);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, cpu.currentIType.opcode);
+            Assert.AreEqual(Register.x29, cpu.currentIType.rd);
+            Assert.AreEqual(0b000, cpu.currentIType.func3);
+            Assert.AreEqual(Register.x0, cpu.currentIType.rs1);
+            Assert.AreEqual(0b00000000_0101, cpu.currentIType.imm);
 
-            inst.Decode(addi02);
-            Assert.AreEqual(addi02, inst.Encode());
+            Kore.RiscISA.Instruction.IType hold = cpu.currentIType;
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, inst.opcode);
-            Assert.AreEqual(Register.x30, inst.rd);
-            Assert.AreEqual(0b000, inst.func3);
-            Assert.AreEqual(Register.x0, inst.rs1);
-            Assert.AreEqual(0b00000010_0101, inst.imm);
+            bus.tick();
+            bus.tick();
+            bus.tick();
+            bus.tick();
+            Assert.AreEqual(5, cpu.registers.getR(Register.x29));
+            Assert.AreEqual(0x4, cpu.registers.getR(Register.PC));
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+            bus.tick();
+            // Should now have encoded instruction
+            Assert.AreEqual(addi02, cpu.currentInstruction);
 
-        }
+            Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
+            bus.tick();
+            // Should now have decoded instruction
 
-        [Test]
-        public void Instruction_I_Type_CPU()
-        {
-            Assert.Fail("Test not coded.");
+            Assert.AreSame(hold, cpu.currentIType);
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, cpu.currentIType.opcode);
+            Assert.AreEqual(Register.x30, cpu.currentIType.rd);
+            Assert.AreEqual(0b000, cpu.currentIType.func3);
+            Assert.AreEqual(Register.x0, cpu.currentIType.rs1);
+            Assert.AreEqual(0b00000010_0101, cpu.currentIType.imm);
+
+            bus.tick();
+            bus.tick();
+            bus.tick();
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
         }
 
         [Test, Ignore("Not made yet")]
@@ -231,5 +285,65 @@ namespace KoreTests
         public void Instruction_J_immediate()
         {
         }
+    }
+    class RiscV64iInstructions
+    {
+        private Kore.MainBus bus;
+        private Kore.CPU cpu;
+        private Kore.RamController ram;
+        [SetUp]
+        public void Setup()
+        {
+            bus = new Kore.MainBus();
+            cpu = new Kore.CPU(bus);
+            ram = new Kore.RamController(bus, cpu.MemorySize);
+        }
+
+        [Test]
+        public void addi()
+        {
+            // .  addi x29, x0, 5   // Add 5 and 0, and store the value to x29.
+            // .  addi x30, x0, 37  // Add 37 and 0, and store the value to x30.
+            //                              00    01    02    03    04    05    06    07  
+            byte[] addi_bin = new byte[] { 0x93, 0x0E, 0x50, 0x00, 0x13, 0x0F, 0x50, 0x02 };
+
+            ram.store(addi_bin, 0, (ulong)addi_bin.Length, 0);
+
+            Assert.AreEqual(Kore.CPU.Cycle.Off, cpu.state);
+            cpu.turnOn();
+            Assert.AreEqual(Kore.CPU.Cycle.Init, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Read, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Exec, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Write, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.MovPC, cpu.state);
+            bus.tick();
+            Assert.AreEqual(5, cpu.registers.getR(Register.x29));
+            Assert.AreEqual(0x4, cpu.registers.getR(Register.PC));
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Read, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Exec, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Write, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.MovPC, cpu.state);
+            bus.tick();
+            Assert.AreEqual(5, cpu.registers.getR(Register.x29));
+            Assert.AreEqual(37, cpu.registers.getR(Register.x30));
+            Assert.AreEqual(0x8, cpu.registers.getR(Register.PC));
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+        }
+
     }
 }

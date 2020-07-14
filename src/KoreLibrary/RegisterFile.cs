@@ -12,7 +12,7 @@ namespace Kore
 
         #region Register Handling
 
-        protected ulong[] registers = new ulong[31];
+        protected ulong[] registers = new ulong[32];
         protected ulong ProgramCounter = 0;
 
         #region R?X Register

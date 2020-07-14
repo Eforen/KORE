@@ -67,14 +67,23 @@ namespace Kore
                 }
                 return output;
             }
-//             public static byte[] toBytes(ulong data)
-//             {
-// 
-//             }
-//             public static byte[] toBytes(ulong[] data)
-//             {
-// 
-//             }
+
+            public static byte[] fromDWord(ulong c, int bytes = 8)
+            {
+                if (bytes <= 0 || bytes > 8) throw new Exception("Too many bytes in fromDWord");
+
+                byte[] output = new byte[bytes];
+                if (bytes > 0) output[0] = (byte)(c);
+                if (bytes > 1) output[1] = (byte)(c >> 8);
+                if (bytes > 2) output[2] = (byte)(c >> 16);
+                if (bytes > 3) output[3] = (byte)(c >> 24);
+                if (bytes > 4) output[4] = (byte)(c >> 32);
+                if (bytes > 5) output[5] = (byte)(c >> 40);
+                if (bytes > 6) output[6] = (byte)(c >> 48);
+                if (bytes > 7) output[7] = (byte)(c >> 56);
+
+                return output;
+            }
         }
     }
 }

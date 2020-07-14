@@ -9,6 +9,40 @@ namespace Kore
 {
     namespace RiscISA
     {
+        /// <summary>
+        /// This needs to be combined with something else because it only represents inst[6:2]
+        /// </summary>
+        public enum InstructionType : byte
+        {
+            LOAD        = 0b00_000_00, // IType
+            LOAD_FP     = 0b00_001_00, 
+            CUSTOM_0    = 0b00_010_00,
+            MISC_MEM    = 0b00_011_00, 
+            OP_IMM      = 0b00_100_00, // IType
+            AUIPC       = 0b00_101_00,
+            OP_IMM_32   = 0b00_110_00,
+            STORE       = 0b01_000_00, // SType
+            STORE_FP    = 0b01_001_00, 
+            CUSTOM_1    = 0b01_010_00,
+            AMO         = 0b01_011_00, 
+            OP          = 0b01_100_00, // RType?
+            LUI         = 0b01_101_00, //UType
+            OP_32       = 0b01_110_00,
+            MADD        = 0b10_000_00,
+            MSUB        = 0b10_001_00,
+            NMSUB       = 0b10_010_00,
+            NMADD       = 0b10_011_00,
+            OP_FP       = 0b10_100_00,
+            RESERVED_0  = 0b10_101_00, 
+            CUSTOM_2    = 0b10_110_00, // (custom-2/rv128)
+            BRANCH      = 0b11_000_00, // BType
+            JALR        = 0b11_001_00, // IType
+            RESERVED_1  = 0b11_010_00,
+            JAL         = 0b11_011_00, // JType
+            SYSTEM      = 0b11_100_00, 
+            RESERVED_2  = 0b11_101_00,
+            CUSTOM_3    = 0b11_110_00 // (custom-3/rv128)
+        }
         public enum Register : byte
         {
             //32 registers to x31
@@ -664,7 +698,7 @@ namespace Kore
                 ulong Encode();
                 void Decode(ulong data);
             }
-            public struct RType : Instruction
+            public class RType : Instruction
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -701,7 +735,7 @@ namespace Kore
                     func7 = (byte)Transcoder.to_func7(data, true);
                 }
             }
-            public struct IType : Instruction
+            public class IType : Instruction
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -732,7 +766,7 @@ namespace Kore
                     imm = (byte)Transcoder.to_imm_11_0(data, true);
                 }
             }
-            public struct SType : Instruction
+            public class SType : Instruction
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right]) 7
@@ -764,7 +798,7 @@ namespace Kore
                 }
 
             }
-            public struct BType : Instruction
+            public class BType : Instruction
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -795,7 +829,7 @@ namespace Kore
                     imm_12_10_5 = (byte)Transcoder.to_imm_12_10_5(data, true);
                 }
             }
-            public struct UType : Instruction
+            public class UType : Instruction
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -819,7 +853,7 @@ namespace Kore
                     imm_31_12 = (byte)Transcoder.to_imm_31_12(data, true);
                 }
             }
-            public struct JType : Instruction
+            public class JType : Instruction
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
