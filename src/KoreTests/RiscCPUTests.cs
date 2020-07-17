@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Kore.RiscISA;
+using Kore.RiscISA.Instruction;
 
 namespace KoreTests
 {
@@ -345,5 +346,63 @@ namespace KoreTests
             Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
         }
 
+        [TestCase("addi a3,a0,4", 0x00450693UL, INST_TYPE.IType, new ulong[] { (byte)Register.a0, 5 }, new ulong[] { (byte)Register.a3, 5 + 4 })]
+        [TestCase("addi a4,x0,1", 0x00100713UL, INST_TYPE.IType, new ulong[] { }, new ulong[] { (byte)Register.a4, 1 })]
+        [TestCase("08:1 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 9 }, new ulong[] { (byte)Register.PC, 0x08 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
+        [TestCase("08:2 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 5 }, new ulong[] { (byte)Register.PC, 0x04 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
+        [TestCase("08:3 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 4 }, new ulong[] { (byte)Register.PC, 0x04 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
+        // 20: 0x01185a63  bge      a6,a7,0x34  (+0x14)
+        // 30: 0xfe0796e3  bne      a5,x0,0x1c  (-14)
+
+        // 00008067  jalr   x0,x1,0
+        // 0006a803  lw     a6,0(a3)
+        // 00068613  addi   a2,a3,0
+        // 00070793  addi   a5,a4,0
+        // ffc62883  lw     a7,-4(a2)
+        // 01162023  sw     a7,0(a2)
+        // fff78793  addi   a5,a5,-1
+        // ffc60613  addi   a2,a2,-4
+        // 00279793  slli   a5,a5,0x2
+        // 00f507b3  add    a5,a0,a5
+        // 0107a023  sw     a6,0(a5)
+        // 00170713  addi   a4,a4,1
+        // 00468693  addi   a3,a3,4
+        // fc1ff06f  jal    x0,8
+        public void instructionTest(string inst, ulong code, INST_TYPE instT, ulong[] registerPrep, ulong[] expectation)
+        {
+            byte[] code_bin = Kore.Utility.Misc.fromDWord(code);
+            ram.store(code_bin, 0, (ulong)code_bin.Length, 0);
+
+            for (int i = 0; i < registerPrep.Length / 2; i++)
+            {
+                Register reg = (Register)registerPrep[i * 2];
+                cpu.registers.setR((Register)reg, registerPrep[i * 2 + 1]);
+                Assert.AreEqual(registerPrep[i * 2 + 1], cpu.registers.getR((Register)reg));
+            }
+
+            Assert.AreEqual(Kore.CPU.Cycle.Off, cpu.state);
+            cpu.turnOn();
+            Assert.AreEqual(Kore.CPU.Cycle.Init, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Decode, cpu.state);
+            bus.tick();
+            Assert.AreEqual(instT, cpu.currentInstructionType);
+            Assert.AreEqual(Kore.CPU.Cycle.Read, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Exec, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.Write, cpu.state);
+            bus.tick();
+            Assert.AreEqual(Kore.CPU.Cycle.MovPC, cpu.state);
+            bus.tick();
+
+            for(int i = 0; i < expectation.Length / 2; i++)
+            {
+                Register reg = (Register)expectation[i * 2];
+                Assert.AreEqual(expectation[i * 2 + 1], cpu.registers.getR((Register) reg));
+            }
+        }
     }
 }

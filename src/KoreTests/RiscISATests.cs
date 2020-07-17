@@ -238,6 +238,55 @@ namespace KoreTests
             Assert.AreEqual(Register.x29, inst.rs2);
         }
 
+        [Test]
+        public void Instruction_B_Type_Struct()
+        {
+            // 08: 0x00b76463  bltu     a4,a1,0x08  (+0x08)
+            // 20: 0x01185a63  bge      a6,a7,0x34  (+0x14)
+            // 30: 0xfe0796e3  bne      a5,x0,0x1c  (-0x14)
+            ulong bltu = 0x00b76463;
+            ulong bge = 0x01185a63;
+            ulong bne = 0xfe0796e3;
+
+            Kore.RiscISA.Instruction.BType inst = new Kore.RiscISA.Instruction.BType();
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+            Assert.AreEqual(0x00, inst.imm);
+            Assert.AreEqual(0, inst.func3);
+            Assert.AreEqual(Register.x0, inst.rs1);
+            Assert.AreEqual(Register.x0, inst.rs2);
+
+            inst.Decode(bltu);
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+            Assert.AreEqual(8, inst.imm);
+            Assert.AreEqual(0b110, inst.func3);
+            Assert.AreEqual(Register.a4, inst.rs1);
+            Assert.AreEqual(Register.a1, inst.rs2);
+
+            Assert.AreEqual(bltu, inst.Encode());
+
+            inst.Decode(bge);
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+            Assert.AreEqual(0x14, inst.imm);
+            Assert.AreEqual(0b101, inst.func3);
+            Assert.AreEqual(Register.a6, inst.rs1);
+            Assert.AreEqual(Register.a7, inst.rs2);
+
+            Assert.AreEqual(bge, inst.Encode());
+
+            inst.Decode(bne);
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+            Assert.AreEqual(-0x14, inst.imm);
+            Assert.AreEqual(0b001, inst.func3);
+            Assert.AreEqual(Register.a5, inst.rs1);
+            Assert.AreEqual(Register.x0, inst.rs2);
+
+            Assert.AreEqual(bne, inst.Encode());
+        }
+
     }
 
 }

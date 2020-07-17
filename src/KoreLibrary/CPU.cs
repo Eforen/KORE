@@ -50,7 +50,7 @@ namespace Kore
             Halt    = 0xFF
         }
 
-        public ulong currentInstruction;
+        public ulong currentInstruction, currentPC;
 
         /// <summary>
         /// Temp Instruction Register
@@ -90,6 +90,9 @@ namespace Kore
         ulong currentReadRS2 = 0;
         ulong currentExeResult = 0;
 
+        ulong currentBranch = 0;
+        bool currentBranchPending = false;
+
         public Cycle state { get; protected set; }
 
 
@@ -103,7 +106,8 @@ namespace Kore
                     break;
                 case Cycle.Fetch:
                     bus.op = MainBus.OP.ld_4b;
-                    bus.address = registers.getR(Register.PC);
+                    currentPC = registers.getR(Register.PC);
+                    bus.address = currentPC;
                     bus.data = 0;
                     break;
                 case Cycle.Decode:
@@ -139,7 +143,10 @@ namespace Kore
                         case InstructionType.OP_FP:
                         case InstructionType.RESERVED_0:
                         case InstructionType.CUSTOM_2:
+                            break;
                         case InstructionType.BRANCH:
+                            currentInstructionType = INST_TYPE.BType;
+                            break;
                         case InstructionType.JALR:
                         case InstructionType.RESERVED_1:
                         case InstructionType.JAL:
@@ -187,6 +194,8 @@ namespace Kore
                         case INST_TYPE.SType:
                             break;
                         case INST_TYPE.BType:
+                            currentReadRS1 = registers.getR(currentBType.rs1);
+                            currentReadRS2 = registers.getR(currentBType.rs2);
                             break;
                         case INST_TYPE.UType:
                             break;
@@ -220,6 +229,35 @@ namespace Kore
                                     break;
                             }
                             break;
+                        case OPCODE.BRANCH:
+                            currentBranch = (ulong)((long)currentPC + (long)currentBType.imm);
+                            switch (currentBType.func3)
+                            {
+                                case 0b000: //BEQ
+                                    currentBranchPending = currentReadRS1 == currentReadRS2;
+                                    break;
+                                case 0b001: //BNE
+                                    currentBranchPending = currentReadRS1 != currentReadRS2;
+                                    break;
+                                case 0b010: //?
+                                case 0b011: //?
+                                    break;
+                                case 0b100: //BLT (signed)
+                                    currentBranchPending = (long) currentReadRS1 < (long)currentReadRS2;
+                                    break;
+                                case 0b101: //BGE (signed)
+                                    currentBranchPending = (long)currentReadRS1 >= (long)currentReadRS2;
+                                    break;
+                                case 0b110: //BLTU (unsigned)
+                                    currentBranchPending = currentReadRS1 < currentReadRS2;
+                                    break;
+                                case 0b111: //BGEU (unsigned)
+                                    currentBranchPending = currentReadRS1 >= currentReadRS2;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -247,7 +285,8 @@ namespace Kore
                     }
                     break;
                 case Cycle.MovPC:
-                    registers.setR(Register.PC, registers.getR(Register.PC) + 0x04u);
+                    if (currentBranchPending) registers.setR(Register.PC, currentBranch);
+                    else registers.setR(Register.PC, currentPC + 0x04u);
                     break;
                 case Cycle.Halt:
                     break;
