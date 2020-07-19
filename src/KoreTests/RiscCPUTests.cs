@@ -346,13 +346,19 @@ namespace KoreTests
             Assert.AreEqual(Kore.CPU.Cycle.Fetch, cpu.state);
         }
 
-        [TestCase("addi a3,a0,4", 0x00450693UL, INST_TYPE.IType, new ulong[] { (byte)Register.a0, 5 }, new ulong[] { (byte)Register.a3, 5 + 4 })]
-        [TestCase("addi a4,x0,1", 0x00100713UL, INST_TYPE.IType, new ulong[] { }, new ulong[] { (byte)Register.a4, 1 })]
-        [TestCase("08:1 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 9 }, new ulong[] { (byte)Register.PC, 0x08 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
-        [TestCase("08:2 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 5 }, new ulong[] { (byte)Register.PC, 0x04 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
-        [TestCase("08:3 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 4 }, new ulong[] { (byte)Register.PC, 0x04 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
-        // 20: 0x01185a63  bge      a6,a7,0x34  (+0x14)
-        // 30: 0xfe0796e3  bne      a5,x0,0x1c  (-14)
+        [TestCase(0x00ul, "addi a3,a0,4", 0x00450693UL, INST_TYPE.IType, new ulong[] { (byte)Register.a0, 5 }, new ulong[] { (byte)Register.a3, 5 + 4 })]
+        [TestCase(0x00ul, "addi a4,x0,1", 0x00100713UL, INST_TYPE.IType, new ulong[] { }, new ulong[] { (byte)Register.a4, 1 })]
+        [TestCase(0x00ul, "08:1 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 9 }, new ulong[] { (byte)Register.PC, 0x08 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
+        [TestCase(0x00ul, "08:2 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 5 }, new ulong[] { (byte)Register.PC, 0x04 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
+        [TestCase(0x00ul, "08:3 0x00b76463  bltu     a4,a1,0x10  (+8)", 0x00b76463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a4, 5, (byte)Register.a1, 4 }, new ulong[] { (byte)Register.PC, 0x04 })] // if (rs1 < rs2) pc += sext(offset) {Offset from 0 not 8}
+        [TestCase(0x20ul, "20:1 0x01185a63  bge      a6,a7,0x34  (+0x14)", 0x01185a63UL, INST_TYPE.BType, new ulong[] { (byte)Register.a6, 5, (byte)Register.a7, 4 }, new ulong[] { (byte)Register.PC, 0x34 })]
+        [TestCase(0x20ul, "20:2 0x01185a63  bge      a6,a7,0x34  (+0x14)", 0x01185a63UL, INST_TYPE.BType, new ulong[] { (byte)Register.a6, 5, (byte)Register.a7, 5 }, new ulong[] { (byte)Register.PC, 0x34 })]
+        [TestCase(0x20ul, "20:3 0x01185a63  bge      a6,a7,0x34  (+0x14)", 0x01185a63UL, INST_TYPE.BType, new ulong[] { (byte)Register.a6, 5, (byte)Register.a7, 6 }, new ulong[] { (byte)Register.PC, 0x24 })]
+        [TestCase(0x20ul, "20:3 0x01185a63  bge      a6,a7,0x34  (+0x14)", 0x01185a63UL, INST_TYPE.BType, new ulong[] { (byte)Register.a6, 5, (byte)Register.a7, 0xFFFF_FFF0 }, new ulong[] { (byte)Register.PC, 0x24 })]
+        [TestCase(0x30ul, "30:1 0xfe0796e3  bne      a5,x0,0x1c  (-0x14)", 0xfe0796e3UL, INST_TYPE.BType, new ulong[] { (byte)Register.a5, 0, (byte)Register.x0, 0 }, new ulong[] { (byte)Register.PC, 0x34 })]
+        [TestCase(0x30ul, "30:2 0xfe0796e3  bne      a5,x0,0x1c  (-0x14)", 0xfe0796e3UL, INST_TYPE.BType, new ulong[] { (byte)Register.a5, 5, (byte)Register.x0, 0 }, new ulong[] { (byte)Register.PC, 0x1c })]
+        [TestCase(0x00ul, "00:1 0x02050463  beqz     a0,0x28", 0x02050463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a0, 5, (byte)Register.x0, 0 }, new ulong[] { (byte)Register.PC, 0x04 })]
+        [TestCase(0x00ul, "00:2 0x02050463  beqz     a0,0x28", 0x02050463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a0, 0, (byte)Register.x0, 0 }, new ulong[] { (byte)Register.PC, 0x28 })]
 
         // 00008067  jalr   x0,x1,0
         // 0006a803  lw     a6,0(a3)
@@ -368,10 +374,10 @@ namespace KoreTests
         // 00170713  addi   a4,a4,1
         // 00468693  addi   a3,a3,4
         // fc1ff06f  jal    x0,8
-        public void instructionTest(string inst, ulong code, INST_TYPE instT, ulong[] registerPrep, ulong[] expectation)
+        public void instructionTest(ulong startPC, string inst, ulong code, INST_TYPE instT, ulong[] registerPrep, ulong[] expectation)
         {
             byte[] code_bin = Kore.Utility.Misc.fromDWord(code);
-            ram.store(code_bin, 0, (ulong)code_bin.Length, 0);
+            ram.store(code_bin, 0, (ulong)code_bin.Length, startPC);
 
             for (int i = 0; i < registerPrep.Length / 2; i++)
             {
@@ -379,6 +385,9 @@ namespace KoreTests
                 cpu.registers.setR((Register)reg, registerPrep[i * 2 + 1]);
                 Assert.AreEqual(registerPrep[i * 2 + 1], cpu.registers.getR((Register)reg));
             }
+
+            cpu.registers.setR(Register.PC, startPC);
+            Assert.AreEqual(startPC, cpu.registers.getR(Register.PC));
 
             Assert.AreEqual(Kore.CPU.Cycle.Off, cpu.state);
             cpu.turnOn();
@@ -403,6 +412,36 @@ namespace KoreTests
                 Register reg = (Register)expectation[i * 2];
                 Assert.AreEqual(expectation[i * 2 + 1], cpu.registers.getR((Register) reg));
             }
+        }
+
+        [Test]
+        public void bgeu()
+        {
+            // No reference so uses BType
+            BType inst = new BType();
+            inst.opcode = OPCODE.BRANCH;
+            inst.func3 = 0b111;
+            inst.rs1 = Register.t0;
+            inst.rs2 = Register.t1;
+            inst.imm = 0x08;
+
+            // >=
+            instructionTest(0x08ul, "", inst.Encode(), INST_TYPE.BType, new ulong[] { (byte)Register.t0, 0, (byte)Register.t1, 0 }, new ulong[] { (byte)Register.PC, 0x10 });
+
+            this.Setup();
+            instructionTest(0x08ul, "", inst.Encode(), INST_TYPE.BType, new ulong[] { (byte)Register.t0, 5, (byte)Register.t1, 6 }, new ulong[] { (byte)Register.PC, 0x0C });
+
+            this.Setup();
+            instructionTest(0x08ul, "", inst.Encode(), INST_TYPE.BType, new ulong[] { (byte)Register.t0, 5, (byte)Register.t1, 5 }, new ulong[] { (byte)Register.PC, 0x10 });
+
+            this.Setup();
+            instructionTest(0x08ul, "", inst.Encode(), INST_TYPE.BType, new ulong[] { (byte)Register.t0, 5, (byte)Register.t1, 4 }, new ulong[] { (byte)Register.PC, 0x10 });
+
+            this.Setup();
+            instructionTest(0x08ul, "", inst.Encode(), INST_TYPE.BType, new ulong[] { (byte)Register.t0, 5, (byte)Register.t1, 0xFFFF_FF00 }, new ulong[] { (byte)Register.PC, 0x0C });
+
+            this.Setup();
+            instructionTest(0x08ul, "", inst.Encode(), INST_TYPE.BType, new ulong[] { (byte)Register.t0, 0xFFFF_FF00, (byte)Register.t1, 5 }, new ulong[] { (byte)Register.PC, 0x10 });
         }
     }
 }
