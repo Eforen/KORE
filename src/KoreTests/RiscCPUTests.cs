@@ -156,7 +156,7 @@ namespace KoreTests
             bus.tick();
             // Should now have decoded instruction
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADD, cpu.currentRType.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADD, cpu.currentRType.opcode);
             Assert.AreEqual(Register.x31, cpu.currentRType.rd);
             Assert.AreEqual(0b000, cpu.currentRType.func3);
             Assert.AreEqual(Register.x30, cpu.currentRType.rs1);
@@ -204,7 +204,7 @@ namespace KoreTests
             bus.tick();
             // Should now have decoded instruction
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, cpu.currentIType.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADDI, cpu.currentIType.opcode);
             Assert.AreEqual(Register.x29, cpu.currentIType.rd);
             Assert.AreEqual(0b000, cpu.currentIType.func3);
             Assert.AreEqual(Register.x0, cpu.currentIType.rs1);
@@ -229,7 +229,7 @@ namespace KoreTests
 
             Assert.AreSame(hold, cpu.currentIType);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, cpu.currentIType.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADDI, cpu.currentIType.opcode);
             Assert.AreEqual(Register.x30, cpu.currentIType.rd);
             Assert.AreEqual(0b000, cpu.currentIType.func3);
             Assert.AreEqual(Register.x0, cpu.currentIType.rs1);
@@ -359,25 +359,35 @@ namespace KoreTests
         [TestCase(0x30ul, "30:2 0xfe0796e3  bne      a5,x0,0x1c  (-0x14)", 0xfe0796e3UL, INST_TYPE.BType, new ulong[] { (byte)Register.a5, 5, (byte)Register.x0, 0 }, new ulong[] { (byte)Register.PC, 0x1c })]
         [TestCase(0x00ul, "00:1 0x02050463  beqz     a0,0x28", 0x02050463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a0, 5, (byte)Register.x0, 0 }, new ulong[] { (byte)Register.PC, 0x04 })]
         [TestCase(0x00ul, "00:2 0x02050463  beqz     a0,0x28", 0x02050463UL, INST_TYPE.BType, new ulong[] { (byte)Register.a0, 0, (byte)Register.x0, 0 }, new ulong[] { (byte)Register.PC, 0x28 })]
-
-        // 00008067  jalr   x0,x1,0
-        // 0006a803  lw     a6,0(a3)
-        // 00068613  addi   a2,a3,0
-        // 00070793  addi   a5,a4,0
-        // ffc62883  lw     a7,-4(a2)
-        // 01162023  sw     a7,0(a2)
-        // fff78793  addi   a5,a5,-1
-        // ffc60613  addi   a2,a2,-4
-        // 00279793  slli   a5,a5,0x2
-        // 00f507b3  add    a5,a0,a5
-        // 0107a023  sw     a6,0(a5)
-        // 00170713  addi   a4,a4,1
-        // 00468693  addi   a3,a3,4
-        // fc1ff06f  jal    x0,8
-        public void instructionTest(ulong startPC, string inst, ulong code, INST_TYPE instT, ulong[] registerPrep, ulong[] expectation)
-        {
+        //0c: 00008067  jalr   x0,x1,0
+        //48: fc1ff06f  jal    x0,8     J-Type
+        //34: 00279793  slli   a5,a5,0x2
+        //14: 00068613  addi   a2,a3,0
+        //18: 00070793  addi   a5,a4,0
+        //28: fff78793  addi   a5,a5,-1
+        //2c: ffc60613  addi   a2,a2,-4
+        //40: 00170713  addi   a4,a4,1
+        //44: 00468693  addi   a3,a3,4
+        //38: 00f507b3  add    a5,a0,a5
+        public void instructionTest(
+            ulong startPC, 
+            string inst, 
+            ulong code, 
+            INST_TYPE instT, 
+            ulong[] registerPrep, 
+            ulong[] expectation
+        ){
             byte[] code_bin = Kore.Utility.Misc.fromDWord(code);
             ram.store(code_bin, 0, (ulong)code_bin.Length, startPC);
+
+//             for (int i = 0; i < ramPrepAddr.Length; i++)
+//             {
+//                 ram.store(ramPrepData[i], 0, (uint)ramPrepData[i].Length, ramPrepAddr[i]);
+//                 for (uint m = 0; m < ramPrepData[m].Length; m++)
+//                 {
+//                     Assert.AreEqual(ramPrepData[i][m], ram.getByte(ramPrepAddr[i] + m));
+//                 }
+//             }
 
             for (int i = 0; i < registerPrep.Length / 2; i++)
             {
@@ -407,10 +417,222 @@ namespace KoreTests
             Assert.AreEqual(Kore.CPU.Cycle.MovPC, cpu.state);
             bus.tick();
 
-            for(int i = 0; i < expectation.Length / 2; i++)
+            for (int i = 0; i < expectation.Length / 2; i++)
             {
                 Register reg = (Register)expectation[i * 2];
-                Assert.AreEqual(expectation[i * 2 + 1], cpu.registers.getR((Register) reg));
+                Assert.AreEqual(expectation[i * 2 + 1], cpu.registers.getR((Register)reg), "Register "+reg+" is not set to the correct value");
+            }
+
+            //             for (int i = 0; i < expectationRam.Length / 2; i++)
+            //             {
+            //                 Register reg = (Register)expectationRam[i * 2];
+            //                 Assert.AreEqual(expectationRam[i * 2 + 1], cpu.registers.getR((Register)reg));
+            //             }
+        }
+
+        [Test]
+        public void lw()
+        {
+
+            //[TestCase(0x00ul, "00:2 0xffc62883  lw       a7,-4(a2)", 0xffc62883UL, INST_TYPE.IType, new ulong[] { (byte)Register.a7, 4*6, (byte)Register.a2, 4*12 }, new ulong[] { (byte)Register.PC, 0x04 }, new ulong[] { 0xffff_ffff }, new byte[][] { { 0 } }, new ulong[] { })]
+
+            //1c: ffc62883  lw     a7,-4(a2)
+            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 4 * 12 - 4);
+            instructionTest(0x00ul, "", 0xffc62883UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 4 * 12 },
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a7, 0xffffffff });
+
+            //10: 0006a803  lw     a6,0(a3)
+            ram.store(new byte[] { 0xFF, 0xAA, 0x77, 0x33 }, 0, 4, 4 * 16);
+            instructionTest(0x00ul, "", 0x0006a803UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a3, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0xffaa7733 });
+
+        }
+
+        [Test]
+        public void sw()
+        {
+            // Stores the four least-significant bytes in register rs2 to memory at address rs1 + sign-extend(offset)
+            // sw rs2,offset(rs1)
+            //24: 01162023  sw     a7,0(a2)
+            instructionTest(0x04ul, "", 0x7FFF_FFFF_0116_2023UL, INST_TYPE.SType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 4 * 12 },
+                new ulong[] { (byte)Register.PC, 0x08 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
+            Assert.AreEqual(0x20, ram.getByte(4 * 12 + 1));
+            Assert.AreEqual(0x16, ram.getByte(4 * 12 + 2));
+            Assert.AreEqual(0x01, ram.getByte(4 * 12 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+
+            //3c: 0107a023  sw     a6,0(a5)
+            instructionTest(0x04ul, "", 0x7FFF_FFFF_0107_A023UL, INST_TYPE.SType,
+                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a2, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x08 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
+            Assert.AreEqual(0xA0, ram.getByte(4 * 12 + 1));
+            Assert.AreEqual(0x07, ram.getByte(4 * 12 + 2));
+            Assert.AreEqual(0x01, ram.getByte(4 * 12 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+        }
+
+        [Test, Ignore("test not coded")]
+        public void sh()
+        {
+            //TODO: change this to an instruction built from S Type
+            // Stores the two least-significant bytes in register rs2 to memory at address rs1 + sign-extend(offset)
+            // sh rs2,offset(rs1)
+
+            //24: 01162023  sw     a7,0(a2)
+            instructionTest(0x04ul, "", 0x7FFF_FFFF_0116_2023UL, INST_TYPE.SType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 4 * 12 },
+                new ulong[] { (byte)Register.PC, 0x08 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
+            Assert.AreEqual(0x20, ram.getByte(4 * 12 + 1));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+
+            //3c: 0107a023  sw     a6,0(a5)
+            instructionTest(0x04ul, "", 0x7FFF_FFFF_0107_A023UL, INST_TYPE.SType,
+                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a2, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x08 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
+            Assert.AreEqual(0xA0, ram.getByte(4 * 12 + 1));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+        }
+
+        [Test, Ignore("test not coded")]
+        public void sd()
+        {
+            //TODO: change this to an instruction built from S Type
+            // Stores the all 8 bytes in register rs2 to memory at address rs1 + sign-extend(offset)
+            // sd rs2,offset(rs1)
+
+            //24: 01162023  sw     a7,0(a2)
+            instructionTest(0x04ul, "", 0x7FDD_AA99_0116_2023UL, INST_TYPE.SType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 4 * 12 },
+                new ulong[] { (byte)Register.PC, 0x08 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
+            Assert.AreEqual(0x20, ram.getByte(4 * 12 + 1));
+            Assert.AreEqual(0x16, ram.getByte(4 * 12 + 2));
+            Assert.AreEqual(0x01, ram.getByte(4 * 12 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+
+            //3c: 0107a023  sw     a6,0(a5)
+            instructionTest(0x04ul, "", 0x7FFF_FFFF_0107_A023UL, INST_TYPE.SType,
+                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a2, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x08 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
+            Assert.AreEqual(0xA0, ram.getByte(4 * 12 + 1));
+            Assert.AreEqual(0x07, ram.getByte(4 * 12 + 2));
+            Assert.AreEqual(0x01, ram.getByte(4 * 12 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+        }
+
+        [Test]
+        public void nop()
+        {
+            // Expands to `addi x0, x0, 0`
+            IType inst = new IType();
+            inst.opcode = OPCODE.B32_ADDI;
+            inst.func3 = 0b111;
+            inst.rs1 = Register.x0;
+            inst.rd = Register.x0;
+            inst.imm = 0;
+
+            Random rand = new Random();
+            for (int i = 0; i < 10; i++)
+            {
+                uint r = (uint) rand.Next(0, 200);
+                r *= 4;
+
+                this.Setup();
+                instructionTest(r, "addi x0,x0,0", inst.Encode(), INST_TYPE.IType, new ulong[] { }, new ulong[] {
+                    (byte)Register.x0, 0,
+                    (byte)Register.x1, 0,
+                    (byte)Register.x2, cpu.MemorySize - 1,
+                    (byte)Register.x3, 0,
+                    (byte)Register.x4, 0,
+                    (byte)Register.x5, 0,
+                    (byte)Register.x6, 0,
+                    (byte)Register.x7, 0,
+                    (byte)Register.x8, 0,
+                    (byte)Register.x9, 0,
+                    (byte)Register.x10, 0,
+                    (byte)Register.x11, 0,
+                    (byte)Register.x12, 0,
+                    (byte)Register.x13, 0,
+                    (byte)Register.x14, 0,
+                    (byte)Register.x15, 0,
+                    (byte)Register.x16, 0,
+                    (byte)Register.x17, 0,
+                    (byte)Register.x18, 0,
+                    (byte)Register.x19, 0,
+                    (byte)Register.x20, 0,
+                    (byte)Register.x21, 0,
+                    (byte)Register.x22, 0,
+                    (byte)Register.x23, 0,
+                    (byte)Register.x24, 0,
+                    (byte)Register.x25, 0,
+                    (byte)Register.x26, 0,
+                    (byte)Register.x27, 0,
+                    (byte)Register.x28, 0,
+                    (byte)Register.x29, 0,
+                    (byte)Register.x30, 0,
+                    (byte)Register.x31, 0,
+                    (byte)Register.PC, (r + 0x4U)
+                });
             }
         }
 
@@ -419,7 +641,7 @@ namespace KoreTests
         {
             // No reference so uses BType
             BType inst = new BType();
-            inst.opcode = OPCODE.BRANCH;
+            inst.opcode = OPCODE.B32_BRANCH;
             inst.func3 = 0b111;
             inst.rs1 = Register.t0;
             inst.rs2 = Register.t1;

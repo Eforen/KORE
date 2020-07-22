@@ -169,6 +169,9 @@ namespace KoreTests
         [Test]
         public void Instruction_I_Type_Struct()
         {
+            //1c: ffc62883  lw     a7,-4(a2)
+            //10: 0006a803  lw     a6,0(a3)
+
             // .  addi x29, x0, 5   // Add 5 and 0, and store the value to x29.
             // .  addi x30, x0, 37  // Add 37 and 0, and store the value to x30.
             //                                00    01    02    03  
@@ -192,7 +195,7 @@ namespace KoreTests
             inst.Decode(addi01);
             Assert.AreEqual(addi01, inst.Encode());
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADDI, inst.opcode);
             Assert.AreEqual(Register.x29, inst.rd);
             Assert.AreEqual(0b000, inst.func3);
             Assert.AreEqual(Register.x0, inst.rs1);
@@ -201,7 +204,7 @@ namespace KoreTests
             inst.Decode(addi02);
             Assert.AreEqual(addi02, inst.Encode());
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADDI, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADDI, inst.opcode);
             Assert.AreEqual(Register.x30, inst.rd);
             Assert.AreEqual(0b000, inst.func3);
             Assert.AreEqual(Register.x0, inst.rs1);
@@ -231,7 +234,7 @@ namespace KoreTests
             inst.Decode(add01);
             Assert.AreEqual(add01, inst.Encode());
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.ADD, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADD, inst.opcode);
             Assert.AreEqual(Register.x31, inst.rd);
             Assert.AreEqual(0b000, inst.func3);
             Assert.AreEqual(Register.x30, inst.rs1);
@@ -258,7 +261,7 @@ namespace KoreTests
 
             inst.Decode(bltu);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
             Assert.AreEqual(8, inst.imm);
             Assert.AreEqual(0b110, inst.func3);
             Assert.AreEqual(Register.a4, inst.rs1);
@@ -268,7 +271,7 @@ namespace KoreTests
 
             inst.Decode(bge);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
             Assert.AreEqual(0x14, inst.imm);
             Assert.AreEqual(0b101, inst.func3);
             Assert.AreEqual(Register.a6, inst.rs1);
@@ -278,7 +281,7 @@ namespace KoreTests
 
             inst.Decode(bne);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
             Assert.AreEqual(-0x14, inst.imm);
             Assert.AreEqual(0b001, inst.func3);
             Assert.AreEqual(Register.a5, inst.rs1);
@@ -287,6 +290,201 @@ namespace KoreTests
             Assert.AreEqual(bne, inst.Encode());
         }
 
-    }
+        [Test, Ignore("Not coded")]
+        public void Instruction_U_Type_Struct()
+        {
+            // 18: 00000097  auipc ra,0x0
+//             ulong bltu = 0x00b76463;
+//             ulong bge = 0x01185a63;
+//             ulong bne = 0xfe0796e3;
+// 
+//             Kore.RiscISA.Instruction.UType inst = new Kore.RiscISA.Instruction.UType();
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+//             Assert.AreEqual(0x00, inst.imm);
+//             Assert.AreEqual(0, inst.func3);
+//             Assert.AreEqual(Register.x0, inst.rs1);
+//             Assert.AreEqual(Register.x0, inst.rs2);
+// 
+//             inst.Decode(bltu);
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+//             Assert.AreEqual(8, inst.imm);
+//             Assert.AreEqual(0b110, inst.func3);
+//             Assert.AreEqual(Register.a4, inst.rs1);
+//             Assert.AreEqual(Register.a1, inst.rs2);
+// 
+//             Assert.AreEqual(bltu, inst.Encode());
+// 
+//             inst.Decode(bge);
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+//             Assert.AreEqual(0x14, inst.imm);
+//             Assert.AreEqual(0b101, inst.func3);
+//             Assert.AreEqual(Register.a6, inst.rs1);
+//             Assert.AreEqual(Register.a7, inst.rs2);
+// 
+//             Assert.AreEqual(bge, inst.Encode());
+// 
+//             inst.Decode(bne);
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+//             Assert.AreEqual(-0x14, inst.imm);
+//             Assert.AreEqual(0b001, inst.func3);
+//             Assert.AreEqual(Register.a5, inst.rs1);
+//             Assert.AreEqual(Register.x0, inst.rs2);
+// 
+//             Assert.AreEqual(bne, inst.Encode());
+        }
 
+        [Test, Ignore("Not coded")]
+        public void Instruction_J_Type_Struct()
+        {
+            // 08: 0x00b76463  bltu     a4,a1,0x08  (+0x08)
+            // 20: 0x01185a63  bge      a6,a7,0x34  (+0x14)
+            // 30: 0xfe0796e3  bne      a5,x0,0x1c  (-0x14)
+//             ulong bltu = 0x00b76463;
+//             ulong bge = 0x01185a63;
+//             ulong bne = 0xfe0796e3;
+// 
+//             Kore.RiscISA.Instruction.JType inst = new Kore.RiscISA.Instruction.JType();
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+//             Assert.AreEqual(0x00, inst.imm);
+//             Assert.AreEqual(0, inst.func3);
+//             Assert.AreEqual(Register.x0, inst.rs1);
+//             Assert.AreEqual(Register.x0, inst.rs2);
+// 
+//             inst.Decode(bltu);
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+//             Assert.AreEqual(8, inst.imm);
+//             Assert.AreEqual(0b110, inst.func3);
+//             Assert.AreEqual(Register.a4, inst.rs1);
+//             Assert.AreEqual(Register.a1, inst.rs2);
+// 
+//             Assert.AreEqual(bltu, inst.Encode());
+// 
+//             inst.Decode(bge);
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+//             Assert.AreEqual(0x14, inst.imm);
+//             Assert.AreEqual(0b101, inst.func3);
+//             Assert.AreEqual(Register.a6, inst.rs1);
+//             Assert.AreEqual(Register.a7, inst.rs2);
+// 
+//             Assert.AreEqual(bge, inst.Encode());
+// 
+//             inst.Decode(bne);
+// 
+//             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.BRANCH, inst.opcode);
+//             Assert.AreEqual(-0x14, inst.imm);
+//             Assert.AreEqual(0b001, inst.func3);
+//             Assert.AreEqual(Register.a5, inst.rs1);
+//             Assert.AreEqual(Register.x0, inst.rs2);
+// 
+//             Assert.AreEqual(bne, inst.Encode());
+        }
+
+        [Test]
+        public void Instruction_S_Type_Struct_Precomps()
+        {
+            //24: 01162023  sw     a7,0(a2) 0b0000000_10001_01100_010_00000_0100011
+            //3c: 0107a023  sw     a6,0(a5) 0b0000000_10000_01111_010_00000_0100011
+            ulong sw1 = 0b0000000_10001_01100_010_00000_0100011;
+            ulong sw2 = 0b0000000_10000_01111_010_00000_0100011;
+
+            Kore.RiscISA.Instruction.SType inst = new Kore.RiscISA.Instruction.SType();
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+            Assert.AreEqual(0x00, inst.imm);
+            Assert.AreEqual(0, inst.func3);
+            Assert.AreEqual(Register.x0, inst.rs1);
+            Assert.AreEqual(Register.x0, inst.rs2);
+
+            inst.Decode(sw1);
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_STORE, inst.opcode);
+            Assert.AreEqual(0x00, inst.imm);
+            Assert.AreEqual(0b010, inst.func3);
+            Assert.AreEqual(Register.a2, inst.rs1);
+            Assert.AreEqual(Register.a7, inst.rs2);
+
+            Assert.AreEqual(sw1, inst.Encode());
+
+            inst.Decode(sw2);
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_STORE, inst.opcode);
+            Assert.AreEqual(0x00, inst.imm);
+            Assert.AreEqual(0b010, inst.func3);
+            Assert.AreEqual(Register.a5, inst.rs1);
+            Assert.AreEqual(Register.a6, inst.rs2);
+
+            Assert.AreEqual(sw2, inst.Encode());
+        }
+
+        [Test]
+        public void Instruction_S_Type_Struct()
+        {
+            Kore.RiscISA.Instruction.SType inst = new Kore.RiscISA.Instruction.SType();
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+            Assert.AreEqual(0x00, inst.imm);
+            Assert.AreEqual(0, inst.func3);
+            Assert.AreEqual(Register.x0, inst.rs1);
+            Assert.AreEqual(Register.x0, inst.rs2);
+
+            Random rand = new Random();
+            bool wasRun = false;
+            for (int i = -2048; i < 0b0000_0111_1111_1111; i++)
+            {
+                if (wasRun == false) wasRun = true;
+                Register rs1 = (Register)rand.Next(0, 31);
+                Register rs2 = (Register)rand.Next(0, 31);
+                byte func3 = (byte)rand.Next(0, 0b111);
+
+                inst.opcode = (OPCODE) 0b0100011;
+                inst.rs1 = rs1;
+                inst.rs2 = rs2;
+                inst.func3 = func3;
+                inst.imm = i;
+
+                Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                Assert.AreEqual(i, inst.imm);
+                Assert.AreEqual(func3, inst.func3);
+                Assert.AreEqual(rs1, inst.rs1);
+                Assert.AreEqual(rs2, inst.rs2);
+
+                ulong code = inst.Encode();
+
+                Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                Assert.AreEqual(i, inst.imm);
+                Assert.AreEqual(func3, inst.func3);
+                Assert.AreEqual(rs1, inst.rs1);
+                Assert.AreEqual(rs2, inst.rs2);
+
+                inst.opcode = Kore.RiscISA.Instruction.OPCODE.unknown00;
+                inst.rs1 = 0;
+                inst.rs2 = 0;
+                inst.func3 = 0;
+                inst.imm = 0;
+
+                Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+                Assert.AreEqual(0x00, inst.imm);
+                Assert.AreEqual(0, inst.func3);
+                Assert.AreEqual(Register.x0, inst.rs1);
+                Assert.AreEqual(Register.x0, inst.rs2);
+
+                inst.Decode(code);
+
+                Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                Assert.AreEqual(i, inst.imm);
+                Assert.AreEqual(func3, inst.func3);
+                Assert.AreEqual(rs1, inst.rs1);
+                Assert.AreEqual(rs2, inst.rs2);
+            }
+
+            if(wasRun == false) Assert.Fail("No tests run for some reason.");
+        }
+    }
 }

@@ -408,14 +408,14 @@ namespace Kore
                 {
                     switch (op)
                     {
-                        case OPCODE.ADDI:
+                        case OPCODE.B32_ADDI:
                             return INST_TYPE.IType;
-                        case OPCODE.ADD:
+                        case OPCODE.B32_ADD:
                             return INST_TYPE.RType;
                         case OPCODE.unknown00:
                         case OPCODE.unknown01:
                         case OPCODE.unknown02:
-                        case OPCODE.LOAD_IMM:
+                        case OPCODE.B32_LOAD_IMM:
                         case OPCODE.unknown04:
                         case OPCODE.unknown05:
                         case OPCODE.unknown06:
@@ -434,7 +434,7 @@ namespace Kore
                         case OPCODE.unknown14:
                         case OPCODE.unknown15:
                         case OPCODE.unknown16:
-                        case OPCODE.AUIPC:
+                        case OPCODE.B32_AUIPC:
                         case OPCODE.unknown18:
                         case OPCODE.unknown19:
                         case OPCODE.unknown1a:
@@ -446,7 +446,7 @@ namespace Kore
                         case OPCODE.unknown20:
                         case OPCODE.unknown21:
                         case OPCODE.unknown22:
-                        case OPCODE.unknown23:
+                        case OPCODE.B32_STORE:
                         case OPCODE.unknown24:
                         case OPCODE.unknown25:
                         case OPCODE.unknown26:
@@ -509,7 +509,7 @@ namespace Kore
                         case OPCODE.unknown60:
                         case OPCODE.unknown61:
                         case OPCODE.unknown62:
-                        case OPCODE.BRANCH:
+                        case OPCODE.B32_BRANCH:
                         case OPCODE.unknown64:
                         case OPCODE.unknown65:
                         case OPCODE.unknown66:
@@ -560,7 +560,7 @@ namespace Kore
                 unknown00 = 0x00,
                 unknown01 = 0x01,
                 unknown02 = 0x02,
-                LOAD_IMM = 0x03,
+                B32_LOAD_IMM = 0b11,
                 unknown04 = 0x04,
                 unknown05 = 0x05,
                 unknown06 = 0x06,
@@ -579,11 +579,11 @@ namespace Kore
                 /// <summary>
                 /// I-Type
                 /// </summary>
-                ADDI = 0b10011, //0x13
+                B32_ADDI = 0b10011, //0x13
                 unknown14 = 0x14,
                 unknown15 = 0x15,
                 unknown16 = 0x16,
-                AUIPC = 0x17,
+                B32_AUIPC = 0b10111,
                 unknown18 = 0x18,
                 unknown19 = 0x19,
                 unknown1a = 0x1a,
@@ -595,7 +595,7 @@ namespace Kore
                 unknown20 = 0x20,
                 unknown21 = 0x21,
                 unknown22 = 0x22,
-                unknown23 = 0x23,
+                B32_STORE = 0x23,
                 unknown24 = 0x24,
                 unknown25 = 0x25,
                 unknown26 = 0x26,
@@ -614,7 +614,7 @@ namespace Kore
                 /// <summary>
                 /// R-Type
                 /// </summary>
-                ADD = 0x33,
+                B32_ADD = 0b110011,
                 unknown34 = 0x34,
                 unknown35 = 0x35,
                 unknown36 = 0x36,
@@ -662,7 +662,7 @@ namespace Kore
                 unknown60 = 0x60,
                 unknown61 = 0x61,
                 unknown62 = 0x62,
-                BRANCH = 0x63,
+                B32_BRANCH = 0b1100011,
                 unknown64 = 0x64,
                 unknown65 = 0x65,
                 unknown66 = 0x66,
@@ -772,29 +772,33 @@ namespace Kore
                 /// opcode (bits 0 to 6 [from 0 on right]) 7
                 /// </summary>
                 public Kore.RiscISA.Instruction.OPCODE opcode;
-                public byte imm_4_0;
                 public byte func3;
                 public Register rs1;
                 public Register rs2;
-                public byte imm_11_5;
+                public long imm;
 
                 public ulong Encode()
                 {
                     return (byte)opcode |
-                        Transcoder.from_imm_4_0(imm_4_0) |
+                        //Transcoder.from_imm_4_0(imm_4_0) |
                         Transcoder.from_func3(func3) |
                         Transcoder.from_rs1((byte) rs1) |
                         Transcoder.from_rs2((byte) rs2) |
-                        Transcoder.from_imm_11_5(imm_11_5);
+                        (((ulong)imm & 0b1111_1110_0000) << 20) |
+                        (((ulong)imm & 0b1_1111) << 7);
+                    //Transcoder.from_imm_11_5(imm_11_5);
                 }
                 public void Decode(ulong data)
                 {
                     opcode = (Kore.RiscISA.Instruction.OPCODE) Transcoder.to_opcode(data, true);
-                    imm_4_0 = (byte)Transcoder.to_imm_4_0(data, true);
+                    //imm_4_0 = (byte)Transcoder.to_imm_4_0(data, true);
                     func3 = (byte)Transcoder.to_func3(data, true);
                     rs1 = (Register) Transcoder.to_rs1(data, true);
                     rs2 = (Register) Transcoder.to_rs2(data, true);
-                    imm_11_5 = (byte)Transcoder.to_imm_11_5(data, true);
+                    //imm_11_5 = (byte)Transcoder.to_imm_11_5(data, true);
+                    this.imm = (short)(((data & 0x80000000) == 0x80000000 ? 0b1111_1000_0000_0000 : 0)
+                        | (ushort)((data >> 20) & 0b0111_1110_0000) // imm[10:5]
+                        | (ushort)((data >> 7) & 0b0001_1111)); // imm[4:0]
                 }
 
             }
@@ -862,18 +866,18 @@ namespace Kore
                 /// rd (bits 7 to 11 [from 0 on right])
                 /// </summary>
                 public Register rd;
-                public byte imm_31_12;
+                public long imm;
                 public ulong Encode()
                 {
                     return (byte)opcode |
-                        Transcoder.from_rd((byte) rd) |
-                        Transcoder.from_imm_31_12(imm_31_12);
+                        Transcoder.from_rd((byte)rd); //|
+                        //Transcoder.from_imm_31_12(imm_31_12);
                 }
                 public void Decode(ulong data)
                 {
                     opcode = (Kore.RiscISA.Instruction.OPCODE) Transcoder.to_opcode(data, true);
                     rd = (Register) Transcoder.to_rd(data, true);
-                    imm_31_12 = (byte)Transcoder.to_imm_31_12(data, true);
+                    //imm_31_12 = (byte)Transcoder.to_imm_31_12(data, true);
                 }
             }
             public class JType : Instruction
@@ -886,19 +890,19 @@ namespace Kore
                 /// rd (bits 7 to 11 [from 0 on right])
                 /// </summary>
                 public Register rd;
-                public byte imm_20_10_1_11_19_12;
+                public long imm;
 
                 public ulong Encode()
                 {
                     return (byte)opcode |
-                        Transcoder.from_rd((byte) rd) |
-                        Transcoder.from_imm_20_10_1_11_19_12(imm_20_10_1_11_19_12);
+                        Transcoder.from_rd((byte)rd); //|
+                        //Transcoder.from_imm_20_10_1_11_19_12(imm_20_10_1_11_19_12);
                 }
                 public void Decode(ulong data)
                 {
                     opcode = (Kore.RiscISA.Instruction.OPCODE) Transcoder.to_opcode(data, true);
                     rd = (Register) Transcoder.to_rd(data, true);
-                    imm_20_10_1_11_19_12 = (byte)Transcoder.to_imm_20_10_1_11_19_12(data, true);
+                    //imm_20_10_1_11_19_12 = (byte)Transcoder.to_imm_20_10_1_11_19_12(data, true);
                 }
             }
         }

@@ -209,7 +209,7 @@ namespace Kore
                 case Cycle.Exec:
                     switch ((OPCODE) currenOPCODE)
                     {
-                        case OPCODE.ADDI: //ADDI is not the correct term for this but I have not gotten to the correct one yet
+                        case OPCODE.B32_ADDI: //ADDI is not the correct term for this but I have not gotten to the correct one yet
                             switch (currentIType.func3)
                             {
                                 case 0b000: //ADDI
@@ -219,7 +219,7 @@ namespace Kore
                                     break;
                             }
                             break;
-                        case OPCODE.ADD: //ADD is not the correct term for this but I have not gotten to the correct one yet
+                        case OPCODE.B32_ADD: //ADD is not the correct term for this but I have not gotten to the correct one yet
                             switch (currentIType.func3)
                             {
                                 case 0b000: //ADD
@@ -229,7 +229,7 @@ namespace Kore
                                     break;
                             }
                             break;
-                        case OPCODE.BRANCH:
+                        case OPCODE.B32_BRANCH:
                             currentBranch = (ulong)((long)currentPC + (long)currentBType.imm);
                             switch (currentBType.func3)
                             {
