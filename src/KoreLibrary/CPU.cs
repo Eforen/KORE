@@ -213,7 +213,7 @@ namespace Kore
                             switch (currentIType.func3)
                             {
                                 case 0b000: //ADDI
-                                    currentExeResult = currentReadRS1 + currentIType.imm;
+                                    currentExeResult = (ulong)((long)currentReadRS1 + currentIType.imm);
                                     break;
                                 default:
                                     break;

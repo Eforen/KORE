@@ -747,15 +747,19 @@ namespace Kore
                 public Register rd;
                 public byte func3;
                 public Register rs1;
-                public byte imm;
+                public int imm;
 
                 public ulong Encode()
                 {
-                    return (byte) opcode |
-                        Transcoder.from_rd((byte) rd) |
+                    return (byte)opcode |
+                        Transcoder.from_rd((byte)rd) |
                         Transcoder.from_func3(func3) |
-                        Transcoder.from_rs1((byte) rs1) |
-                        Transcoder.from_imm_11_0(imm);
+                        Transcoder.from_rs1((byte)rs1) |
+                        ((ulong)imm << 20);
+                        //Transcoder.from_imm_11_0((uint)imm);
+                        //31:20
+                        // 0b11111111_11110000_00000000_00000000
+
                 }
                 public void Decode(ulong data)
                 {
@@ -763,7 +767,8 @@ namespace Kore
                     rd = (Register) Transcoder.to_rd(data, true);
                     func3 = (byte)Transcoder.to_func3(data, true);
                     rs1 = (Register) Transcoder.to_rs1(data, true);
-                    imm = (byte)Transcoder.to_imm_11_0(data, true);
+                    //imm = (int)Transcoder.to_imm_11_0(data, true);
+                    imm = (int)((int)(0b11111111_11110000_00000000_00000000 & data) << 32 >> 32 >> 20);
                 }
             }
             public class SType : Instruction
@@ -890,18 +895,34 @@ namespace Kore
                 /// rd (bits 7 to 11 [from 0 on right])
                 /// </summary>
                 public Register rd;
-                public long imm;
+                public int imm;
 
                 public ulong Encode()
                 {
+                    // imm
                     return (byte)opcode |
-                        Transcoder.from_rd((byte)rd); //|
-                        //Transcoder.from_imm_20_10_1_11_19_12(imm_20_10_1_11_19_12);
+                        Transcoder.from_rd((byte)rd) |
+                        (((uint)imm) & 0b00000000_00010000_00000000_00000000ul) << 11 | // inst[31] imm[20]
+                        ((uint)imm) & 0b00000000_00001111_11110000_00000000ul | //inst|imm [19:12] no shift needed which is nice
+                        (((uint)imm) & 0b00000000_00000000_00001000_00000000ul) << 9 | // inst[20] imm[11]
+                        (((uint)imm) & 0b00000000_00000000_00000111_11111110ul) << 20; // inst[30:12] imm[10:1]
+                                                                                      // imm has no bit 0 usage
+                                                                                      // Convert.ToString((uint)imm,2).PadLeft(64,'0')	                            "0b00000000000000000000000000000000_11111111_11111111_11111000_00000000"
+                                                                                      // Convert.ToString((int)(((uint)imm) & 0x8000_0000) >> 12,2).PadLeft(64,'0')	"0b00000000000000000000000000000000_11111111_11111000_00000000_00000000"	string
+                                                                                      // 0b0000000000000000000000000000000000000000_0001_0000_00000000_00000000
                 }
                 public void Decode(ulong data)
                 {
                     opcode = (Kore.RiscISA.Instruction.OPCODE) Transcoder.to_opcode(data, true);
                     rd = (Register) Transcoder.to_rd(data, true);
+                    imm = (int)(
+                        (uint)((int)((uint)(data & 0x8000_0000)) >> 11) & 0b11111111_11110000_00000000_00000000u | // inst[31] imm[20]
+                        data & 0b00000000_00001111_11110000_00000000u | //inst|imm [19:12] no shift needed which is nice
+                        ((uint)data >> 9) & 0b00000000_00000000_00001000_00000000u | // inst[20] imm[11]
+                        ((uint)data >> 20) & 0b00000000_00000000_00000111_11111110u // inst[30:12] imm[10:1]
+                        );
+                    //((ulong)imm) & 0b00000000_00000000_00000000_00000000_00000000_00011111_11100000_00000000ul << 10 | //inst[19:12]
+                    //((ulong)imm) & 0b00000000_00000000_00000000_00000000_00000000_00100000_00000000_00000000ul << 11; // 11
                     //imm_20_10_1_11_19_12 = (byte)Transcoder.to_imm_20_10_1_11_19_12(data, true);
                 }
             }
