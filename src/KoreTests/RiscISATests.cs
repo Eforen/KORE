@@ -324,6 +324,11 @@ namespace KoreTests
             Assert.AreEqual(Register.x29, inst.rs2);
         }
 
+        [Test, Ignore("Needs Code")]
+        public void Instruction_R_Type_Struct_FullRange()
+        {
+        }
+
         [Test]
         public void Instruction_B_Type_Struct_Precomp()
         {
@@ -371,6 +376,11 @@ namespace KoreTests
             Assert.AreEqual(Register.x0, inst.rs2);
 
             Assert.AreEqual(bne, inst.Encode());
+        }
+
+        [Test, Ignore("Needs Code")]
+        public void Instruction_B_Type_Struct_FullRange()
+        {
         }
 
         [Test, Ignore("Needs Example")]
