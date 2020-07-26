@@ -447,9 +447,87 @@ namespace KoreTests
             Assert.AreEqual(bne, inst.Encode());
         }
 
-        [Test, Ignore("Needs Code")]
+        [Test]
         public void Instruction_B_Type_Struct_FullRange()
         {
+            Kore.RiscISA.Instruction.BType inst = new Kore.RiscISA.Instruction.BType();
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+            Assert.AreEqual(0x00, inst.imm);
+            Assert.AreEqual(0, inst.func3);
+            Assert.AreEqual(Register.x0, inst.rs1);
+            Assert.AreEqual(Register.x0, inst.rs2);
+
+            Random rand = new Random();
+            bool wasRun = false;
+#if FULLTEST
+            for (Register rs1 = 0; rs1 <= Register.x31; rs1++)
+            {
+                for (Register rs2 = 0; rs2 <= Register.x31; rs2++)
+                {
+#else
+                    Register rs1 = (Register)rand.Next(0, 31);
+                    Register rs2 = (Register)rand.Next(0, 31);
+                    // byte func3 = (byte)rand.Next(0, 0b111);
+#endif
+                    for (byte func3 = 0; func3 <= 0b111; func3++)
+                    {
+                        for (int ii = 0; ii < 4095; ii++)
+                        {
+                            short i = (short)(ii << 21 >> 20); // 1st bit is not used of so we shift to end of int and then back but we shift back one less so we sign extend and shift to correct position at the same time.
+                            
+                            if (wasRun == false) wasRun = true;
+                            // Register rs1 = (Register)rand.Next(0, 31);
+                            // Register rs2 = (Register)rand.Next(0, 31);
+                            // byte func3 = (byte)rand.Next(0, 0b111);
+
+                            inst.opcode = (OPCODE)0b0100011;
+                            inst.rs1 = rs1;
+                            inst.rs2 = rs2;
+                            inst.func3 = func3;
+                            inst.imm = i;
+
+                            Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                            Assert.AreEqual(i, inst.imm);
+                            Assert.AreEqual(func3, inst.func3);
+                            Assert.AreEqual(rs1, inst.rs1);
+                            Assert.AreEqual(rs2, inst.rs2);
+
+                            ulong code = inst.Encode();
+
+                            Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                            Assert.AreEqual(i, inst.imm);
+                            Assert.AreEqual(func3, inst.func3);
+                            Assert.AreEqual(rs1, inst.rs1);
+                            Assert.AreEqual(rs2, inst.rs2);
+
+                            inst.opcode = Kore.RiscISA.Instruction.OPCODE.unknown00;
+                            inst.rs1 = 0;
+                            inst.rs2 = 0;
+                            inst.func3 = 0;
+                            inst.imm = 0;
+
+                            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+                            Assert.AreEqual(0x00, inst.imm);
+                            Assert.AreEqual(0, inst.func3);
+                            Assert.AreEqual(Register.x0, inst.rs1);
+                            Assert.AreEqual(Register.x0, inst.rs2);
+
+                            inst.Decode(code);
+
+                            Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                            Assert.AreEqual(i, inst.imm);
+                            Assert.AreEqual(func3, inst.func3);
+                            Assert.AreEqual(rs1, inst.rs1);
+                            Assert.AreEqual(rs2, inst.rs2);
+                        }
+                    }
+#if FULLTEST
+                }
+            }
+#endif
+
+            if (wasRun == false) Assert.Fail("No tests run for some reason.");
         }
 
         [Test, Ignore("Needs Example")]

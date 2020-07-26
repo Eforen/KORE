@@ -2,11 +2,11 @@
 * Replace conditional negitives and replace with bitwise shifting for handelling of sign extensions (if tests show they are faster)
 * Program JType Precom Tests
 * Program UType Precom Tests
-* Program BType Full Range Tests
 
 # Working On
 
 # Finished
+* Program BType Full Range Tests
 * Program RType Full Range Tests
 * Program UType Full Range Tests
 * Program JType Full Range Tests
