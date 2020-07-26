@@ -324,9 +324,78 @@ namespace KoreTests
             Assert.AreEqual(Register.x29, inst.rs2);
         }
 
-        [Test, Ignore("Needs Code")]
+        [Test]
         public void Instruction_R_Type_Struct_FullRange()
         {
+            
+            Kore.RiscISA.Instruction.RType inst = new Kore.RiscISA.Instruction.RType();
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+            Assert.AreEqual(0, inst.func3);
+            Assert.AreEqual(Register.x0, inst.rd);
+            Assert.AreEqual(Register.x0, inst.rs1);
+            Assert.AreEqual(Register.x0, inst.rs2);
+
+            Random rand = new Random();
+            bool wasRun = false;
+            for (Register rd = 0; rd <= Register.x31; rd++)
+            {
+                for (Register rs1 = 0; rs1 <= Register.x31; rs1++)
+                {
+                    for (Register rs2 = 0; rs2 <= Register.x31; rs2++)
+                    {
+                        for (byte func3 = 0; func3 <= 0b111; func3++)
+                        {
+                            if (wasRun == false) wasRun = true;
+                            // Register rs1 = (Register)rand.Next(0, 31);
+                            // Register rs2 = (Register)rand.Next(0, 31);
+                            // byte func3 = (byte)rand.Next(0, 0b111);
+
+                            inst.opcode = OPCODE.B32_ADD;
+                            inst.rd = rd;
+                            inst.rs1 = rs1;
+                            inst.rs2 = rs2;
+                            inst.func3 = func3;
+
+                            Assert.AreEqual(OPCODE.B32_ADD, inst.opcode);
+                            Assert.AreEqual(func3, inst.func3);
+                            Assert.AreEqual(rd, inst.rd);
+                            Assert.AreEqual(rs1, inst.rs1);
+                            Assert.AreEqual(rs2, inst.rs2);
+
+                            ulong code = inst.Encode();
+
+                            Assert.AreEqual(OPCODE.B32_ADD, inst.opcode);
+                            Assert.AreEqual(func3, inst.func3);
+                            Assert.AreEqual(rd, inst.rd);
+                            Assert.AreEqual(rs1, inst.rs1);
+                            Assert.AreEqual(rs2, inst.rs2);
+
+                            inst.opcode = Kore.RiscISA.Instruction.OPCODE.unknown00;
+                            inst.rd = 0;
+                            inst.rs1 = 0;
+                            inst.rs2 = 0;
+                            inst.func3 = 0;
+
+                            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+                            Assert.AreEqual(0, inst.func3);
+                            Assert.AreEqual(Register.x0, inst.rd);
+                            Assert.AreEqual(Register.x0, inst.rs1);
+                            Assert.AreEqual(Register.x0, inst.rs2);
+
+                            inst.Decode(code);
+
+                            Assert.AreEqual(OPCODE.B32_ADD, inst.opcode);
+                            Assert.AreEqual(func3, inst.func3);
+                            Assert.AreEqual(rd, inst.rd);
+                            Assert.AreEqual(rs1, inst.rs1);
+                            Assert.AreEqual(rs2, inst.rs2);
+                        }
+                    }
+                }
+            }
+
+            if (wasRun == false) Assert.Fail("No tests run for some reason.");
         }
 
         [Test]
