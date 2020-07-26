@@ -261,31 +261,31 @@ namespace KoreTests
         public void Instruction_J_Type()
         {
         }
-
-        [Test, Ignore("Not made yet")]
-        public void Instruction_I_immediate()
-        {
-        }
-
-        [Test, Ignore("Not made yet")]
-        public void Instruction_S_immediate()
-        {
-        }
-
-        [Test, Ignore("Not made yet")]
-        public void Instruction_B_immediate()
-        {
-        }
-
-        [Test, Ignore("Not made yet")]
-        public void Instruction_U_immediate()
-        {
-        }
-
-        [Test, Ignore("Not made yet")]
-        public void Instruction_J_immediate()
-        {
-        }
+// 
+//         [Test, Ignore("Not made yet")]
+//         public void Instruction_I_immediate()
+//         {
+//         }
+// 
+//         [Test, Ignore("Not made yet")]
+//         public void Instruction_S_immediate()
+//         {
+//         }
+// 
+//         [Test, Ignore("Not made yet")]
+//         public void Instruction_B_immediate()
+//         {
+//         }
+// 
+//         [Test, Ignore("Not made yet")]
+//         public void Instruction_U_immediate()
+//         {
+//         }
+// 
+//         [Test, Ignore("Not made yet")]
+//         public void Instruction_J_immediate()
+//         {
+//         }
     }
     class RiscV64iInstructions
     {
