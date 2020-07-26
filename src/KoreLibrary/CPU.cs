@@ -88,10 +88,20 @@ namespace Kore
 
         ulong currentReadRS1 = 0;
         ulong currentReadRS2 = 0;
-        ulong currentExeResult = 0;
 
         ulong currentBranch = 0;
         bool currentBranchPending = false;
+
+        public enum PIPELINE_WRITE_MODE
+        {
+            NOP,
+            WRITE_REGISTER,
+            WRITE_MEMORY
+        }
+        public PIPELINE_WRITE_MODE pipeWriteMode { get; private set; }
+        public ulong pipeWriteData = 0;
+        public ulong pipeWriteAddress = 0;
+        public byte pipeWriteByteCount = 0;
 
         public Cycle state { get; protected set; }
 
@@ -131,6 +141,8 @@ namespace Kore
                             currentInstructionType = INST_TYPE.IType;
                             break;
                         case InstructionType.STORE:
+                            currentInstructionType = INST_TYPE.SType;
+                            break;
                         case InstructionType.STORE_FP:
                         case InstructionType.CUSTOM_1:
                         case InstructionType.AMO:
@@ -192,6 +204,8 @@ namespace Kore
                             currentReadRS1 = registers.getR(currentIType.rs1);
                             break;
                         case INST_TYPE.SType:
+                            currentReadRS1 = registers.getR(currentSType.rs1);
+                            currentReadRS2 = registers.getR(currentSType.rs2); 
                             break;
                         case INST_TYPE.BType:
                             currentReadRS1 = registers.getR(currentBType.rs1);
@@ -213,7 +227,10 @@ namespace Kore
                             switch (currentIType.func3)
                             {
                                 case 0b000: //ADDI
-                                    currentExeResult = (ulong)((long)currentReadRS1 + currentIType.imm);
+                                    pipeWriteMode = PIPELINE_WRITE_MODE.WRITE_REGISTER;
+                                    pipeWriteAddress = (ulong)currentRType.rd;
+                                    pipeWriteData = (ulong)((long)currentReadRS1 + currentIType.imm);
+                                    pipeWriteByteCount = 8;
                                     break;
                                 default:
                                     break;
@@ -223,7 +240,10 @@ namespace Kore
                             switch (currentIType.func3)
                             {
                                 case 0b000: //ADD
-                                    currentExeResult = currentReadRS1 + currentReadRS2;
+                                    pipeWriteMode = PIPELINE_WRITE_MODE.WRITE_REGISTER;
+                                    pipeWriteAddress = (ulong)currentRType.rd;
+                                    pipeWriteData = currentReadRS1 + currentReadRS2;
+                                    pipeWriteByteCount = 8;
                                     break;
                                 default:
                                     break;
@@ -258,31 +278,68 @@ namespace Kore
                                     break;
                             }
                             break;
+                        case OPCODE.B32_STORE_S:
+                            pipeWriteMode = PIPELINE_WRITE_MODE.WRITE_MEMORY;
+                            pipeWriteAddress = (ulong)((long) currentReadRS1 + currentSType.imm);
+                            pipeWriteData = currentReadRS2;
+                            switch ((FUNC3_MEMORY)currentSType.func3)
+                            {
+                                case FUNC3_MEMORY.BYTE:
+                                    pipeWriteByteCount = 1;
+                                    break;
+                                case FUNC3_MEMORY.HALFWORD:
+                                    pipeWriteByteCount = 2;
+                                    break;
+                                case FUNC3_MEMORY.WORD:
+                                    pipeWriteByteCount = 4;
+                                    break;
+                                case FUNC3_MEMORY.DOUBLEWORD:
+                                    pipeWriteByteCount = 8;
+                                    break;
+                                default:
+                                    throw new Exception("KORE HARDWARE PANIC", new Exception("Unsigned FUNC3 Store OPs are not supported."));
+                            }
+                            break;
                         default:
                             break;
                     }
                     break;
                 case Cycle.Write:
-                    switch (currentInstructionType)
+                    switch (pipeWriteMode)
                     {
-                        case INST_TYPE.RType:
-                            registers.setR(currentRType.rd, currentExeResult);
+                        case PIPELINE_WRITE_MODE.NOP:
                             break;
-                        case INST_TYPE.IType:
-                            registers.setR(currentIType.rd, currentExeResult);
+                        case PIPELINE_WRITE_MODE.WRITE_REGISTER:
+                            registers.setR((Register)pipeWriteAddress, pipeWriteData);
                             break;
-                        case INST_TYPE.SType:
+                        case PIPELINE_WRITE_MODE.WRITE_MEMORY:
+                            switch (pipeWriteByteCount)
+                            {
+                                case 1:
+                                    bus.op = MainBus.OP.st_1b;
+                                    break;
+                                case 2:
+                                    bus.op = MainBus.OP.st_2b;
+                                    break;
+                                case 4:
+                                    bus.op = MainBus.OP.st_4b;
+                                    break;
+                                case 8:
+                                    bus.op = MainBus.OP.st_8b;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            bus.address = pipeWriteAddress;
+                            bus.data = pipeWriteData;
                             break;
-                        case INST_TYPE.BType:
-                            break;
-                        case INST_TYPE.UType:
-                            break;
-                        case INST_TYPE.JType:
-                            break;
-                        case INST_TYPE.Unkwn:
                         default:
-                            throw new NotImplementedException("Instruction Type Not Set Correctly");
+                            break;
                     }
+                    pipeWriteMode = PIPELINE_WRITE_MODE.NOP;
+                    pipeWriteData = 0;
+                    pipeWriteAddress = 0;
+                    pipeWriteByteCount = 0;
                     break;
                 case Cycle.MovPC:
                     if (currentBranchPending) registers.setR(Register.PC, currentBranch);

@@ -446,11 +446,11 @@ namespace Kore
                         case OPCODE.unknown20:
                         case OPCODE.unknown21:
                         case OPCODE.unknown22:
-                        case OPCODE.B32_STORE:
+                        case OPCODE.B32_STORE_S:
                         case OPCODE.unknown24:
                         case OPCODE.unknown25:
                         case OPCODE.unknown26:
-                        case OPCODE.unknown27:
+                        case OPCODE.B32_STORE_R:
                         case OPCODE.unknown28:
                         case OPCODE.unknown29:
                         case OPCODE.unknown2a:
@@ -554,6 +554,26 @@ namespace Kore
                 UType = 0x05,
                 JType = 0x06
             }
+
+            public enum FUNC3_MEMORY : byte
+            {
+                /// <summary> 1 Byte </summary>
+                BYTE = 0b000,
+                /// <summary> 2 Bytes </summary>
+                HALFWORD = 0b001,
+                /// <summary> 4 Bytes </summary>
+                WORD = 0b010,
+                /// <summary> 8 Bytes </summary>
+                DOUBLEWORD = 0b011,
+                /// <summary> Unknown Function 01 </summary>
+                UNSIGNED_BYTE = 0b100,
+                /// <summary> Unknown Function 02 </summary>
+                UNSIGNED_HALFWORD = 0b101,
+                /// <summary> Unknown Function 03 </summary>
+                UNSIGNED_WORD = 0b110,
+                /// <summary> Unknown Function 04 </summary>
+                UNSIGNED_DOUBLEWORD = 0b111
+            }
             
             public enum OPCODE : byte
             {
@@ -576,10 +596,8 @@ namespace Kore
                 unknown10 = 0x10,
                 unknown11 = 0x11,
                 unknown12 = 0x12,
-                /// <summary>
-                /// I-Type
-                /// </summary>
-                B32_ADDI = 0b10011, //0x13
+                /// <summary> I-Type </summary>
+                B32_ADDI = 0b0010011, //0x13
                 unknown14 = 0x14,
                 unknown15 = 0x15,
                 unknown16 = 0x16,
@@ -595,11 +613,13 @@ namespace Kore
                 unknown20 = 0x20,
                 unknown21 = 0x21,
                 unknown22 = 0x22,
-                B32_STORE = 0x23,
+                /// <summary> S-Type Store </summary>
+                B32_STORE_S = 0b0100011,
                 unknown24 = 0x24,
                 unknown25 = 0x25,
                 unknown26 = 0x26,
-                unknown27 = 0x27,
+                /// <summary> R-Type Store </summary>
+                B32_STORE_R = 0b0100111,
                 unknown28 = 0x28,
                 unknown29 = 0x29,
                 unknown2a = 0x2a,
@@ -616,7 +636,7 @@ namespace Kore
                 /// </summary>
                 B32_ADD = 0b110011,
                 unknown34 = 0x34,
-                unknown35 = 0x35,
+                unknown35 = 0b0110101,
                 unknown36 = 0x36,
                 unknown37 = 0x37,
                 unknown38 = 0x38,

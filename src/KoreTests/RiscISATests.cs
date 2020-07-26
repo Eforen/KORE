@@ -727,7 +727,7 @@ namespace KoreTests
 
             inst.Decode(sw1);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_STORE, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_STORE_S, inst.opcode);
             Assert.AreEqual(0x00, inst.imm);
             Assert.AreEqual(0b010, inst.func3);
             Assert.AreEqual(Register.a2, inst.rs1);
@@ -737,7 +737,7 @@ namespace KoreTests
 
             inst.Decode(sw2);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_STORE, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_STORE_S, inst.opcode);
             Assert.AreEqual(0x00, inst.imm);
             Assert.AreEqual(0b010, inst.func3);
             Assert.AreEqual(Register.a5, inst.rs1);

@@ -4,8 +4,11 @@
 * Program UType Precom Tests
 
 # Working On
+* write tests for all SType Store Instructions
 
 # Finished
+* Impliment Assembly OP SW
+* Refactor Write Cycle to Generalize
 * Program BType Full Range Tests
 * Program RType Full Range Tests
 * Program UType Full Range Tests
