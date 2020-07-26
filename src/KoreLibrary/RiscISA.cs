@@ -863,6 +863,8 @@ namespace Kore
             }
             public class UType : Instruction
             {
+                private const uint immMask = 0b11111111_11111111_11110000_00000000u;
+
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
                 /// </summary>
@@ -871,17 +873,19 @@ namespace Kore
                 /// rd (bits 7 to 11 [from 0 on right])
                 /// </summary>
                 public Register rd;
-                public long imm;
+                public int imm;
                 public ulong Encode()
                 {
                     return (byte)opcode |
-                        Transcoder.from_rd((byte)rd); //|
+                        Transcoder.from_rd((byte)rd) |
+                        (ulong) ((uint) imm & immMask);
                         //Transcoder.from_imm_31_12(imm_31_12);
                 }
                 public void Decode(ulong data)
                 {
                     opcode = (Kore.RiscISA.Instruction.OPCODE) Transcoder.to_opcode(data, true);
                     rd = (Register) Transcoder.to_rd(data, true);
+                    imm = (int) ((uint)data & immMask);
                     //imm_31_12 = (byte)Transcoder.to_imm_31_12(data, true);
                 }
             }

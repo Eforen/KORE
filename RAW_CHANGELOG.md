@@ -4,11 +4,11 @@
 * Program UType Precom Tests
 * Program BType Full Range Tests
 * Program RType Full Range Tests
-* Program UType Full Range Tests
 
 # Working On
 
 # Finished
+* Program UType Full Range Tests
 * Program JType Full Range Tests
 * Program IType Full Range Tests
 * Expand S Type Full range test to include registers

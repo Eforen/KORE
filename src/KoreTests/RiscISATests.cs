@@ -389,10 +389,109 @@ namespace KoreTests
             // lui
         }
 
-        [Test, Ignore("Needs Example")]
+        [Test]
         public void Instruction_U_Type_Struct_FullRange()
         {
-            // lui
+            //The lower 12 bits are all not used by the imm so we will be testing multiples of 4,096
+            
+            Kore.RiscISA.Instruction.UType inst = new Kore.RiscISA.Instruction.UType();
+
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+            Assert.AreEqual(0x00, inst.imm);
+            Assert.AreEqual(Register.x0, inst.rd);
+
+            Random rand = new Random();
+            bool wasRun = false;
+#if FULLTEST
+            for (Register rd = 0; rd <= Register.x31; rd++)
+            {
+#else
+                Register rd = (Register)rand.Next(0, 31);
+#endif
+                bool secondHalf = false;
+                for (int ii = 0; ii <= 0b00000000_00001111_11111111_11111111; ii++) // By 2 because the imm[0] is not used
+                {
+                    int i = ii << 12;
+                    if (wasRun == false) wasRun = true;
+                    if (i < 0 && secondHalf)
+                    {
+                        // Has looped over onto itself
+                        // So drop out and do all 1s test
+                        break;
+                    }
+                    else if(i > 0 && secondHalf == false)
+                    {
+                        secondHalf = true;
+                    }
+                    // Register rs1 = (Register)rand.Next(0, 31);
+                    // Register rs2 = (Register)rand.Next(0, 31);
+                    // byte func3 = (byte)rand.Next(0, 0b111);
+
+                    inst.opcode = (OPCODE)0b0100011;
+                    inst.rd = rd;
+                    inst.imm = i;
+
+                    Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                    Assert.AreEqual(i, inst.imm);
+                    Assert.AreEqual(rd, inst.rd);
+
+                    ulong code = inst.Encode();
+
+                    Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                    Assert.AreEqual(i, inst.imm);
+                    Assert.AreEqual(rd, inst.rd);
+
+                    inst.opcode = Kore.RiscISA.Instruction.OPCODE.unknown00;
+                    inst.rd = 0;
+                    inst.imm = 0;
+
+                    Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+                    Assert.AreEqual(0x00, inst.imm);
+                    Assert.AreEqual(Register.x0, inst.rd);
+
+                    inst.Decode(code);
+
+                    Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                    Assert.AreEqual(rd, inst.rd);
+                    Assert.AreEqual(i, inst.imm);
+                }
+
+                // Just run it all one more time cause I am too lazy to do the math
+
+//                 int last = (int)0b01111111_11111111_11110000_00000000u;
+//                 inst.opcode = (OPCODE)0b0100011;
+//                 inst.rd = rd;
+//                 inst.imm = last;
+// 
+//                 Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+//                 Assert.AreEqual(last, inst.imm);
+//                 Assert.AreEqual(rd, inst.rd);
+// 
+//                 ulong code2 = inst.Encode();
+// 
+//                 Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+//                 Assert.AreEqual(last, inst.imm);
+//                 Assert.AreEqual(rd, inst.rd);
+// 
+//                 inst.opcode = Kore.RiscISA.Instruction.OPCODE.unknown00;
+//                 inst.rd = 0;
+//                 inst.imm = 0;
+// 
+//                 Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.unknown00, inst.opcode);
+//                 Assert.AreEqual(0x00, inst.imm);
+//                 Assert.AreEqual(Register.x0, inst.rd);
+// 
+//                 inst.Decode(code2);
+// 
+//                 Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+//                 Assert.AreEqual(rd, inst.rd);
+//                 Assert.AreEqual(last, inst.imm);
+#if FULLTEST
+            }
+#endif
+
+            if (wasRun == false) Assert.Fail("No tests run for some reason.");
+
         }
 
         [Test, Ignore("Needs Example")]
