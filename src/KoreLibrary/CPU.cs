@@ -228,7 +228,7 @@ namespace Kore
                             {
                                 case 0b000: //ADDI
                                     pipeWriteMode = PIPELINE_WRITE_MODE.WRITE_REGISTER;
-                                    pipeWriteAddress = (ulong)currentRType.rd;
+                                    pipeWriteAddress = (ulong)currentIType.rd;
                                     pipeWriteData = (ulong)((long)currentReadRS1 + currentIType.imm);
                                     pipeWriteByteCount = 8;
                                     break;
