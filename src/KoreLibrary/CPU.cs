@@ -96,7 +96,8 @@ namespace Kore
         {
             NOP,
             WRITE_REGISTER,
-            WRITE_MEMORY
+            WRITE_MEMORY,
+            LOAD_TO_REGISTER,
         }
         public PIPELINE_WRITE_MODE pipeWriteMode { get; private set; }
         public ulong pipeWriteData = 0;
@@ -125,13 +126,15 @@ namespace Kore
                     InstructionType op = (InstructionType)(0b0111_1100 & currenOPCODE);
                     switch (op)
                     {
+                        case InstructionType.LOAD:
+                            currentInstructionType = INST_TYPE.IType;
+                            break;
                         case InstructionType.OP:
                             currentInstructionType = INST_TYPE.RType;
                             break;
                         case InstructionType.OP_IMM:
                             currentInstructionType = INST_TYPE.IType;
                             break;
-                        case InstructionType.LOAD:
                         case InstructionType.LOAD_FP:
                         case InstructionType.CUSTOM_0:
                         case InstructionType.MISC_MEM:
@@ -223,6 +226,46 @@ namespace Kore
                 case Cycle.Exec:
                     switch ((OPCODE) currenOPCODE)
                     {
+                        case OPCODE.B32_LOAD_IMM:
+                            bus.address = (ulong)((long)currentReadRS1 + currentIType.imm); //Set target Address
+                            bus.data = 0; //Clear the bus
+
+                            pipeWriteMode = PIPELINE_WRITE_MODE.LOAD_TO_REGISTER; // Tell write cycle what we want to do.
+                            pipeWriteAddress = (byte)currentIType.rd; // Tell write cycle where we want to do it.
+                            switch ((FUNC3_MEMORY)currentIType.func3)
+                            {
+                                case FUNC3_MEMORY.UNSIGNED_BYTE:
+                                case FUNC3_MEMORY.BYTE:
+                                    pipeWriteByteCount = 1;
+                                    bus.op = MainBus.OP.ld_1b;
+                                    break;
+                                case FUNC3_MEMORY.UNSIGNED_HALFWORD:
+                                case FUNC3_MEMORY.HALFWORD:
+                                    pipeWriteByteCount = 2;
+                                    bus.op = MainBus.OP.ld_2b;
+                                    break;
+                                case FUNC3_MEMORY.UNSIGNED_WORD:
+                                case FUNC3_MEMORY.WORD:
+                                    pipeWriteByteCount = 4;
+                                    bus.op = MainBus.OP.ld_4b;
+                                    break;
+                                case FUNC3_MEMORY.UNSIGNED_DOUBLEWORD:
+                                case FUNC3_MEMORY.DOUBLEWORD:
+                                    pipeWriteByteCount = 8;
+                                    bus.op = MainBus.OP.ld_8b;
+                                    break;
+                                default:
+                                    throw new Exception("KORE HARDWARE PANIC", new Exception("Unsigned FUNC3 Store OPs are not supported."));
+                            }
+                            if((FUNC3_MEMORY)currentIType.func3 == (FUNC3_MEMORY.UNSIGNED_BYTE | FUNC3_MEMORY.UNSIGNED_HALFWORD | FUNC3_MEMORY.UNSIGNED_WORD | FUNC3_MEMORY.UNSIGNED_DOUBLEWORD))
+                            {
+                                pipeWriteData = 0; // Tell Pipe to NOT sign extend
+                            }
+                            else
+                            {
+                                pipeWriteData = 1; // Tell Pipe to sign extend
+                            }
+                            break;
                         case OPCODE.B32_ADDI: //ADDI is not the correct term for this but I have not gotten to the correct one yet
                             switch (currentIType.func3)
                             {
@@ -332,6 +375,31 @@ namespace Kore
                             }
                             bus.address = pipeWriteAddress;
                             bus.data = pipeWriteData;
+                            break;
+                        case PIPELINE_WRITE_MODE.LOAD_TO_REGISTER:
+
+                            if(pipeWriteData == 1) //Should Sign Extend
+                            {
+                                switch (pipeWriteByteCount)
+                                {
+                                    case 1:
+                                        registers.setR((Register)pipeWriteAddress, (ulong)(((short)(ushort)bus.data << 8) >> 8));
+                                        break;
+                                    case 2:
+                                        registers.setR((Register)pipeWriteAddress, (ulong)(long)(short)(ushort)bus.data);
+                                        break;
+                                    case 4:
+                                        registers.setR((Register)pipeWriteAddress, (ulong)(long)(int)(uint)bus.data);
+                                        break;
+                                    case 8:
+                                    default:
+                                        registers.setR((Register)pipeWriteAddress, bus.data);
+                                        break;
+                                }
+                            } else
+                            {
+                                registers.setR((Register)pipeWriteAddress, bus.data);
+                            }
                             break;
                         default:
                             break;

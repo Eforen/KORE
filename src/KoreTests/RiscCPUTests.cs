@@ -436,18 +436,25 @@ namespace KoreTests
 
             //[TestCase(0x00ul, "00:2 0xffc62883  lw       a7,-4(a2)", 0xffc62883UL, INST_TYPE.IType, new ulong[] { (byte)Register.a7, 4*6, (byte)Register.a2, 4*12 }, new ulong[] { (byte)Register.PC, 0x04 }, new ulong[] { 0xffff_ffff }, new byte[][] { { 0 } }, new ulong[] { })]
 
-            //1c: ffc62883  lw     a7,-4(a2)
-            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 4 * 12 - 4);
-            instructionTest(0x00ul, "", 0xffc62883UL, INST_TYPE.IType,
-                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 4 * 12 },
-                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a7, 0xffffffff });
+            //10: 0006a803  lw     a6,0(a3)
+            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 48); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0x0006a803, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 6, (byte)Register.a3, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0xffffffff_fffffffful });
 
+            this.Setup();
+            //1c: ffc62883  lw     a7,-4(a2)
+            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 48 - 4); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0b111111111100_01100_010_10001_0000011UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a7, 0xffffffff_fffffffful });
+
+            this.Setup();
             //10: 0006a803  lw     a6,0(a3)
             ram.store(new byte[] { 0xFF, 0xAA, 0x77, 0x33 }, 0, 4, 4 * 16);
             instructionTest(0x00ul, "", 0x0006a803UL, INST_TYPE.IType,
                 new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a3, 4 * 16 },
-                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0xffaa7733 });
-
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0x3377aaff });
         }
 
         [Test]
