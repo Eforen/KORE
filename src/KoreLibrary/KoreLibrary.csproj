@@ -46,6 +46,7 @@
     <Compile Include="MainBus.cs" />
     <Compile Include="MainBusComponent.cs" />
     <Compile Include="MiscUtilities.cs" />
+    <Compile Include="KuickCompiler.cs" />
     <Compile Include="RamController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterFile.cs" />

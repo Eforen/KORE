@@ -410,7 +410,7 @@ namespace Kore
                     {
                         case OPCODE.B32_ADDI:
                             return INST_TYPE.IType;
-                        case OPCODE.B32_ADD:
+                        case OPCODE.B32_OP:
                             return INST_TYPE.RType;
                         case OPCODE.unknown00:
                         case OPCODE.unknown01:
@@ -555,6 +555,55 @@ namespace Kore
                 JType = 0x06
             }
 
+            public enum TYPE_OF_INST : byte
+            {
+                lui = (byte)INST_TYPE.UType,
+                auipc = (byte)INST_TYPE.UType,
+                jal = (byte)INST_TYPE.JType,
+                jalr = (byte)INST_TYPE.IType,
+                beq = (byte)INST_TYPE.BType,
+                bne = (byte)INST_TYPE.BType,
+                blt = (byte)INST_TYPE.BType,
+                bge = (byte)INST_TYPE.BType,
+                bltu = (byte)INST_TYPE.BType,
+                bgeu = (byte)INST_TYPE.BType,
+                lb = (byte)INST_TYPE.IType,
+                lh = (byte)INST_TYPE.IType,
+                lw = (byte)INST_TYPE.IType,
+                lhu = (byte)INST_TYPE.IType,
+                sb = (byte)INST_TYPE.SType,
+                sh = (byte)INST_TYPE.SType,
+                sw = (byte)INST_TYPE.SType,
+                addi = (byte)INST_TYPE.IType,
+                slti = (byte)INST_TYPE.IType,
+                sltiu = (byte)INST_TYPE.IType,
+                xori = (byte)INST_TYPE.IType,
+                ori = (byte)INST_TYPE.IType,
+                andi = (byte)INST_TYPE.IType,
+                slli = (byte)INST_TYPE.IType,
+                srli = (byte)INST_TYPE.IType,
+                srai = (byte)INST_TYPE.IType,
+                add = (byte)INST_TYPE.RType,
+                sub = (byte)INST_TYPE.RType,
+                sll = (byte)INST_TYPE.RType,
+                slt = (byte)INST_TYPE.RType,
+                sltu = (byte)INST_TYPE.RType,
+                xor = (byte)INST_TYPE.RType,
+                srl = (byte)INST_TYPE.RType,
+                sra = (byte)INST_TYPE.RType,
+                or = (byte)INST_TYPE.RType,
+                and = (byte)INST_TYPE.RType,
+                fence = (byte)INST_TYPE.IType,
+                fence_i = (byte)INST_TYPE.IType,
+                ecall = (byte)INST_TYPE.IType,
+                ebreak = (byte)INST_TYPE.IType,
+                csrrw = (byte)INST_TYPE.IType,
+                csrrc = (byte)INST_TYPE.IType,
+                csrrwi = (byte)INST_TYPE.IType,
+                csrrsi = (byte)INST_TYPE.IType,
+                csrrci = (byte)INST_TYPE.IType
+            }
+
             public enum FUNC3_MEMORY : byte
             {
                 /// <summary> 1 Byte </summary>
@@ -634,7 +683,7 @@ namespace Kore
                 /// <summary>
                 /// R-Type
                 /// </summary>
-                B32_ADD = 0b110011,
+                B32_OP = 0b110011, //Maybe this should be called B32_OP?
                 unknown34 = 0x34,
                 unknown35 = 0b0110101,
                 unknown36 = 0x36,
@@ -713,12 +762,13 @@ namespace Kore
                 unknown7f = 0x7f
             }
 
-            public interface Instruction
+            public interface Instruction<T>
             {
                 ulong Encode();
                 void Decode(ulong data);
+                T clone();
             }
-            public class RType : Instruction
+            public class RType : Instruction<RType>
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -754,8 +804,13 @@ namespace Kore
                     rs2 = (Register)Transcoder.to_rs2(data, true);
                     func7 = (byte)Transcoder.to_func7(data, true);
                 }
+
+                public RType clone()
+                {
+                    return new RType() { opcode = opcode, func3 = func3, rd = rd, func7 = func7, rs1 = rs1, rs2 = rs2 };
+                }
             }
-            public class IType : Instruction
+            public class IType : Instruction<IType>
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -790,8 +845,13 @@ namespace Kore
                     //imm = (int)Transcoder.to_imm_11_0(data, true);
                     imm = (int)((int)(0b11111111_11110000_00000000_00000000 & data) << 32 >> 32 >> 20);
                 }
+
+                public IType clone()
+                {
+                    return new IType() { opcode = opcode, func3 = func3, rd = rd, rs1 = rs1, imm = imm };
+                }
             }
-            public class SType : Instruction
+            public class SType : Instruction<SType>
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right]) 7
@@ -826,8 +886,13 @@ namespace Kore
                         | (ushort)((data >> 7) & 0b0001_1111)); // imm[4:0]
                 }
 
+                public SType clone()
+                {
+                    return new SType() { opcode = opcode, func3 = func3, rs1 = rs1, rs2 = rs2, imm = imm };
+                }
+
             }
-            public class BType : Instruction
+            public class BType : Instruction<BType>
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -880,8 +945,13 @@ namespace Kore
                         | (ushort)((data >> 20) & 0b111_1110_0000) // imm[10:5]
                         | (ushort)((data >> 7) & 0b0001_1110)); // imm[4:1]
                 }
+
+                public BType clone()
+                {
+                    return new BType() { opcode = opcode, func3 = func3, rs1 = rs1, rs2 = rs2, imm = imm };
+                }
             }
-            public class UType : Instruction
+            public class UType : Instruction <UType>
             {
                 private const uint immMask = 0b11111111_11111111_11110000_00000000u;
 
@@ -908,8 +978,13 @@ namespace Kore
                     imm = (int) ((uint)data & immMask);
                     //imm_31_12 = (byte)Transcoder.to_imm_31_12(data, true);
                 }
+
+                public UType clone()
+                {
+                    return new UType() { opcode = opcode, rd = rd, imm = imm };
+                }
             }
-            public class JType : Instruction
+            public class JType : Instruction<JType>
             {
                 /// <summary>
                 /// opcode (bits 0 to 6 [from 0 on right])
@@ -948,6 +1023,11 @@ namespace Kore
                     //((ulong)imm) & 0b00000000_00000000_00000000_00000000_00000000_00011111_11100000_00000000ul << 10 | //inst[19:12]
                     //((ulong)imm) & 0b00000000_00000000_00000000_00000000_00000000_00100000_00000000_00000000ul << 11; // 11
                     //imm_20_10_1_11_19_12 = (byte)Transcoder.to_imm_20_10_1_11_19_12(data, true);
+                }
+
+                public JType clone()
+                {
+                    return new JType() { opcode = opcode, rd = rd, imm = imm };
                 }
             }
         }

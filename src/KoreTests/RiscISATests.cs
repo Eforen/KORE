@@ -317,7 +317,7 @@ namespace KoreTests
             inst.Decode(add01);
             Assert.AreEqual(add01, inst.Encode());
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADD, inst.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_OP, inst.opcode);
             Assert.AreEqual(Register.x31, inst.rd);
             Assert.AreEqual(0b000, inst.func3);
             Assert.AreEqual(Register.x30, inst.rs1);
@@ -351,13 +351,13 @@ namespace KoreTests
                             // Register rs2 = (Register)rand.Next(0, 31);
                             // byte func3 = (byte)rand.Next(0, 0b111);
 
-                            inst.opcode = OPCODE.B32_ADD;
+                            inst.opcode = OPCODE.B32_OP;
                             inst.rd = rd;
                             inst.rs1 = rs1;
                             inst.rs2 = rs2;
                             inst.func3 = func3;
 
-                            Assert.AreEqual(OPCODE.B32_ADD, inst.opcode);
+                            Assert.AreEqual(OPCODE.B32_OP, inst.opcode);
                             Assert.AreEqual(func3, inst.func3);
                             Assert.AreEqual(rd, inst.rd);
                             Assert.AreEqual(rs1, inst.rs1);
@@ -365,7 +365,7 @@ namespace KoreTests
 
                             ulong code = inst.Encode();
 
-                            Assert.AreEqual(OPCODE.B32_ADD, inst.opcode);
+                            Assert.AreEqual(OPCODE.B32_OP, inst.opcode);
                             Assert.AreEqual(func3, inst.func3);
                             Assert.AreEqual(rd, inst.rd);
                             Assert.AreEqual(rs1, inst.rs1);
@@ -385,7 +385,7 @@ namespace KoreTests
 
                             inst.Decode(code);
 
-                            Assert.AreEqual(OPCODE.B32_ADD, inst.opcode);
+                            Assert.AreEqual(OPCODE.B32_OP, inst.opcode);
                             Assert.AreEqual(func3, inst.func3);
                             Assert.AreEqual(rd, inst.rd);
                             Assert.AreEqual(rs1, inst.rs1);

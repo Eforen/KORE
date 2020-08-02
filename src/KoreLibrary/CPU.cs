@@ -279,7 +279,7 @@ namespace Kore
                                     break;
                             }
                             break;
-                        case OPCODE.B32_ADD: //ADD is not the correct term for this but I have not gotten to the correct one yet
+                        case OPCODE.B32_OP: //ADD is not the correct term for this but I have not gotten to the correct one yet
                             switch (currentIType.func3)
                             {
                                 case 0b000: //ADD

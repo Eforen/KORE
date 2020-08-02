@@ -156,7 +156,7 @@ namespace KoreTests
             bus.tick();
             // Should now have decoded instruction
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_ADD, cpu.currentRType.opcode);
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_OP, cpu.currentRType.opcode);
             Assert.AreEqual(Register.x31, cpu.currentRType.rd);
             Assert.AreEqual(0b000, cpu.currentRType.func3);
             Assert.AreEqual(Register.x30, cpu.currentRType.rs1);
@@ -521,92 +521,127 @@ namespace KoreTests
             Assert.AreEqual(0x00, ram.getByte(4 * 16 + 7 + 0xf0));
         }
 
-        [Test, Ignore("test not coded")]
+        [Test]
         public void sh()
         {
             //TODO: change this to an instruction built from S Type
             // Stores the two least-significant bytes in register rs2 to memory at address rs1 + sign-extend(offset)
             // sh rs2,offset(rs1)
 
-            //24: 01162023  sw     a7,0(a2)
-            instructionTest(0x04ul, "", 0x7FFF_FFFF_0116_2023UL, INST_TYPE.SType,
-                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 4 * 12 },
-                new ulong[] { (byte)Register.PC, 0x08 });
+            //24:  sh     a7,45(a2)
+            SType inst = new SType();
+            inst.imm = 0x45;
+            inst.rs2 = Register.a7;
+            inst.rs1 = Register.a2;
+            inst.opcode = OPCODE.B32_STORE_S;
+            inst.func3 = (byte)FUNC3_MEMORY.HALFWORD;
 
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
-            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
-            Assert.AreEqual(0x20, ram.getByte(4 * 12 + 1));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+            instructionTest(0x24ul, "", inst.Encode(), INST_TYPE.SType,
+                new ulong[] { (byte)Register.a7, 0xaf24_2023, (byte)Register.a2, 4 * 12 },
+                new ulong[] { (byte)Register.PC, 0x28 });
 
-            //3c: 0107a023  sw     a6,0(a5)
-            instructionTest(0x04ul, "", 0x7FFF_FFFF_0107_A023UL, INST_TYPE.SType,
-                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a2, 4 * 16 },
-                new ulong[] { (byte)Register.PC, 0x08 });
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0x45 + 0));
+            Assert.AreEqual(0x20, ram.getByte(4 * 12 + 0x45 + 1));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 + 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x45 + 7));
 
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
-            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
-            Assert.AreEqual(0xA0, ram.getByte(4 * 12 + 1));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+            this.Setup();
+            //30: sw     t1,47(a4)
+            inst.imm = 0x47;
+            inst.rs2 = Register.t1;
+            inst.rs1 = Register.a4;
+            inst.opcode = OPCODE.B32_STORE_S;
+            inst.func3 = (byte)FUNC3_MEMORY.HALFWORD;
+
+            instructionTest(0x30ul, "", inst.Encode(), INST_TYPE.SType,
+                new ulong[] { (byte)Register.t1, 0xBA84_A023, (byte)Register.a4, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x34 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0x47 + 0));
+            Assert.AreEqual(0xA0, ram.getByte(4 * 12 + 0x47 + 1));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 7));
         }
 
-        [Test, Ignore("test not coded")]
+        [Test]
         public void sd()
         {
             //TODO: change this to an instruction built from S Type
             // Stores the all 8 bytes in register rs2 to memory at address rs1 + sign-extend(offset)
             // sd rs2,offset(rs1)
 
-            //24: 01162023  sw     a7,0(a2)
-            instructionTest(0x04ul, "", 0x7FDD_AA99_0116_2023UL, INST_TYPE.SType,
-                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 4 * 12 },
-                new ulong[] { (byte)Register.PC, 0x08 });
+            //24:  sd     a7,x72(a2)
+            SType inst = new SType();
+            inst.imm = 0x72;
+            inst.rs2 = Register.a7;
+            inst.rs1 = Register.a2;
+            inst.opcode = OPCODE.B32_STORE_S;
+            inst.func3 = (byte)FUNC3_MEMORY.DOUBLEWORD;
 
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
-            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
-            Assert.AreEqual(0x20, ram.getByte(4 * 12 + 1));
-            Assert.AreEqual(0x16, ram.getByte(4 * 12 + 2));
-            Assert.AreEqual(0x01, ram.getByte(4 * 12 + 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+            instructionTest(0x24ul, "", inst.Encode(), INST_TYPE.SType,
+                new ulong[] { (byte)Register.a7, 0x6435251001162023, (byte)Register.a2, 4 * 12 },
+                new ulong[] { (byte)Register.PC, 0x28 });
 
-            //3c: 0107a023  sw     a6,0(a5)
-            instructionTest(0x04ul, "", 0x7FFF_FFFF_0107_A023UL, INST_TYPE.SType,
-                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a2, 4 * 16 },
-                new ulong[] { (byte)Register.PC, 0x08 });
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0x72 + 0));
+            Assert.AreEqual(0x20, ram.getByte(4 * 12 + 0x72 + 1));
+            Assert.AreEqual(0x16, ram.getByte(4 * 12 + 0x72 + 2));
+            Assert.AreEqual(0x01, ram.getByte(4 * 12 + 0x72 + 3));
+            Assert.AreEqual(0x10, ram.getByte(4 * 12 + 0x72 + 4));
+            Assert.AreEqual(0x25, ram.getByte(4 * 12 + 0x72 + 5));
+            Assert.AreEqual(0x35, ram.getByte(4 * 12 + 0x72 + 6));
+            Assert.AreEqual(0x64, ram.getByte(4 * 12 + 0x72 + 7));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 + 8));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 + 9));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 + 10));
+            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x72 + 11));
 
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 - 1));
-            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0));
-            Assert.AreEqual(0xA0, ram.getByte(4 * 12 + 1));
-            Assert.AreEqual(0x07, ram.getByte(4 * 12 + 2));
-            Assert.AreEqual(0x01, ram.getByte(4 * 12 + 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 5));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 6));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 7));
+            this.Setup();
+            //3c: sd     a6, 64(a5)
+            inst.imm = 0x64;
+            inst.rs2 = Register.a6;
+            inst.rs1 = Register.a5;
+            inst.opcode = OPCODE.B32_STORE_S;
+            inst.func3 = (byte)FUNC3_MEMORY.DOUBLEWORD;
+            instructionTest(0x3Cul, "", inst.Encode(), INST_TYPE.SType,
+                new ulong[] { (byte)Register.a6, 0x0336_7305_0107_a023, (byte)Register.a5, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x3C + 4 });
+
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 16 + 0x64 + 0));
+            Assert.AreEqual(0xA0, ram.getByte(4 * 16 + 0x64 + 1));
+            Assert.AreEqual(0x07, ram.getByte(4 * 16 + 0x64 + 2));
+            Assert.AreEqual(0x01, ram.getByte(4 * 16 + 0x64 + 3));
+            Assert.AreEqual(0x05, ram.getByte(4 * 16 + 0x64 + 4));
+            Assert.AreEqual(0x73, ram.getByte(4 * 16 + 0x64 + 5));
+            Assert.AreEqual(0x36, ram.getByte(4 * 16 + 0x64 + 6));
+            Assert.AreEqual(0xF3, ram.getByte(4 * 16 + 0x64 + 7));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 + 8));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 + 9));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 + 10));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 + 11));
         }
 
         [Test]
