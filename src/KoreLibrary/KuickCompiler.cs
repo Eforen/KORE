@@ -122,6 +122,46 @@ namespace Kore
                         output = (uint)r.Encode();
                         break;
                     case INST_TYPE.IType:
+                        switch (op)
+                        {
+                            case "jalr":
+                                i.opcode = (OPCODE)0b11_001_11;
+                                break;
+                            case "lb":
+                            case "lh":
+                            case "lw":
+                            case "lbu":
+                            case "lhu":
+                                i.opcode = (OPCODE)0b00_000_11;
+                                break;
+                            case "addi":
+                            case "sltu":
+                            case "sltiu":
+                            case "xori":
+                            case "ori":
+                            case "andi":
+                            case "slli":
+                            case "srli":
+                            case "srai":
+                                i.opcode = (OPCODE)0b00_100_11;
+                                break;
+                            case "fence":
+                            case "fence.i":
+                                i.opcode = (OPCODE)0b00_011_11;
+                                break;
+                            case "ecall":
+                            case "ebrake":
+                            case "csrrw":
+                            case "csrrs":
+                            case "csrrc":
+                            case "csrrwi":
+                            case "csrrsi":
+                            case "csrrci":
+                                i.opcode = (OPCODE)0b11_100_11;
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     case INST_TYPE.SType:
                         break;

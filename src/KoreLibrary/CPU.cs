@@ -257,7 +257,7 @@ namespace Kore
                                 default:
                                     throw new Exception("KORE HARDWARE PANIC", new Exception("Unsigned FUNC3 Store OPs are not supported."));
                             }
-                            if((FUNC3_MEMORY)currentIType.func3 == (FUNC3_MEMORY.UNSIGNED_BYTE | FUNC3_MEMORY.UNSIGNED_HALFWORD | FUNC3_MEMORY.UNSIGNED_WORD | FUNC3_MEMORY.UNSIGNED_DOUBLEWORD))
+                            if(currentIType.func3 == (byte)FUNC3_MEMORY.UNSIGNED_BYTE || currentIType.func3 == (byte)FUNC3_MEMORY.UNSIGNED_HALFWORD || currentIType.func3 == (byte)FUNC3_MEMORY.UNSIGNED_WORD || currentIType.func3 == (byte)FUNC3_MEMORY.UNSIGNED_DOUBLEWORD)
                             {
                                 pipeWriteData = 0; // Tell Pipe to NOT sign extend
                             }

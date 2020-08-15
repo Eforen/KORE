@@ -431,6 +431,78 @@ namespace KoreTests
         }
 
         [Test]
+        public void ld()
+        {
+            //10: 0006b803  ld     a6,0(a3)
+            ram.store(new byte[] { 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff }, 0, 10, 47); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0x0006b803, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 6, (byte)Register.a3, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0xFF000000_000000FFul });
+
+            this.Setup();
+            //1c: ffc63883  ld     a7,-4(a2)
+            ram.store(new byte[] { 0xff, 0xAF, 0xAA, 0xAA, 0xFF, 0xFF, 0xAA, 0xAA, 0xFA, 0xff }, 0, 10, 48 - 4 - 1); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0xffc63883UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a7, 0xfaaaaaff_ffaaaaaful });
+
+            this.Setup();
+            //10: 0006b803  ld     a6,0(a3)
+            ram.store(new byte[] { 0xFF, 0xAA, 0x77, 0x33, 0x33, 0x77, 0xAA, 0xFF, 0xAA }, 0, 9, 4 * 16 - 1);
+            instructionTest(0x00ul, "", 0x0006b803UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a3, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0xaaffaa77_333377aaul });
+        }
+
+        [Test]
+        public void lh()
+        {
+            //10: 00069803  lh     a6,0(a3)
+            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 48 - 1); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0x00069803, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 6, (byte)Register.a3, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0xFFFFFFFF_FFFF_FFFFul });
+
+            this.Setup();
+            //1c: ffc61883  lh     a7,-4(a2)
+            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 48 - 4 - 1); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0xffc61883UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a7, 0xFFFFFFFF_FFFF_FFFFul });
+
+            this.Setup();
+            //10: 00069803  lh     a6,0(a3)
+            ram.store(new byte[] { 0xFF, 0xAA, 0x77, 0x33 }, 0, 4, 4 * 16 - 1);
+            instructionTest(0x00ul, "", 0x00069803UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a3, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0x00000000_0000_77AA });
+        }
+
+        [Test]
+        public void lhu()
+        {
+            //10: 0006d803  lhu     a6,0(a3)
+            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 48 - 1); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0x0006d803, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 6, (byte)Register.a3, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0x0000fffful });
+
+            this.Setup();
+            //1c: ffc61883  lhu     a7,-4(a2)
+            ram.store(new byte[] { 0xff, 0xff, 0xff, 0xff }, 0, 4, 48 - 4 - 1); // 4 * 12 = 48
+            instructionTest(0x00ul, "", 0xffc65883UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a7, 4 * 6, (byte)Register.a2, 48 }, // 4 * 12 = 48
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a7, 0x0000fffful });
+
+            this.Setup();
+            //10: 00069803  lhu     a6,0(a3)
+            ram.store(new byte[] { 0xFF, 0xAA, 0x77, 0x33 }, 0, 4, 4 * 16 - 1);
+            instructionTest(0x00ul, "", 0x0006d803UL, INST_TYPE.IType,
+                new ulong[] { (byte)Register.a6, 4 * 7, (byte)Register.a3, 4 * 16 },
+                new ulong[] { (byte)Register.PC, 0x04, (byte)Register.a6, 0x000077aa });
+        }
+
+        [Test]
         public void lw()
         {
 
@@ -565,18 +637,18 @@ namespace KoreTests
                 new ulong[] { (byte)Register.t1, 0xBA84_A023, (byte)Register.a4, 4 * 16 },
                 new ulong[] { (byte)Register.PC, 0x34 });
 
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 - 1));
-            Assert.AreEqual(0x23, ram.getByte(4 * 12 + 0x47 + 0));
-            Assert.AreEqual(0xA0, ram.getByte(4 * 12 + 0x47 + 1));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 2));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 3));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 4));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 5));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 6));
-            Assert.AreEqual(0x00, ram.getByte(4 * 12 + 0x47 + 7));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 - 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 - 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 - 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 - 1));
+            Assert.AreEqual(0x23, ram.getByte(4 * 16 + 0x47 + 0));
+            Assert.AreEqual(0xA0, ram.getByte(4 * 16 + 0x47 + 1));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 + 2));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 + 3));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 + 4));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 + 5));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 + 6));
+            Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x47 + 7));
         }
 
         [Test]
@@ -623,7 +695,7 @@ namespace KoreTests
             inst.opcode = OPCODE.B32_STORE_S;
             inst.func3 = (byte)FUNC3_MEMORY.DOUBLEWORD;
             instructionTest(0x3Cul, "", inst.Encode(), INST_TYPE.SType,
-                new ulong[] { (byte)Register.a6, 0x0336_7305_0107_a023, (byte)Register.a5, 4 * 16 },
+                new ulong[] { (byte)Register.a6, 0xf336_7305_0107_a023, (byte)Register.a5, 4 * 16 },
                 new ulong[] { (byte)Register.PC, 0x3C + 4 });
 
             Assert.AreEqual(0x00, ram.getByte(4 * 16 + 0x64 - 4));
