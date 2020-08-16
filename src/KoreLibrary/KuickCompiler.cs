@@ -34,24 +34,27 @@ namespace Kore
             public static readonly string SpaceSingle = "\\s";
             public static readonly string SpaceAnyOrNone = SpaceSingle+"*";
             public static readonly string SpaceOneOrMore = SpaceSingle + "+";
-            public static readonly string ImmidiateValue = "[0-9a-f]+";
-            public static readonly string OffsetRegister = "(?<ori>" + ImmidiateValue + ")\\(?<orr>" + Register+"\\)";
+            public static readonly string ImmidiateValue = "\\-{0,1}[0-9a-f]+";
+            public static readonly string OffsetRegister = "(?<ori>" + ImmidiateValue + ")\\((?<orr>" + Register+")\\)";
             public static readonly string DataRegReg = "(?<rr1>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rr2>" + Register + ")";
             public static readonly string DataRegRegReg = "(?<rrr1>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rrr2>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rrr3>" + Register + ")";
             public static readonly string DataRegImm = "(?<rir>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rii>" + ImmidiateValue + ")";
-            public static readonly string DataRegRegImm = "(?<rri1>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rri2>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rrii>" + ImmidiateValue + ")";
+            public static readonly string DataRegRegImm = "(?<rri_rd>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rri_r1>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + "(?<rri_imm>" + ImmidiateValue + ")";
             public static readonly string DataRegOffsetReg = "(?<ror1>" + Register + ")" + SpaceAnyOrNone + "," + SpaceAnyOrNone + OffsetRegister;
             public static readonly string DataCombined = DataRegReg + "|" + DataRegRegReg + "|" + DataRegImm + "|" + DataRegRegImm + "|" + DataRegOffsetReg;
             public static readonly string CommentOptional = "(?<comment>#.+)?(\n|$)";
             public static readonly string OpName = "(?<op>[a-z.]+)";
-            public static readonly string expr = SpaceAnyOrNone+ OpName + SpaceOneOrMore+"(?<data>"+ DataCombined + ")"+SpaceAnyOrNone+CommentOptional;
+            public static readonly string expr = SpaceAnyOrNone+ OpName + SpaceOneOrMore+"(?<data>"+ DataCombined + ")" + SpaceAnyOrNone + CommentOptional + "|" + SpaceAnyOrNone + CommentOptional;
             public static readonly Regex regex = new Regex(expr);
             public static class g
             {
                 public static readonly int op = regex.GroupNumberFromName("op");
-                public static readonly int rrr1 = regex.GroupNumberFromName("rrr1");
-                public static readonly int rrr2 = regex.GroupNumberFromName("rrr2");
-                public static readonly int rrr3 = regex.GroupNumberFromName("rrr3");
+                public static readonly int rrr_rd = regex.GroupNumberFromName("rrr1");
+                public static readonly int rrr_r1 = regex.GroupNumberFromName("rrr2");
+                public static readonly int rrr_r2 = regex.GroupNumberFromName("rrr3");
+                public static readonly int rri_rd = regex.GroupNumberFromName("rri_rd");
+                public static readonly int rri_r1 = regex.GroupNumberFromName("rri_r1");
+                public static readonly int rri_imm = regex.GroupNumberFromName("rri_imm");
             }
             public static Match test(string text)
             {
@@ -79,9 +82,9 @@ namespace Kore
                     case INST_TYPE.RType:
                         r.opcode = OPCODE.B32_OP;
                         r.func7 = 0b0000000;
-                        if (Enum.TryParse(match.Groups[Regexpression.g.rrr1].Value, out r.rd) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rd` of `" + match.Groups[Regexpression.g.rrr1].Value + "` in the partern `OP rd, rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
-                        if (Enum.TryParse(match.Groups[Regexpression.g.rrr2].Value, out r.rs1) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs1` of `" + match.Groups[Regexpression.g.rrr2].Value + "` in the partern `OP rd, rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
-                        if (Enum.TryParse(match.Groups[Regexpression.g.rrr3].Value, out r.rs2) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs2` of `" + match.Groups[Regexpression.g.rrr3].Value + "` in the partern `OP rd, rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        if (Enum.TryParse(match.Groups[Regexpression.g.rrr_rd].Value, out r.rd) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rd` of `" + match.Groups[Regexpression.g.rrr_rd].Value + "` in the RType partern `OP rd, rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        if (Enum.TryParse(match.Groups[Regexpression.g.rrr_r1].Value, out r.rs1) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs1` of `" + match.Groups[Regexpression.g.rrr_r1].Value + "` in the RType partern `OP rd, rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        if (Enum.TryParse(match.Groups[Regexpression.g.rrr_r2].Value, out r.rs2) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs2` of `" + match.Groups[Regexpression.g.rrr_r2].Value + "` in the RType partern `OP rd, rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
                         switch (op)
                         {
                             case "add": // add rd, rs1, rs2
@@ -122,20 +125,38 @@ namespace Kore
                         output = (uint)r.Encode();
                         break;
                     case INST_TYPE.IType:
+                        i.opcode = 0;
+                        if (Enum.TryParse(match.Groups[Regexpression.g.rri_rd].Value, out i.rd) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rd` of `" + match.Groups[Regexpression.g.rrr_rd].Value + "` in the IType partern `OP rd, rs1, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        if (Enum.TryParse(match.Groups[Regexpression.g.rri_r1].Value, out i.rs1) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs1` of `" + match.Groups[Regexpression.g.rrr_r1].Value + "` in the IType partern `OP rd, rs1, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        if (Int32.TryParse(match.Groups[Regexpression.g.rri_imm].Value, out i.imm) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs1` of `" + match.Groups[Regexpression.g.rrr_r1].Value + "` in the IType partern `OP rd, rs1, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
                         switch (op)
                         {
                             case "jalr":
-                                i.opcode = (OPCODE)0b11_001_11;
+                                i.opcode = (OPCODE)0b11_011_11;
                                 break;
                             case "lb":
                             case "lh":
                             case "lw":
+                            case "ld":
                             case "lbu":
                             case "lhu":
+                            case "lwu":
+                            case "ldu":
                                 i.opcode = (OPCODE)0b00_000_11;
                                 break;
+                            case "addiw": // RV64I Only
+                            case "slliw": // RV64I Only
+                            case "srliw": // RV64I Only
+                            case "sraiw": // RV64I Only
+                            case "sltiw": // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
+                            case "sltiuw": // I don't think this instruction exists in the RiscV ISA // Would be RV64I Only because would do nothing on RV32
+                            case "xoriw": // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
+                            case "oriw": // I don't think this instruction exists in the RiscV ISA   // Would be RV64I Only because would do nothing on RV32
+                            case "andiw": // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
+                                i.opcode = (OPCODE)0b00_110_11;
+                                break;
                             case "addi":
-                            case "sltu":
+                            case "slti":
                             case "sltiu":
                             case "xori":
                             case "ori":
@@ -162,6 +183,84 @@ namespace Kore
                             default:
                                 break;
                         }
+                        switch (op)
+                        {
+                            case "jalr":
+                                i.func3 = 0b000;
+                                break;
+                            case "lb":
+                                i.func3 = (byte)FUNC3_MEMORY.BYTE;
+                                break;
+                            case "lh":
+                                i.func3 = (byte)FUNC3_MEMORY.HALFWORD;
+                                break;
+                            case "lw":
+                                i.func3 = (byte)FUNC3_MEMORY.WORD;
+                                break;
+                            case "ld":
+                                i.func3 = (byte)FUNC3_MEMORY.DOUBLEWORD;
+                                break;
+                            case "lbu":
+                                i.func3 = (byte)FUNC3_MEMORY.UNSIGNED_BYTE;
+                                break;
+                            case "lhu":
+                                i.func3 = (byte)FUNC3_MEMORY.UNSIGNED_HALFWORD;
+                                break;
+                            case "lwu":
+                                i.func3 = (byte)FUNC3_MEMORY.UNSIGNED_WORD;
+                                break;
+                            case "ldu":
+                                i.func3 = (byte)FUNC3_MEMORY.UNSIGNED_DOUBLEWORD;
+                                break;
+                            case "addi":
+                                i.func3 = (byte)FUNC3_ALU.ADD;
+                                break;
+                            case "slti":
+                                i.func3 = (byte)FUNC3_ALU.SLT;
+                                break;
+                            case "sltiu":
+                                i.func3 = (byte)FUNC3_ALU.SLTU;
+                                break;
+                            case "xori":
+                                i.func3 = (byte)FUNC3_ALU.XOR;
+                                break;
+                            case "ori":
+                                i.func3 = (byte)FUNC3_ALU.OR;
+                                break;
+                            case "andi":
+                                i.func3 = (byte)FUNC3_ALU.AND;
+                                break;
+                            case "slli":
+                                i.func3 = (byte)FUNC3_ALU.SLL;
+                                i.imm = 0b0000000_11111 & i.imm; //Truncate IMM if its out of range
+                                break;
+                            case "srli":
+                                i.func3 = (byte)FUNC3_ALU.SR;
+                                i.imm = 0b0000000_11111 & i.imm; //Truncate IMM if its out of range
+                                break;
+                            case "srai":
+                                i.func3 = (byte)FUNC3_ALU.SR;
+                                i.imm = 0b0000000_11111 & i.imm; //Truncate IMM if its out of range
+                                i.imm = 0b0100000_00000 | i.imm; // Add bit that denotes this being and sra not an srl
+                                break;
+                            case "fence":
+                            case "fence.i":
+                                i.func3 = 0b000;
+                                break;
+                            case "ecall":
+                            case "ebrake":
+                            case "csrrw":
+                            case "csrrs":
+                            case "csrrc":
+                            case "csrrwi":
+                            case "csrrsi":
+                            case "csrrci":
+                                i.func3 = 0b000;
+                                break;
+                            default:
+                                break;
+                        }
+                        output = (uint)i.Encode();
                         break;
                     case INST_TYPE.SType:
                         break;

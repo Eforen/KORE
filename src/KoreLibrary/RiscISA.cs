@@ -583,6 +583,15 @@ namespace Kore
                 slli = (byte)INST_TYPE.IType,
                 srli = (byte)INST_TYPE.IType,
                 srai = (byte)INST_TYPE.IType,
+                addiw = (byte)INST_TYPE.IType,  // RV64I Only
+                slliw = (byte)INST_TYPE.IType,  // RV64I Only
+                srliw = (byte)INST_TYPE.IType,  // RV64I Only
+                sraiw = (byte)INST_TYPE.IType,  // RV64I Only
+                sltiw = (byte)INST_TYPE.IType,  // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
+                sltiuw = (byte)INST_TYPE.IType, // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
+                xoriw = (byte)INST_TYPE.IType,  // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
+                oriw = (byte)INST_TYPE.IType,   // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
+                andiw = (byte)INST_TYPE.IType,  // I don't think this instruction exists in the RiscV ISA  // Would be RV64I Only because would do nothing on RV32
                 add = (byte)INST_TYPE.RType,
                 sub = (byte)INST_TYPE.RType,
                 sll = (byte)INST_TYPE.RType,
@@ -623,7 +632,27 @@ namespace Kore
                 /// <summary> Unknown Function 04 </summary>
                 UNSIGNED_DOUBLEWORD = 0b111
             }
-            
+
+            public enum FUNC3_ALU : byte
+            {
+                /// <summary> Addition Operation and Subtraction </summary>
+                ADD  = 0b000,
+                /// <summary> Shift Left Logical </summary>
+                SLL  = 0b001,
+                /// <summary> Set if less than (signed) </summary>
+                SLT  = 0b010,
+                /// <summary> Set if less than (unsigned) </summary>
+                SLTU = 0b011,
+                /// <summary> Bitwise Exclusive OR </summary>
+                XOR = 0b100,
+                /// <summary> SRL/SRA: Shift Right Logical/Arithmetic </summary>
+                SR   = 0b101,
+                /// <summary> Bitwise OR </summary>
+                OR   = 0b110,
+                /// <summary> Bitwise AND </summary>
+                AND  = 0b111,
+            }
+
             public enum OPCODE : byte
             {
                 unknown00 = 0x00,
