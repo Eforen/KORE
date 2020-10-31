@@ -208,14 +208,12 @@ namespace KoreTests
         [TestCase("ecall", 0x00000073u)]
         [TestCase("negw    s0,s0", 0x4080043bu)]
         [TestCase("sw      s0,0(a0)", 0x00852023u)]
+        [TestCase("ebreak", 0x00100073u)]
         public void compileDataSingle(string str, uint code)
         {
             uint result = KuickCompiler.compile(str);
             Assert.AreEqual(code, result,
-                "Data Mismatch\n" +
-                Convert.ToString((int)(code), 2).PadLeft(32, '0') +
-                "\n" +
-                Convert.ToString((int)(result), 2).PadLeft(32, '0')
+                TestUtils.getDataMismatchString(code,result)
             );
         }
 
@@ -305,6 +303,11 @@ namespace KoreTests
                 "\n" +
                 Convert.ToString((int)(result), 2).PadLeft(32, '0')
             );
+        }
+
+        [Test, Ignore("Not Understood Yet")]
+        public void asemblerMacros(string[] strings, uint[] codes)
+        {
         }
 
         public void compileDataMulti(string[] strings, uint[] codes)
