@@ -58,6 +58,8 @@ namespace Kore
                 public static readonly int ror_r1 = regex.GroupNumberFromName("ror_r1");
                 public static readonly int ror_r2 = regex.GroupNumberFromName("ror_r2");
                 public static readonly int ror_imm = regex.GroupNumberFromName("ror_imm");
+                public static readonly int rir = regex.GroupNumberFromName("rir");
+                public static readonly int rii = regex.GroupNumberFromName("rii");
             }
             public static Match test(string text)
             {
@@ -396,6 +398,30 @@ namespace Kore
                     case INST_TYPE.BType:
                         break;
                     case INST_TYPE.UType:
+                        syntax = instructionSyntax.ri;
+                        u.opcode = 0;
+                        needs_rd = true;
+                        needs_imm = true;
+
+                        switch (op)
+                        {
+                            case "auipc":
+                                u.opcode = (OPCODE)0b00_101_11;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (syntax == instructionSyntax.ri && needs_rd && Enum.TryParse(match.Groups[Regexpression.g.rir].Value, out u.rd) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rd` of `" + match.Groups[Regexpression.g.rir].Value + "` in the IType partern `OP rd, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        try
+                        {
+                            if (syntax == instructionSyntax.ri && needs_imm) u.imm = Convert.ToInt32(match.Groups[Regexpression.g.rii].Value, 16);
+                        }
+                        catch (Exception)
+                        {
+                            throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `imm` of `" + match.Groups[Regexpression.g.rii].Value + "` in the IType partern `OP rd, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        }
+                        output = (uint)u.Encode();
                         break;
                     case INST_TYPE.JType:
                         break;

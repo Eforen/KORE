@@ -999,14 +999,14 @@ namespace Kore
                 {
                     return (byte)opcode |
                         Transcoder.from_rd((byte)rd) |
-                        (ulong) ((uint) imm & immMask);
+                        (ulong) ((uint) imm << 12);
                         //Transcoder.from_imm_31_12(imm_31_12);
                 }
                 public void Decode(ulong data)
                 {
                     opcode = (Kore.RiscISA.Instruction.OPCODE) Transcoder.to_opcode(data, true);
                     rd = (Register) Transcoder.to_rd(data, true);
-                    imm = (int) ((uint)data & immMask);
+                    imm = (int) ((uint)data >> 12);
                     //imm_31_12 = (byte)Transcoder.to_imm_31_12(data, true);
                 }
 
