@@ -401,12 +401,12 @@ namespace KoreTests
         [Test]
         public void Instruction_B_Type_Struct_Precomp()
         {
-            // 08: 0x00b76463  bltu     a4,a1,0x08  (+0x08)
+            // 08: 0x00b76463  bltu     a4,a1,0x10  (+0x08  )
             // 20: 0x01185a63  bge      a6,a7,0x34  (+0x14)
             // 30: 0xfe0796e3  bne      a5,x0,0x1c  (-0x14)
-            ulong bltu = 0x00b76463;
-            ulong bge = 0x01185a63;
-            ulong bne = 0xfe0796e3;
+            ulong bltu = 0x00b76463u;
+            ulong bge = 0x01185a63u;
+            ulong bne = 0xfe0796e3u;
 
             Kore.RiscISA.Instruction.BType inst = new Kore.RiscISA.Instruction.BType();
 
@@ -418,18 +418,19 @@ namespace KoreTests
 
             inst.Decode(bltu);
 
-            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
-            Assert.AreEqual(8, inst.imm);
-            Assert.AreEqual(0b110, inst.func3);
-            Assert.AreEqual(Register.a4, inst.rs1);
-            Assert.AreEqual(Register.a1, inst.rs2);
 
-            Assert.AreEqual(bltu, inst.Encode());
+            Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode, TestUtils.getDataMismatchString((uint)Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, (uint)inst.opcode));
+            Assert.AreEqual(0x08, inst.imm * 2, TestUtils.getDataMismatchString(0x08, (uint) inst.imm)); // Note: Branch addressing is multiplied by 2
+            Assert.AreEqual(0b110, inst.func3, TestUtils.getDataMismatchString(0b110, (uint) inst.func3));
+            Assert.AreEqual(Register.a4, inst.rs1, TestUtils.getDataMismatchString((uint)Register.a4, (uint)inst.rs1));
+            Assert.AreEqual(Register.a1, inst.rs2, TestUtils.getDataMismatchString((uint)Register.a1, (uint)inst.rs2));
+
+            Assert.AreEqual(bltu, inst.Encode(), TestUtils.getDataMismatchString((uint)bltu, (uint)inst.Encode()));
 
             inst.Decode(bge);
 
             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
-            Assert.AreEqual(0x14, inst.imm);
+            Assert.AreEqual(0x14, inst.imm * 2); // Note: Branch addressing is multiplied by 2
             Assert.AreEqual(0b101, inst.func3);
             Assert.AreEqual(Register.a6, inst.rs1);
             Assert.AreEqual(Register.a7, inst.rs2);
@@ -439,7 +440,7 @@ namespace KoreTests
             inst.Decode(bne);
 
             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
-            Assert.AreEqual(-0x14, inst.imm);
+            Assert.AreEqual(-0x14, inst.imm * 2); // Note: Branch addressing is multiplied by 2
             Assert.AreEqual(0b001, inst.func3);
             Assert.AreEqual(Register.a5, inst.rs1);
             Assert.AreEqual(Register.x0, inst.rs2);

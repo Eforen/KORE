@@ -52,17 +52,35 @@ namespace Kore
                 public static readonly int rrr_rd = regex.GroupNumberFromName("rrr1");
                 public static readonly int rrr_r1 = regex.GroupNumberFromName("rrr2");
                 public static readonly int rrr_r2 = regex.GroupNumberFromName("rrr3");
+                /// <summary>
+                /// OP rs, rs, imm<br/>
+                /// OP __, rs, imm<br/>
+                /// op rri_rd, rri_r1, rri_imm 
+                /// </summary>
                 public static readonly int rri_rd = regex.GroupNumberFromName("rri_rd");
+                /// <summary>
+                /// OP rs, rs, imm<br/>
+                /// OP rs, __, imm<br/>
+                /// op rri_rd, rri_r1, rri_imm 
+                /// </summary>
                 public static readonly int rri_r1 = regex.GroupNumberFromName("rri_r1");
+                /// <summary>
+                /// OP rs, rs, imm<br/>
+                /// OP rs, rs, ___<br/>
+                /// op rri_rd, rri_r1, rri_imm 
+                /// </summary>
                 public static readonly int rri_imm = regex.GroupNumberFromName("rri_imm");
                 public static readonly int ror_r1 = regex.GroupNumberFromName("ror_r1");
                 public static readonly int ror_r2 = regex.GroupNumberFromName("ror_r2");
                 public static readonly int ror_imm = regex.GroupNumberFromName("ror_imm");
                 public static readonly int rir = regex.GroupNumberFromName("rir");
                 public static readonly int rii = regex.GroupNumberFromName("rii");
+                public static readonly int rr1 = regex.GroupNumberFromName("rr1");
+                public static readonly int rr2 = regex.GroupNumberFromName("rr2");
             }
             public static Match test(string text)
             {
+                // throw new Exception("Test Expression: "+expr); // For debugging expression
                 return regex.Match(text);
             }
         }
@@ -101,7 +119,7 @@ namespace Kore
         private static BType b = new BType();
         private static UType u = new UType();
         private static JType j = new JType();
-        public static uint compile(string asm)
+        public static uint assembleSingleLine(int opStartByte, string asm)
         {
             Match match = Regexpression.test(asm.ToLower());
             if(match.Success == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could not understand the input of `" + asm + "` as a line of Risc-V ASM"));
@@ -172,6 +190,7 @@ namespace Kore
                         switch (op)
                         {
                             case "jalr":
+                                syntax = instructionSyntax.ror;
                                 i.opcode = (OPCODE)0b11_001_11;
                                 break;
                             case "lb":
@@ -396,6 +415,39 @@ namespace Kore
                         output = (uint)s.Encode();
                         break;
                     case INST_TYPE.BType:
+                        syntax = instructionSyntax.rri;
+                        b.opcode = OPCODE.B32_BRANCH;
+                        if (Enum.TryParse(match.Groups[Regexpression.g.rri_rd].Value, out b.rs1) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs1` of `" + match.Groups[Regexpression.g.rri_rd].Value + "` in the BType partern `OP rs1, rs2, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        if (Enum.TryParse(match.Groups[Regexpression.g.rri_r1].Value, out b.rs2) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs2` of `" + match.Groups[Regexpression.g.rri_r1].Value + "` in the BType partern `OP rs1, rs2, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        Int64 immTemp = 0; // TODO: This should probably be moved out to a global temp so that it does not cause memory alloc.
+                        if (Int64.TryParse(match.Groups[Regexpression.g.rri_imm].Value, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out immTemp) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `imm` of `" + match.Groups[Regexpression.g.rri_imm].Value + "` in the BType partern `OP rs1, rs2, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        b.imm = (short)((immTemp - opStartByte) / 2);
+
+                        switch (op)
+                        {
+                            case "beq":
+                                b.func3 = (byte) FUNC3_LOGICAL.EQ;
+                                break;
+                            case "bne":
+                                b.func3 = (byte)FUNC3_LOGICAL.NE;
+                                break;
+                            case "blt":
+                                b.func3 = (byte)FUNC3_LOGICAL.LT;
+                                break;
+                            case "bge":
+                                b.func3 = (byte)FUNC3_LOGICAL.GE;
+                                break;
+                            case "bltu":
+                                b.func3 = (byte)FUNC3_LOGICAL.LTU;
+                                break;
+                            case "bgeu":
+                                b.func3 = (byte)FUNC3_LOGICAL.GEU;
+                                break;
+                            default:
+                                throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `op` of `" + op + "` in the BType partern `OP rs1, rs2, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
+                        }
+
+                        output = (uint)b.Encode();
                         break;
                     case INST_TYPE.UType:
                         syntax = instructionSyntax.ri;
@@ -425,6 +477,26 @@ namespace Kore
                         break;
                     case INST_TYPE.JType:
                         break;
+                    case INST_TYPE.PType:
+                        switch (op)
+                        {
+                            case "mv":
+                                if (syntax == instructionSyntax.ror && needs_rs1 && Enum.TryParse(match.Groups[Regexpression.g.rr1].Value, out s.rs1) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs1` of `" + match.Groups[Regexpression.g.rr1].Value + "` in the partern `OP rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
+                                if (syntax == instructionSyntax.ror && needs_rs2 && Enum.TryParse(match.Groups[Regexpression.g.rr2].Value, out s.rs2) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs2` of `" + match.Groups[Regexpression.g.rr2].Value + "` in the partern `OP rs1, rs2` with the input `" + asm + "` as a line of Risc-V ASM"));
+                                return assembleSingleLine(opStartByte, "addi "+ match.Groups[Regexpression.g.rr1].Value+", "+ match.Groups[Regexpression.g.rr2].Value + ", 0");
+                            default:
+                                throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could not translate pseudoinstruction `op` of `" + op + "` in the line input `" + asm + "` as a line of Risc-V ASM"));
+                        }
+                    case INST_TYPE.PRType:
+                        try
+                        {
+                            return assembleSingleLine(opStartByte, Transcoder.PSEDO_REPLACEMENTS[op]);
+                        } catch(Exception e)
+                        {
+                            //Console.WriteLine("External Compiler Panic");
+                            //Console.WriteLine(e);
+                            throw new Exception("External Compiler Panic", new Exception("Kuick Compiler should never reach this line of code. It is likely that the transcoder could not find the Psedocode replacement. The input was `" + asm + "`"));
+                        }
                     case INST_TYPE.Unkwn:
                     default:
                         throw new Exception("External Compiler Panic", new Exception("Kuick Compiler should never reach this line of code. The input was `" + asm + "`"));

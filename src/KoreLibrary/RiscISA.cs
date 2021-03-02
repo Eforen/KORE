@@ -542,6 +542,13 @@ namespace Kore
                             return INST_TYPE.Unkwn;
                     }
                 }
+
+                public static Dictionary<string, string> PSEDO_REPLACEMENTS = new Dictionary<string, string>
+                {
+                    { "nop", "addi x0, x0, 0" },
+                    { "ret", "jalr x0, 0(x1)" },
+                    { "wfi", "" }
+                };
             }
 
             public enum INST_TYPE : byte
@@ -552,7 +559,15 @@ namespace Kore
                 SType = 0x03,
                 BType = 0x04,
                 UType = 0x05,
-                JType = 0x06
+                JType = 0x06,
+                /// <summary>
+                /// Pseudoinstructions
+                /// </summary>
+                PType = 0x07,
+                /// <summary>
+                /// Simple Pseudoinstruction Replacements
+                /// </summary>
+                PRType = 0x08
             }
 
             public enum TYPE_OF_INST : byte
@@ -612,7 +627,12 @@ namespace Kore
                 csrrc = (byte)INST_TYPE.IType,
                 csrrwi = (byte)INST_TYPE.IType,
                 csrrsi = (byte)INST_TYPE.IType,
-                csrrci = (byte)INST_TYPE.IType
+                csrrci = (byte)INST_TYPE.IType,
+                li = (byte)INST_TYPE.PType,
+                mv = (byte)INST_TYPE.PType,
+                nop = (byte)INST_TYPE.PRType,
+                ret = (byte)INST_TYPE.PRType,
+                wfi = (byte)INST_TYPE.PRType
             }
 
             public enum FUNC3_MEMORY : byte
@@ -653,6 +673,26 @@ namespace Kore
                 OR   = 0b110,
                 /// <summary> Bitwise AND </summary>
                 AND  = 0b111,
+            }
+
+            public enum FUNC3_LOGICAL : byte
+            {
+                /// <summary> Equals </summary>
+                EQ  = 0b000,
+                /// <summary> Not Equal </summary>
+                NE = 0b001,
+                /// <summary> There appears to be a void in the ISA documentaion here. If what logicly should be here in physical ALUs can be determined fill this. </summary>
+                UNKNOWN02  = 0b010, // I would argue that this likely should be Equal Unsigned because both bit 1 seems to indicate unsigned and bit 0 as a 0 says a thing and the bit at 1 says not that thing. The problem with this is that there is no dif between eq and equ so this is likely just a redundent equal if it is a valid circuit path.
+                /// <summary> There appears to be a void in the ISA documentaion here. If what logicly should be here in physical ALUs can be determined fill this. </summary>
+                UNKNOWN03 = 0b011, // I would argue that this likely should be Not Equal Unsigned See Above, though as this makes no sense likely just a redundent Not Equals if anything.
+                /// <summary> Bitwise Exclusive OR </summary>
+                LT  = 0b100,
+                /// <summary> SRL/SRA: Shift Right Logical/Arithmetic </summary>
+                GE   = 0b101,
+                /// <summary> Bitwise OR </summary>
+                LTU   = 0b110,
+                /// <summary> Bitwise AND </summary>
+                GEU = 0b111,
             }
 
             public enum OPCODE : byte
@@ -945,6 +985,9 @@ namespace Kore
                 // public byte imm_12_10_5;
                 // public bool writeDirty;
                 // public bool readDirty;
+                /// <summary>
+                /// Note: Branch addressing should be multiplied by 2 because it is stored divided in half (This value is half of the actuall address offset to jump)
+                /// </summary>
                 public short imm;
 
                 public ulong Encode()
@@ -954,10 +997,16 @@ namespace Kore
                         Transcoder.from_func3(func3) |
                         Transcoder.from_rs1((byte)rs1) |
                         Transcoder.from_rs2((byte)rs2) |
-                        (((ulong)imm << 19) & 0b10000000_00000000_00000000_00000000) |
-                        (((ulong)imm >> 4) & 0b10000000) |
-                        (((ulong)imm & 0b11111100000) << 20) |
-                        (((ulong)imm & 0b11110) << 7);
+                        (((ulong)imm << 19) & 0b10000000_00000000_00000000_00000000) | // imm[12]
+                        // imm                                 0011_1111_0000
+                        // inst << 21 0111_1110_0000_0000_0000_0000_0000_0000
+                        (((ulong)imm & 0b11111100000) << 20) | // imm[10:5]
+                        // imm       0000_0000_1111
+                        // inst << 8 1111_0000_0000
+                        (((ulong)imm & 0b1111) << 8) | // imm[4:1]
+                        // imm  0100_0000_0000
+                        // inst >> 3 1000_0000
+                        (((ulong)imm & 0b10000000000u) >> 3); // imm[11]
                         //Transcoder.from_imm_12_10_5(imm_12_10_5);
                 }
                 public void Decode(ulong data)
@@ -971,10 +1020,20 @@ namespace Kore
 
                     // imm[12|10:5|4:1|11] = inst[31|30:25|11:8|7]
                     //(short)((ushort)(short)((ulong)(uint)(data & 0b10000000_00000000_00000000_00000000) >> 19)| 
-                    this.imm = (short)(((data & 0x80000000) == 0x80000000 ? 0xF800 : 0)
-                        | (ushort)((data & 0b1000_0000) << 4) // imm[11]
-                        | (ushort)((data >> 20) & 0b111_1110_0000) // imm[10:5]
-                        | (ushort)((data >> 7) & 0b0001_1110)); // imm[4:1]
+                    this.imm = (short)(
+                        ((data & 0x80000000u) == 0x80000000u ? 0b1111_1000_0000_0000u : 0)
+                            // imm  0100_0000_0000
+                            // inst << 3 1000_0000
+                            | ((
+                                (ushort)((data & 1000_0000) << 3) // imm[11]
+                                // imm                                 0011_1111_0000
+                                // inst >> 21 0111_1110_0000_0000_0000_0000_0000_0000
+                                | (ushort)((data & 0b0111_1110_0000_0000_0000_0000_0000_0000) >> 21) // imm[10:5]
+                                // imm       0000_0000_1111
+                                // inst >> 8 1111_0000_0000
+                                | (ushort)((data & 0b1111_0000_0000u) >> 8)
+                            ) & 0b0111_1111_1111u)
+                        ); // imm[4:1]
                 }
 
                 public BType clone()
