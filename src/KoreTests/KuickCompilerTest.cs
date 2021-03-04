@@ -28,7 +28,7 @@ namespace KoreTests
         /* 14 */ [TestCase(0x14, "addi  a2,a3,0   # Maecenas tincidunt nisi non pretium vulputate.", 0x00068613u)]
         /* 18 */ [TestCase(0x18, "addi  a5,a4,0   # Aliquam pharetra justo eget erat consectetur pharetra.", 0x00070793u)]
         /* 1C */ [TestCase(0x1C, "lw    a7,-4(a2) # Nunc condimentum felis eget fermentum sodales.", 0xffc62883u)]
-        /* 20 */ [TestCase(0x20, "bge   a6,a7,34  # Praesent vel nulla varius metus consequat mattis.", 0x01185a63u)]
+        /* 20 */ [TestCase(0x20, "bge   a6,a7,34  # Praesent vel nulla varius metus consequat mattis.", 0b0000000_10001_10000_101_10100_1100011u)]
         /* 24 */ [TestCase(0x24, "sw    a7,0(a2)  # Curabitur volutpat quam convallis dolor tempus viverra.", 0x01162023u)]
         /* 28 */ [TestCase(0x28, "addi  a5,a5,-1   ", 0xfff78793u)]
         /* 2C */ [TestCase(0x2C, "addi  a2,a2,-4  # Duis sagittis ante a quam faucibus suscipit.", 0xffc60613u)]

@@ -421,7 +421,8 @@ namespace Kore
                         if (Enum.TryParse(match.Groups[Regexpression.g.rri_r1].Value, out b.rs2) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `rs2` of `" + match.Groups[Regexpression.g.rri_r1].Value + "` in the BType partern `OP rs1, rs2, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
                         Int64 immTemp = 0; // TODO: This should probably be moved out to a global temp so that it does not cause memory alloc.
                         if (Int64.TryParse(match.Groups[Regexpression.g.rri_imm].Value, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out immTemp) == false) throw new Exception("External Compiler Panic", new Exception("Kuick Compiler could understand `imm` of `" + match.Groups[Regexpression.g.rri_imm].Value + "` in the BType partern `OP rs1, rs2, imm` with the input `" + asm + "` as a line of Risc-V ASM"));
-                        b.imm = (short)((immTemp - opStartByte) / 2);
+                        //b.imm = (short)((immTemp - opStartByte) / 2); // This is automatic from the corrections to the BType encoding that has been corrected
+                        b.imm = (short)(immTemp - opStartByte);
 
                         switch (op)
                         {
