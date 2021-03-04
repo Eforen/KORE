@@ -420,7 +420,7 @@ namespace KoreTests
 
 
             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode, TestUtils.getDataMismatchString((uint)Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, (uint)inst.opcode));
-            Assert.AreEqual(0x08, inst.imm * 2, TestUtils.getDataMismatchString(0x08, (uint) inst.imm)); // Note: Branch addressing is multiplied by 2
+            Assert.AreEqual(0x08, inst.imm, TestUtils.getDataMismatchString(0x08, (uint) inst.imm)); // Note: Branch addressing is always a multiple of 2 be vertue of the fact that the 0th bit is not set.
             Assert.AreEqual(0b110, inst.func3, TestUtils.getDataMismatchString(0b110, (uint) inst.func3));
             Assert.AreEqual(Register.a4, inst.rs1, TestUtils.getDataMismatchString((uint)Register.a4, (uint)inst.rs1));
             Assert.AreEqual(Register.a1, inst.rs2, TestUtils.getDataMismatchString((uint)Register.a1, (uint)inst.rs2));
@@ -430,7 +430,7 @@ namespace KoreTests
             inst.Decode(bge);
 
             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
-            Assert.AreEqual(0x14, inst.imm * 2); // Note: Branch addressing is multiplied by 2
+            Assert.AreEqual(0x14, inst.imm); // Note: Branch addressing is always a multiple of 2 be vertue of the fact that the 0th bit is not set.
             Assert.AreEqual(0b101, inst.func3);
             Assert.AreEqual(Register.a6, inst.rs1);
             Assert.AreEqual(Register.a7, inst.rs2);
@@ -440,7 +440,7 @@ namespace KoreTests
             inst.Decode(bne);
 
             Assert.AreEqual(Kore.RiscISA.Instruction.OPCODE.B32_BRANCH, inst.opcode);
-            Assert.AreEqual(-0x14, inst.imm * 2); // Note: Branch addressing is multiplied by 2
+            Assert.AreEqual(-0x14, inst.imm); // Note: Branch addressing is always a multiple of 2 be vertue of the fact that the 0th bit is not set.
             Assert.AreEqual(0b001, inst.func3);
             Assert.AreEqual(Register.a5, inst.rs1);
             Assert.AreEqual(Register.x0, inst.rs2);
@@ -473,22 +473,26 @@ namespace KoreTests
 #endif
                     for (byte func3 = 0; func3 <= 0b111; func3++)
                     {
-                        for (int ii = 0; ii < 4095; ii++)
+                        for (short ii = 0; ii < 0b1111111111110; ii+=0b10)
                         {
-                            short i = (short)(ii << 21 >> 20); // 1st bit is not used of so we shift to end of int and then back but we shift back one less so we sign extend and shift to correct position at the same time.
-                            
+                            // 1st bit is not used of so we shift to end of int and then back but we shift back one less so we sign extend and shift to correct position at the same time.
+                            // short i = (short)(ii << 21 >> 21); 
+                            short i = (short)((short)(ii << 3) >> 3);
+                            // 0b0001_1111__1111_1110
+
+
                             if (wasRun == false) wasRun = true;
                             // Register rs1 = (Register)rand.Next(0, 31);
                             // Register rs2 = (Register)rand.Next(0, 31);
                             // byte func3 = (byte)rand.Next(0, 0b111);
 
-                            inst.opcode = (OPCODE)0b0100011;
+                            inst.opcode = (OPCODE)0b1100011;
                             inst.rs1 = rs1;
                             inst.rs2 = rs2;
                             inst.func3 = func3;
                             inst.imm = i;
 
-                            Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                            Assert.AreEqual((OPCODE)0b1100011, inst.opcode);
                             Assert.AreEqual(i, inst.imm);
                             Assert.AreEqual(func3, inst.func3);
                             Assert.AreEqual(rs1, inst.rs1);
@@ -496,7 +500,7 @@ namespace KoreTests
 
                             ulong code = inst.Encode();
 
-                            Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
+                            Assert.AreEqual((OPCODE)0b1100011, inst.opcode);
                             Assert.AreEqual(i, inst.imm);
                             Assert.AreEqual(func3, inst.func3);
                             Assert.AreEqual(rs1, inst.rs1);
@@ -516,11 +520,19 @@ namespace KoreTests
 
                             inst.Decode(code);
 
-                            Assert.AreEqual((OPCODE)0b0100011, inst.opcode);
-                            Assert.AreEqual(i, inst.imm);
-                            Assert.AreEqual(func3, inst.func3);
-                            Assert.AreEqual(rs1, inst.rs1);
-                            Assert.AreEqual(rs2, inst.rs2);
+                            Assert.AreEqual((OPCODE)0b1100011, inst.opcode, TestUtils.getDataMismatchString(0b1100011, (uint)inst.opcode));
+                            Assert.AreEqual(func3, inst.func3, TestUtils.getDataMismatchString(func3, (uint)inst.func3));
+                            Assert.AreEqual(rs1, inst.rs1, TestUtils.getDataMismatchString((uint)rs1, (uint)inst.rs1));
+                            Assert.AreEqual(rs2, inst.rs2, TestUtils.getDataMismatchString((uint)rs1, (uint)inst.rs1));
+                            try
+                            {
+                                Assert.AreEqual(i, inst.imm, TestUtils.getDataMismatchString((uint)i, (uint)inst.imm));
+                            }
+                            catch (Exception e)
+                            {
+                                Assert.AreEqual(0, code, TestUtils.getDataMismatchString((uint)0, (uint)code)); //Debug only do not leave this line uncommented in actual testing
+                                throw e;
+                            }
                         }
                     }
 #if FULLTEST

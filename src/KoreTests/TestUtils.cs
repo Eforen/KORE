@@ -16,7 +16,7 @@ namespace KoreTests
         public static string getDataMismatchString(uint expected, uint actual)
         {
                                                            // Expect:
-            return String.Format("Data Mismatch\n  Bit#: {0}\n        {1}\nExpect: {2}\nActual: {3}", "|3332222|22222|21111|111|11100|0000000|", "|2109876|54321|09876|543|21098|7654321|", getRootDataSplitString(expected), getRootDataSplitString(actual));
+            return String.Format("Data Mismatch\n  Bit#: {0}\n        {1}\nExpect: {2}\nActual: {3}", "|3322222|22222|11111|111|11000|0000000|", "|1098765|43210|98765|432|10987|6543210|", getRootDataSplitString(expected), getRootDataSplitString(actual));
 //             return "Data Mismatch\n" +
 //                 Convert.ToString((int)(code), 2).PadLeft(32, '0') +
 //                 "\n" +

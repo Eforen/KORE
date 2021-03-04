@@ -986,27 +986,33 @@ namespace Kore
                 // public bool writeDirty;
                 // public bool readDirty;
                 /// <summary>
-                /// Note: Branch addressing should be multiplied by 2 because it is stored divided in half (This value is half of the actuall address offset to jump)
+                /// Note: Branch addressing should be a multiple of 2 because it is stored divided in half by vertue of the fact the 0th bit is truncated (This value is the full address offset to jump but will be truncated by removing the 0th bit when encoded)
                 /// </summary>
                 public short imm;
 
                 public ulong Encode()
                 {
+                    if((0b01u & this.imm) > 0) this.imm = (short)(this.imm >> 1 << 1);
                     return (byte)opcode |
                         //Transcoder.from_imm_4_0(imm_4_1_11) |
                         Transcoder.from_func3(func3) |
                         Transcoder.from_rs1((byte)rs1) |
                         Transcoder.from_rs2((byte)rs2) |
                         (((ulong)imm << 19) & 0b10000000_00000000_00000000_00000000) | // imm[12]
-                        // imm                                 0011_1111_0000
-                        // inst << 21 0111_1110_0000_0000_0000_0000_0000_0000
-                        (((ulong)imm & 0b11111100000) << 20) | // imm[10:5]
-                        // imm       0000_0000_1111
-                        // inst << 8 1111_0000_0000
-                        (((ulong)imm & 0b1111) << 8) | // imm[4:1]
-                        // imm  0100_0000_0000
-                        // inst >> 3 1000_0000
-                        (((ulong)imm & 0b10000000000u) >> 3); // imm[11]
+                        //                                   2 1098_7654_3210
+                        // imm                               0_0111_1110_0000
+                        // inst << 20 0111_1110_0000_0000_0000_0000_0000_0000
+                        //             0b0_0111_1110_0000
+                        (((ulong)imm & 0b0_0111_1110_0000) << 20) | // imm[10:5]
+                        //          2 1098_7654_3210
+                        // imm      0_0000_0001_1110
+                        // inst << 7  1111_0000_0000
+                        (((ulong)imm & 0b11110) << 7) | // imm[4:1]
+                        //      2 1098_7654_3210
+                        // imm  0_1000_0000_0000
+                        // inst >> 4   1000_0000
+                        //               0_1000_0000_0000
+                        (((ulong)imm & 0b0_1000_0000_0000u) >> 4); // imm[11]
                         //Transcoder.from_imm_12_10_5(imm_12_10_5);
                 }
                 public void Decode(ulong data)
@@ -1020,19 +1026,20 @@ namespace Kore
 
                     // imm[12|10:5|4:1|11] = inst[31|30:25|11:8|7]
                     //(short)((ushort)(short)((ulong)(uint)(data & 0b10000000_00000000_00000000_00000000) >> 19)| 
+                    //                                              1_0000_0000_0000
                     this.imm = (short)(
-                        ((data & 0x80000000u) == 0x80000000u ? 0b1111_1000_0000_0000u : 0)
-                            // imm  0100_0000_0000
-                            // inst << 3 1000_0000
+                        ((data & 0x80000000u) == 0x80000000u ? 0b1111_0000_0000_0000u : 0)
+                            // imm 0_1000_0000_0000
+                            // inst << 4  1000_0000
                             | ((
-                                (ushort)((data & 1000_0000) << 3) // imm[11]
-                                // imm                                 0011_1111_0000
-                                // inst >> 21 0111_1110_0000_0000_0000_0000_0000_0000
-                                | (ushort)((data & 0b0111_1110_0000_0000_0000_0000_0000_0000) >> 21) // imm[10:5]
-                                // imm       0000_0000_1111
-                                // inst >> 8 1111_0000_0000
-                                | (ushort)((data & 0b1111_0000_0000u) >> 8)
-                            ) & 0b0111_1111_1111u)
+                                (ushort)((data & 1000_0000) << 4) // imm[11]
+                                // imm                               0_0111_1110_0000
+                                // inst >> 20 0111_1110_0000_0000_0000_0000_0000_0000
+                                | (ushort)((data & 0b0111_1110_0000_0000_0000_0000_0000_0000) >> 20) // imm[10:5]
+                                // imm      0_0000_0001_1110
+                                // inst >> 7  1111_0000_0000
+                                | (ushort)((data & 0b1111_0000_0000u) >> 7)
+                            ) & 0b0_1111_1111_1110u)
                         ); // imm[4:1]
                 }
 
@@ -1043,6 +1050,7 @@ namespace Kore
             }
             public class UType : Instruction <UType>
             {
+                ///                          0b11111111_11111111_11110000_00000000
                 private const uint immMask = 0b11111111_11111111_11110000_00000000u;
 
                 /// <summary>
@@ -1058,14 +1066,14 @@ namespace Kore
                 {
                     return (byte)opcode |
                         Transcoder.from_rd((byte)rd) |
-                        (ulong) ((uint) imm << 12);
+                        (ulong) ((uint) imm & immMask);
                         //Transcoder.from_imm_31_12(imm_31_12);
                 }
                 public void Decode(ulong data)
                 {
                     opcode = (Kore.RiscISA.Instruction.OPCODE) Transcoder.to_opcode(data, true);
                     rd = (Register) Transcoder.to_rd(data, true);
-                    imm = (int) ((uint)data >> 12);
+                    imm = (int) ((uint)data & immMask);
                     //imm_31_12 = (byte)Transcoder.to_imm_31_12(data, true);
                 }
 
