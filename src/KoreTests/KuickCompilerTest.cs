@@ -41,12 +41,12 @@ namespace KoreTests
         /* 48 */ [TestCase(0x48, "jal x0, 8 # Bar", 0xfc1ff06fu)]
         [TestCase(0x20, "bne     a6,a7,28 # From Compiler", 0x01181463u)]
         [TestCase(-1, "li      a5,0", 0x00000793u)]
-        [TestCase(-1, "lui     a0,0x10", 0x00010537u)]
+        [TestCase(-1, "lui     a0,10", 0x00010537u)]
         [TestCase(-1, "ret", 0x00008067u)]
         [TestCase(-1, "auipc   gp,0x2", 0x00002197u)]
         [TestCase(-1, "sub     a2,a2,a0", 0x40a60633u)]
         [TestCase(-1, "li      a1,0", 0x00000593u)]
-        [TestCase(-1, "auipc   a0,0x0", 0x00000517u)]
+        [TestCase(-1, "auipc   a0,0", 0x00000517u)]
         [TestCase(-1, "lw      a0,0(sp)", 0x00012503u)]
         [TestCase(-1, "addi    a1,sp,8", 0x00810593u)]
         [TestCase(-1, "li      a2,0", 0x00000613u)]
@@ -54,13 +54,13 @@ namespace KoreTests
         [TestCase(-1, "sd      s0,0(sp)", 0x00813023u)]
         [TestCase(-1, "mv      s0,a5", 0x00078413u)]
         [TestCase(-1, "sd      ra,8(sp)", 0x00113423u)]
-        [TestCase(-1, "lui     a0,0x11", 0x00011537u)]
-        [TestCase(-1, "auipc   ra,0x0", 0x00000097u)]
+        [TestCase(-1, "lui     a0,11", 0x00011537u)]
+        [TestCase(-1, "auipc   ra,0", 0x00000097u)]
         [TestCase(-1, "li      a5,1", 0x00100793u)]
         [TestCase(-1, "ld      ra,8(sp)", 0x00813083u)]
         [TestCase(-1, "ld      s0,0(sp)", 0x00013403u)]
         [TestCase(-1, "addi    sp,sp,16", 0x01010113u)]
-        [TestCase(-1, "auipc   t1,0x0", 0x00000317u)]
+        [TestCase(-1, "auipc   t1,0", 0x00000317u)]
         [TestCase(-1, "mv      s0,a0", 0x00050413u)]
         [TestCase(-1, "ld      a5,88(a0)", 0x05853783u)]
         [TestCase(-1, "jalr    a5", 0x000780e7u)]
@@ -68,12 +68,12 @@ namespace KoreTests
         [TestCase(-1, "addi    sp,sp,-32", 0xfe010113u)]
         [TestCase(-1, "sd      s0,16(sp)", 0x00813823u)]
         [TestCase(-1, "sd      s2,0(sp)", 0x01213023u)]
-        [TestCase(-1, "lui     s0,0x11", 0x00011437u)]
-        [TestCase(-1, "lui     s2,0x11", 0x00011937u)]
+        [TestCase(-1, "lui     s0,11", 0x00011437u)]
+        [TestCase(-1, "lui     s2,11", 0x00011937u)]
         [TestCase(-1, "sub     s2,s2,a5", 0x40f90933u)]
         [TestCase(-1, "sd      ra,24(sp)", 0x00113c23u)]
         [TestCase(-1, "sd      s1,8(sp)", 0x00913423u)]
-        [TestCase(-1, "srai    s2,s2,0x3", 0x40395913u)]
+        [TestCase(-1, "srai    s2,s2,3", 0x40395913u)]
         [TestCase(-1, "addi    s0,s0,1468", 0x5bc40413u)]
         [TestCase(-1, "li      s1,0", 0x00000493u)]
         [TestCase(-1, "ld      a5,0(s0)", 0x00043783u)]
@@ -95,8 +95,8 @@ namespace KoreTests
         [TestCase(-1, "sd      a1,8(a4)", 0x00b73423u)]
         [TestCase(-1, "addi    a4,a4,16", 0x01070713u)]
         [TestCase(-1, "sub     a3,t1,a2", 0x40c306b3u)]
-        [TestCase(-1, "slli    a3,a3,0x2", 0x00269693u)]
-        [TestCase(-1, "auipc   t0,0x0", 0x00000297u)]
+        [TestCase(-1, "slli    a3,a3,2", 0x00269693u)]
+        [TestCase(-1, "auipc   t0,0", 0x00000297u)]
         [TestCase(-1, "add     a3,a3,t0", 0x005686b3u)]
         [TestCase(-1, "jr      12(a3)", 0x00c68067u)]
         [TestCase(-1, "sb      a1,14(a4)", 0x00b70723u)]
@@ -115,11 +115,11 @@ namespace KoreTests
         [TestCase(-1, "sb      a1,1(a4)", 0x00b700a3u)]
         [TestCase(-1, "sb      a1,0(a4)", 0x00b70023u)]
         [TestCase(-1, "andi    a1,a1,255", 0x0ff5f593u)]
-        [TestCase(-1, "slli    a3,a1,0x8", 0x00859693u)]
+        [TestCase(-1, "slli    a3,a1,8", 0x00859693u)]
         [TestCase(-1, "or      a1,a1,a3", 0x00d5e5b3u)]
-        [TestCase(-1, "slli    a3,a1,0x10", 0x01059693u)]
-        [TestCase(-1, "slli    a3,a1,0x20", 0x02059693u)]
-        [TestCase(-1, "slli    a3,a5,0x2", 0x00279693u)]
+        [TestCase(-1, "slli    a3,a1,10", 0x01059693u)]
+        [TestCase(-1, "slli    a3,a1,20", 0x02059693u)]
+        [TestCase(-1, "slli    a3,a5,2", 0x00279693u)]
         [TestCase(-1, "mv      t0,ra", 0x00008293u)]
         [TestCase(-1, "jalr    -104(a3)", 0xf98680e7u)]
         [TestCase(-1, "mv      ra,t0", 0x00028093u)]
@@ -144,7 +144,7 @@ namespace KoreTests
         [TestCase(-1, "li      s3,-1", 0xfff00993u)]
         [TestCase(-1, "lw      s1,8(s2)", 0x00892483u)]
         [TestCase(-1, "addiw   s0,s1,-1", 0xfff4841bu)]
-        [TestCase(-1, "slli    s1,s1,0x3", 0x00349493u)]
+        [TestCase(-1, "slli    s1,s1,3", 0x00349493u)]
         [TestCase(-1, "add     s1,s2,s1", 0x009904b3u)]
         [TestCase(-1, "ld      a5,520(s1)", 0x2084b783u)]
         [TestCase(-1, "addiw   s0,s0,-1", 0xfff4041bu)]
@@ -181,9 +181,9 @@ namespace KoreTests
         [TestCase(-1, "mv      a1,a0", 0x00050593u)]
         [TestCase(-1, "li      a3,0", 0x00000693u)]
         [TestCase(-1, "li      a0,0", 0x00000513u)]
-        [TestCase(-1, "lui     a5,0x11", 0x000117b7u)]
+        [TestCase(-1, "lui     a5,11", 0x000117b7u)]
         [TestCase(-1, "sub     a5,a5,s0", 0x408787b3u)]
-        [TestCase(-1, "srai    s1,a5,0x3", 0x4037d493u)]
+        [TestCase(-1, "srai    s1,a5,3", 0x4037d493u)]
         [TestCase(-1, "addi    a5,a5,-8", 0xff878793u)]
         [TestCase(-1, "add     s0,a5,s0", 0x00878433u)]
         [TestCase(-1, "addi    s1,s1,-1", 0xfff48493u)]
@@ -191,7 +191,7 @@ namespace KoreTests
         [TestCase(-1, "ld      a5,504(a4)", 0x1f873783u)]
         [TestCase(-1, "lw      a4,8(a5)", 0x0087a703u)]
         [TestCase(-1, "li      a6,31", 0x01f00813u)]
-        [TestCase(-1, "slli    a6,a4,0x3", 0x00371813u)]
+        [TestCase(-1, "slli    a6,a4,3", 0x00371813u)]
         [TestCase(-1, "add     a6,a5,a6", 0x01078833u)]
         [TestCase(-1, "sd      a2,272(a6)", 0x10c83823u)]
         [TestCase(-1, "lw      a7,784(a5)", 0x3107a883u)]
@@ -202,7 +202,7 @@ namespace KoreTests
         [TestCase(-1, "sd      a3,528(a6)", 0x20d83823u)]
         [TestCase(-1, "li      a3,2", 0x00200693u)]
         [TestCase(-1, "addi    a3,a4,2", 0x00270693u)]
-        [TestCase(-1, "slli    a3,a3,0x3", 0x00369693u)]
+        [TestCase(-1, "slli    a3,a3,3", 0x00369693u)]
         [TestCase(-1, "addiw   a4,a4,1", 0x0017071bu)]
         [TestCase(-1, "sw      a4,8(a5)", 0x00e7a423u)]
         [TestCase(-1, "add     a5,a5,a3", 0x00d787b3u)]
@@ -222,7 +222,7 @@ namespace KoreTests
         public void compileDataSingle(int opStartByte, string str, uint code)
         {
             if(opStartByte < 0) opStartByte = getRandomInstructionStartingPoint();
-            uint result = KuickCompiler.assembleSingleLine(opStartByte, str);
+            uint result = KuickCompiler.assembleSingleLine((ulong)opStartByte, str);
             Assert.AreEqual(code, result,
                 TestUtils.getDataMismatchString(code,result)
             );
@@ -308,7 +308,7 @@ namespace KoreTests
         public void compileDataSingleComplexRef(int opStartByte, string str, uint code)
         {
             if(opStartByte < 0) opStartByte = getRandomInstructionStartingPoint();
-            uint result = KuickCompiler.assembleSingleLine(opStartByte, str);
+            uint result = KuickCompiler.assembleSingleLine((ulong)opStartByte, str);
             Assert.AreEqual(code, result, TestUtils.getDataMismatchString(code, result));
         }
 
