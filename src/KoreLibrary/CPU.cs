@@ -280,14 +280,22 @@ namespace Kore
                             }
                             break;
                         case OPCODE.B32_OP: //ADD is not the correct term for this but I have not gotten to the correct one yet
-                            switch (currentIType.func3)
+                            switch ((FUNC3_ALU) currentIType.func3)
                             {
-                                case 0b000: //ADD
+                                case FUNC3_ALU.ADD: //ADD
                                     pipeWriteMode = PIPELINE_WRITE_MODE.WRITE_REGISTER;
                                     pipeWriteAddress = (ulong)currentRType.rd;
-                                    pipeWriteData = currentReadRS1 + currentReadRS2;
+                                    if(currentRType.func7 == 0b0100000) pipeWriteData = currentReadRS1 - currentReadRS2;
+                                    else pipeWriteData = currentReadRS1 + currentReadRS2;
                                     pipeWriteByteCount = 8;
                                     break;
+                                case FUNC3_ALU.SLL:
+                                case FUNC3_ALU.SLT:
+                                case FUNC3_ALU.SLTU:
+                                case FUNC3_ALU.XOR:
+                                case FUNC3_ALU.SR:
+                                case FUNC3_ALU.OR:
+                                case FUNC3_ALU.AND:
                                 default:
                                     break;
                             }
