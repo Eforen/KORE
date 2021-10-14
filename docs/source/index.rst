@@ -6,6 +6,9 @@
 .. warning::
     This project is not complete.
 
+.. warning::
+    This project is currently in to process of moving from a custom ISA to the RISC-V ISA and thus some of this documentation is for RISC-V ISA and some is not.
+
 Welcome to KORE's documentation!
 ================================
 
@@ -52,6 +55,21 @@ Indices and tables
 
     assembly/spec
     assembly/structure
+    assembly/catalog
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+    :caption: Instructions
+
+    instructions/catalog
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+    :caption: Machine Instruction Format (1s and 0s)
+
+    instruction_encoding/data_format
 
 .. toctree::
     :maxdepth: 2

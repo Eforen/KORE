@@ -14,7 +14,75 @@ namespace KoreTests
     public class KuickCompilerTest
     {
         private static Random rand = new Random();
-        
+
+        public void KuickAsmLoadLines()
+        {
+            string input = "addi  a3,a0,4   # Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n" +
+                            "addi  a4,x0,1   # Sed eget nisl eget ipsum rutrum congue id in libero.\n" +
+                            "bltu  a4,a1,10  # Aenean nec lacus eget diam placerat accumsan nec et nunc.\n" +
+                            "jalr  x0,x1,0   # Ut ultrices diam et bibendum bibendum.\n" +
+                            "lw    a6, 0(a3) # Aenean congue nunc non molestie accumsan.\n" +
+                            "addi  a2,a3,0   # Maecenas tincidunt nisi non pretium vulputate.\n" +
+                            "addi  a5,a4,0   # Aliquam pharetra justo eget erat consectetur pharetra.\n" +
+                            "lw    a7,-4(a2) # Nunc condimentum felis eget fermentum sodales.\n" +
+                            "bge   a6,a7,34  # Praesent vel nulla varius metus consequat mattis.\n" +
+                            "sw    a7,0(a2)  # Curabitur volutpat quam convallis dolor tempus viverra.";
+            string[] output = new string[] {
+                "addi  a3,a0,4   # Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "addi  a4,x0,1   # Sed eget nisl eget ipsum rutrum congue id in libero.",
+                "bltu  a4,a1,10  # Aenean nec lacus eget diam placerat accumsan nec et nunc.",
+                "jalr  x0,x1,0   # Ut ultrices diam et bibendum bibendum.",
+                "lw    a6, 0(a3) # Aenean congue nunc non molestie accumsan.",
+                "addi  a2,a3,0   # Maecenas tincidunt nisi non pretium vulputate.",
+                "addi  a5,a4,0   # Aliquam pharetra justo eget erat consectetur pharetra.",
+                "lw    a7,-4(a2) # Nunc condimentum felis eget fermentum sodales.",
+                "bge   a6,a7,34  # Praesent vel nulla varius metus consequat mattis.",
+                "sw    a7,0(a2)  # Curabitur volutpat quam convallis dolor tempus viverra."
+            };
+
+            KuickAssemblyObject obj = new KuickAssemblyObject(input);
+
+            for (int line = 0; line < output.Length; line++)
+            {
+                Assert.AreEqual(obj.getLine(line), output[line]);
+                Assert.AreEqual(obj[line], output[line]);
+            }
+        }
+        public void KuickAsmLoadLinesWindowsLineEnding()
+        {
+            string input = "addi  a3,a0,4   # Lorem ipsum dolor sit amet, consectetur adipiscing elit.\r\n" +
+                            "addi  a4,x0,1   # Sed eget nisl eget ipsum rutrum congue id in libero.\r\n" +
+                            "bltu  a4,a1,10  # Aenean nec lacus eget diam placerat accumsan nec et nunc.\r\n" +
+                            "jalr  x0,x1,0   # Ut ultrices diam et bibendum bibendum.\r\n" +
+                            "lw    a6, 0(a3) # Aenean congue nunc non molestie accumsan.\r\n" +
+                            "addi  a2,a3,0   # Maecenas tincidunt nisi non pretium vulputate.\r\n" +
+                            "addi  a5,a4,0   # Aliquam pharetra justo eget erat consectetur pharetra.\r\n" +
+                            "lw    a7,-4(a2) # Nunc condimentum felis eget fermentum sodales.\r\n" +
+                            "bge   a6,a7,34  # Praesent vel nulla varius metus consequat mattis.\r\n" +
+                            "sw    a7,0(a2)  # Curabitur volutpat quam convallis dolor tempus viverra.";
+
+            string[] output = new string[] {
+                "addi  a3,a0,4   # Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "addi  a4,x0,1   # Sed eget nisl eget ipsum rutrum congue id in libero.",
+                "bltu  a4,a1,10  # Aenean nec lacus eget diam placerat accumsan nec et nunc.",
+                "jalr  x0,x1,0   # Ut ultrices diam et bibendum bibendum.",
+                "lw    a6, 0(a3) # Aenean congue nunc non molestie accumsan.",
+                "addi  a2,a3,0   # Maecenas tincidunt nisi non pretium vulputate.",
+                "addi  a5,a4,0   # Aliquam pharetra justo eget erat consectetur pharetra.",
+                "lw    a7,-4(a2) # Nunc condimentum felis eget fermentum sodales.",
+                "bge   a6,a7,34  # Praesent vel nulla varius metus consequat mattis.",
+                "sw    a7,0(a2)  # Curabitur volutpat quam convallis dolor tempus viverra."
+            };
+
+            KuickAssemblyObject obj = new KuickAssemblyObject(input);
+
+            for (int line = 0; line < output.Length; line++)
+            {
+                Assert.AreEqual(obj.getLine(line), output[line]);
+                Assert.AreEqual(obj[line], output[line]);
+            }
+        }
+
         /** get random 4 byte aligned byte possition */
         public static int getRandomInstructionStartingPoint(){
             return rand.Next(1000)*4;
@@ -312,10 +380,94 @@ namespace KoreTests
             Assert.AreEqual(code, result, TestUtils.getDataMismatchString(code, result));
         }
 
+/*
+        [TestCase(".text", new Type[] { typeof(KuickDirectiveToken)})] 
+        [TestCase(".global _start", new KuickLexerToken[] { new KuickDirectiveToken(".text"), new KuickLexerToken("_start") })]
+        [TestCase(".type _start, @function", new KuickLexerToken[] { new KuickDirectiveToken(".text"), new KuickLexerToken("_start"), new KuickLexerToken("@function") })]
+*/
+
         [Test, Ignore("Not Understood Yet")]
         public void asemblerMacros(string[] strings, uint[] codes)
         {
         }
+
+        [Test, Ignore("Not Coded Yet")]
+        public void asemblerMacroText(string[] strings, uint[] codes)
+        {
+            // .text
+            // Subsequent items are stored in the text section (machine code).
+            // should always start at 0x1000 due to RISC-V Conventions
+        }
+
+        [Test, Ignore("Not Coded Yet")]
+        public void asemblerMacroData(string[] strings, uint[] codes)
+        {
+            // .data
+            // Subsequent items are stored in the data section (global variables staticly set).
+            // This should always imidiately follow the text section
+            // in this above definition we do not mean staticly set in that it does not change thus being read-only we mean that the value to start with is provided in the object file
+        }
+
+        [Test, Ignore("Not Coded Yet")]
+        public void asemblerMacroBSS(string[] strings, uint[] codes)
+        {
+            // .bss
+            // Subsequent items are stored in the bss section (global variables initialized to 0).
+            // This should always be the last data in the file because any time before that and the assembler would need to include that data in the raw bin file output padding with 0s where at the end nothing needs to be done because our implimentation already initialzes to zero all memory.
+        }
+
+        [Test, Ignore("Not Coded Yet")]
+        public void asemblerMacroSection(string[] strings, uint[] codes)
+        {
+            // .section .foo
+            // Subsequent items are stored in the section named .foo (not entirly sure what this is for yet...).
+            // I will impliment this when I know what it does...
+        }
+
+        [Test, Ignore("Not Coded Yet")]
+        public void asemblerMacroAlign(string[] strings, uint[] codes)
+        {
+            // .align n
+            // Align the next datum on a 2n-byte boundary 
+            // I will impliment this when I know what it does...
+        }
+
+        [Test, Ignore("Not Coded Yet")]
+        public void asemblerMacroBAlign(string[] strings, uint[] codes)
+        {
+            // .balign n
+            // Align the next datum on a 2n-byte boundary 
+            // I will impliment this when I know what it does...
+        }
+
+        [Test, Ignore("Not Coded Yet")]
+        public void asemblerMacroGlobal(string[] strings, uint[] codes)
+        {
+            // .global <sym>
+            // Allows the symbol to be used in other files
+            // as we are not compiling
+        }
+
+        // .string "str"
+        // .byte b1, b2,...., bn
+        // .half w1, w2,...., wn
+        // .word w1, w2,...., wn
+        // .dword w1, w2,...., wn
+        // .float f1, f2,...., fn
+        // .double d1, d2,...., dn
+        // .option rvc
+        // .option norvc
+        // .option relax
+        // .option norelax
+        // .option pic
+        // .option nopic
+        // .option push
+        /* .repeat
+         * asm
+         * .endr
+         * this will not be implimented until later down the road
+         * */
+        // .option push
 
         public void compileDataMulti(string[] strings, uint[] codes)
         {

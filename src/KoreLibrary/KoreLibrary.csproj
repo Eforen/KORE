@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="ALU.cs" />
     <Compile Include="CPU.cs" />
+    <Compile Include="KuickTokenizer.cs" />
+    <Compile Include="KuickParser.cs" />
     <Compile Include="MainBus.cs" />
     <Compile Include="MainBusComponent.cs" />
     <Compile Include="MiscUtilities.cs" />

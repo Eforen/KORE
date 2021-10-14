@@ -1,6 +1,7 @@
 ﻿using Kore.RiscISA;
 using Kore.RiscISA.Instruction;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -10,6 +11,30 @@ using System.Threading.Tasks;
 
 namespace Kore
 {
+    /// <summary>
+    /// This object holds all the data about an ongoing Assembly Compile
+    /// </summary>
+    public class KuickAssemblyObject
+    {
+        Dictionary<long, string> arr = new Dictionary<long, string>();
+        public KuickAssemblyObject(string asm)
+        {
+
+        }
+
+        public double getLine(int line)
+        {
+            throw new NotImplementedException();
+        }
+
+        //TODO: This may need to change to another object type the support other types of information being stored about a line we shall see
+        public string this[long i]
+        {
+            get { return arr.ContainsKey(i) ? arr[i] : null; }
+            set { arr[i] = value; }
+        }
+    }
+
     public static class KuickCompiler {
         // This regex is built with static read only strings because its basicly free because of how the C# compiler handels it and even if not for that it would only be done once.
         public static class Regexpression
