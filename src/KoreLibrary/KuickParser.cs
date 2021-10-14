@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,21 @@ namespace Kore
             public object value;
             public override string ToString()
             {
-                return "[" + Enum.GetName(typeof(KuickTokenizer.Token), type) + "|" + value.ToString() +"]";
+                if(value != null && value.GetType().IsArray)
+                {
+                    string str = "[";
+                    bool first = true;
+                    foreach (object item in (object[])value)
+                    {
+                        if (item == null) continue;
+                        if (first) first = false;
+                        else str += ",";
+                        str += item.ToString();
+                    }
+                    str += "]";
+                    return "[" + Enum.GetName(typeof(KuickTokenizer.Token), type) + "|" + str + "]";
+                }
+                return "[" + Enum.GetName(typeof(KuickTokenizer.Token), type) + (value == null ? "" : "|" + value.ToString()) +"]";
             }
         }
 
@@ -54,12 +69,53 @@ namespace Kore
          * Main entry point.
          * 
          * Page
-         *   : NumericLiteral
+         *   : Expression
          *   ;
          */
         ParseData Page()
         {
-            return new ParseData { type = KuickTokenizer.Token.PAGE, value = Literal() };
+            return new ParseData { type = KuickTokenizer.Token.PAGE, value = ExpressionList() };
+        }
+
+        /**
+         * ExpressionList
+         *    : Expression
+         *    : ExpressionList Expression
+         *    ;
+         */
+        ParseData ExpressionList()
+        {
+            ArrayList expressions = new ArrayList(1);
+            while(_nextToken.token != KuickTokenizer.Token.EOF)
+            {
+                _voidAnyNullTokens();
+                var expression = Expression();
+                if(expression.type != KuickTokenizer.Token.EOF) expressions.Add(expression);
+            }
+            if (expressions.Count == 1) return (ParseData)expressions[0];
+            return new ParseData() { type = KuickTokenizer.Token.EXPRESSION_LIST, value = expressions.ToArray() };
+        }
+
+        /**
+         * Expression
+         *    : DirectiveCall
+         *    : Literal
+         *    ;
+         */
+        ParseData Expression()
+        {
+            switch (_nextToken.token)
+            {
+                case KuickTokenizer.Token.DIRECTIVE:
+                    return DirectiveCall();
+                case KuickTokenizer.Token.NUMBER_INT:
+                case KuickTokenizer.Token.STRING:
+                    return Literal();
+                case KuickTokenizer.Token.EOF:
+                    return new ParseData() { type = KuickTokenizer.Token.EOF, value = null };
+                default:
+                    throw new ParserSyntaxException("Expression: unexpected expression `" + _nextToken.value + "`");
+            }
         }
 
         /**
@@ -74,6 +130,8 @@ namespace Kore
             {
                 case KuickTokenizer.Token.NUMBER_INT:
                     return IntLiteral();
+                case KuickTokenizer.Token.STRING:
+                    return StringLiteral();
                 default:
                     throw new ParserSyntaxException("Literal: unexpected literal `" + _nextToken.value + "`");
             }
@@ -89,6 +147,189 @@ namespace Kore
             var token = _consume(KuickTokenizer.Token.NUMBER_INT);
             return new ParseData { type = KuickTokenizer.Token.NUMBER_INT, value = Int32.Parse(token.value) };
         }
+
+        /**
+         * StringLiteral
+         *   : STRING
+         *   ;
+         */
+        ParseData StringLiteral()
+        {
+            var token = _consume(KuickTokenizer.Token.STRING);
+            return new ParseData { type = KuickTokenizer.Token.STRING, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+
+        /**
+         * Compiler Directive Call
+         *   : DirectiveText
+         *   : DirectiveData
+         *   : DirectiveBss
+         *   : DirectiveSection
+         *   : DirectiveAlign
+         *   : DirectiveBAlign
+         *   : DirectiveGlobal
+         *   : DirectiveString
+         *   : DirectiveByte
+         *   : DirectiveHalf
+         *   : DirectiveWord
+         *   : DirectiveDword
+         *   : DirectiveFloat
+         *   : DirectiveDouble
+         *   : DirectiveOption
+         *   ;
+         */
+        ParseData DirectiveCall()
+        {
+            switch (_nextToken.value.ToLower().Substring(1))
+            {
+                case "text":
+                    return DirectiveSimple();
+                case "data":
+                    return DirectiveSimple();
+                case "bss":
+                    return DirectiveSimple();
+                case "section":
+                    return DirectiveSection();
+                case "align":
+                    return DirectiveAlign();
+                case "balign":
+                    return DirectiveBAlign();
+                case "global":
+                    return DirectiveGlobal();
+                case "string":
+                    return DirectiveString();
+                case "byte":
+                    return DirectiveByte();
+                case "half":
+                    return DirectiveHalf();
+                case "word":
+                    return DirectiveWord();
+                case "dword":
+                    return DirectiveDword();
+                case "float":
+                    return DirectiveFloat();
+                case "double":
+                    return DirectiveDouble();
+                case "option":
+                    return DirectiveOption();
+                default:
+                    throw new ParserSyntaxException("DirectiveCall: unexpected directive `" + _nextToken.value.Substring(1) + "`");
+            }
+        }
+        /// <summary>
+        /// Serves Text, Data, and BSS directives
+        /// </summary>
+        /// <returns></returns>
+        ParseData DirectiveSimple()
+        {
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+
+            switch (token.value.ToLower().Substring(1))
+            {
+                case "text":
+                    token.token = KuickTokenizer.Token.DIRECTIVE_TEXT;
+                    break;
+                case "data":
+                    token.token = KuickTokenizer.Token.DIRECTIVE_DATA;
+                    break;
+                case "bss":
+                    token.token = KuickTokenizer.Token.DIRECTIVE_BSS;
+                    break;
+                default:
+                    throw new ParserSyntaxException("DirectiveSimple: unexpected directive `" + token.value.Substring(1) + "`");
+            }
+            return new ParseData { type = token.token, value = null };
+        }
+
+        ParseData DirectiveSection()
+        {
+            throw new NotImplementedException("Section Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_SECTION, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveAlign()
+        {
+            throw new NotImplementedException("Align Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_ALIGN, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveBAlign()
+        {
+            throw new NotImplementedException("BAlign Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_BALIGN, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveGlobal()
+        {
+            throw new NotImplementedException("Global Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_GLOBAL, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveString()
+        {
+            throw new NotImplementedException("String Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_STRING, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveByte()
+        {
+            throw new NotImplementedException("Byte Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_BYTE, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveHalf()
+        {
+            throw new NotImplementedException("Half Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_HALF, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveWord()
+        {
+            throw new NotImplementedException("Word Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_WORD, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveDword()
+        {
+            throw new NotImplementedException("Dword Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_DWORD, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveFloat()
+        {
+            throw new NotImplementedException("Float Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_FLOAT, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveDouble()
+        {
+            throw new NotImplementedException("Double Directive not supported yet");
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_DOUBLE, value = token.value.Substring(1, token.value.Length - 2) };
+        }
+        ParseData DirectiveOption()
+        {
+            // Consume the Directive Call
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+
+            // Consume the Option Flag
+            var option = Identifier();
+            // return an options directive
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_OPTION, value = ((string)(option.value)).ToLower() };
+        }
+
+
+        /**
+         * Identifier
+         *   : IDENTIFIER
+         *   ;
+         */
+        ParseData Identifier()
+        {
+            var token = _consume(KuickTokenizer.Token.IDENTIFIER);
+            return new ParseData { type = KuickTokenizer.Token.IDENTIFIER, value = token.value };
+        }
+
 
         /// <summary>
         /// Expects that the next token is of expectedToken and if it is not will throw an error

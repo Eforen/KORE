@@ -9,11 +9,6 @@ namespace Kore
 {
     public class KuickTokenizer
     {
-        public class TokenSyntaxException: Exception
-        {
-            public TokenSyntaxException(string message) : base(message){}
-            public TokenSyntaxException(string message, Exception innerException) : base(message, innerException){}
-        }
 
         public enum Token : int
         {
@@ -30,7 +25,45 @@ namespace Kore
             REGISTER,
             PREPROCESSOR,
             PARREN_OPEN,
-            PARREN_CLOSE
+            PARREN_CLOSE,
+            IDENTIFIER,
+            DIRECTIVE_TEXT,
+            DIRECTIVE_DATA,
+            DIRECTIVE_BSS,
+            DIRECTIVE_SECTION,
+            DIRECTIVE_ALIGN,
+            DIRECTIVE_BALIGN,
+            DIRECTIVE_GLOBAL,
+            DIRECTIVE_STRING,
+            DIRECTIVE_BYTE,
+            DIRECTIVE_HALF,
+            DIRECTIVE_WORD,
+            DIRECTIVE_DWORD,
+            DIRECTIVE_FLOAT,
+            DIRECTIVE_DOUBLE,
+            DIRECTIVE_OPTION,
+            EOF,
+            EXPRESSION_LIST
+        }
+
+        public TokenFinder[] Spec =
+        {
+            new TokenFinder(@"^\s+", Token.NULL), // Whitespace
+            new TokenFinder(@"^\n+", Token.NULL), // Whitespace
+            new TokenFinder(@"^\/\/.*", Token.NULL), // Throw away // comments
+            new TokenFinder(@"^#.*", Token.NULL), // Throw away # comments
+            new TokenFinder(@"^\/\*[\s\S]*?\*\/", Token.NULL), // Throw away /* {ANY} */ comments
+            new TokenFinder(@"^\d+", Token.NUMBER_INT), // Number
+            new TokenFinder(@"^""[^""]*""", Token.STRING), // " String //TODO: Make this allow escapes
+            new TokenFinder(@"^'[^']*'", Token.STRING), // ' String //TODO: Make this allow escapes
+            new TokenFinder(@"^\.[a-zA-Z]*", Token.DIRECTIVE), // Directive
+            new TokenFinder(@"^[a-zA-Z]*:", Token.LABEL), // Label
+            new TokenFinder(@"^\w+", Token.IDENTIFIER), // Identifier
+        };
+        public class TokenSyntaxException : Exception
+        {
+            public TokenSyntaxException(string message) : base(message) { }
+            public TokenSyntaxException(string message, Exception innerException) : base(message, innerException) { }
         }
 
         public struct TokenFinder
@@ -96,17 +129,6 @@ namespace Kore
             }
         }
 
-        public TokenFinder[] Spec =
-        {
-            new TokenFinder(@"^\s+", Token.NULL), // Whitespace
-            new TokenFinder(@"^\/\/.*", Token.NULL), // Throw away // comments
-            new TokenFinder(@"^#.*", Token.NULL), // Throw away # comments
-            new TokenFinder(@"^\/\*[\s\S]*?\*\/", Token.NULL), // Throw away /* {ANY} */ comments
-            new TokenFinder(@"^\d+", Token.NUMBER_INT), // Number
-            new TokenFinder(@"^""[^""]*""", Token.STRING), // " String //TODO: Make this allow escapes
-            new TokenFinder(@"^'[^']*'", Token.STRING), // ' String //TODO: Make this allow escapes
-        };
-
         /// <summary>
         /// This holds the string that is currently being Tokenized
         /// </summary>
@@ -146,7 +168,7 @@ namespace Kore
         public TokenData readToken()
         {
             // if no more tokens then return default
-            if (isEOF) return default;
+            if (isEOF) return new TokenData(KuickTokenizer.Token.EOF, null);
 
             string str = this._string.Substring(_cursor);
             string nextChar = getNextCharInStr(str);
