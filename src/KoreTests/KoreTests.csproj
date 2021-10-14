@@ -17,4 +17,10 @@
     <ProjectReference Include="..\KoreLibrary\KoreLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="rvddt.stand00.crt0.S">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -4,6 +4,7 @@ using NSubstitute;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -20,6 +21,19 @@ namespace KoreTests
             KuickParser parser = new KuickParser();
 
             string page = "42";
+
+            object r = parser.parse(page);
+
+            Console.WriteLine(r.ToString());
+            Assert.AreEqual("[PAGE|[NUMBER_INT|42]]", (r.ToString()));
+        }
+
+        [Test]
+        public void RVDDT_Stand00_crt0_Test()
+        {
+            KuickParser parser = new KuickParser();
+
+            string page = File.ReadAllText("rvddt.stand00.crt0.S");
 
             object r = parser.parse(page);
 
@@ -217,6 +231,36 @@ namespace KoreTests
                 Assert.AreEqual("[PAGE|[EXPRESSION_LIST|[[DIRECTIVE_OPTION|" + option + "],[NUMBER_INT|" + padding + "]]]]", (r1.ToString()));
                 Assert.AreEqual("[PAGE|[EXPRESSION_LIST|[[NUMBER_INT|" + padding + "],[DIRECTIVE_OPTION|" + option + "]]]]", (r2.ToString()));
                 Assert.AreEqual("[PAGE|[DIRECTIVE_OPTION|" + option + "]]", (r3.ToString()));
+            }
+        }
+
+
+        [TestCase("ajdgnf")]
+        [TestCase("sdgere")]
+        [TestCase("asdg4er")]
+        [TestCase("ASDgfagf4")]
+        [TestCase("_fnkejhb3")]
+        [TestCase("_3")]
+        [TestCase("asklfj_23")]
+        [TestCase("pop")]
+        public void GlobalDirectiveTest(string sym)
+        {
+            KuickParser parser = new KuickParser();
+
+            for (int i = 0; i < 100; i++)
+            {
+                int padding = rand.Next();
+                string page1 = " .global " + sym + " \n " + padding + " /* \n.global " + sym + "\n" + padding + "\n*/ ";
+                string page2 = "" + padding + " \n\n\n\n\n\n.global " + sym + "";
+                string page3 = ".global " + sym + "";
+
+                KuickParser.ParseData r1 = parser.parse(page1);
+                KuickParser.ParseData r2 = parser.parse(page2);
+                KuickParser.ParseData r3 = parser.parse(page3);
+
+                Assert.AreEqual("[PAGE|[EXPRESSION_LIST|[[DIRECTIVE_GLOBAL|" + sym + "],[NUMBER_INT|" + padding + "]]]]", (r1.ToString()));
+                Assert.AreEqual("[PAGE|[EXPRESSION_LIST|[[NUMBER_INT|" + padding + "],[DIRECTIVE_GLOBAL|" + sym + "]]]]", (r2.ToString()));
+                Assert.AreEqual("[PAGE|[DIRECTIVE_GLOBAL|" + sym + "]]", (r3.ToString()));
             }
         }
     }

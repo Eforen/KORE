@@ -161,9 +161,7 @@ namespace Kore
 
         /**
          * Compiler Directive Call
-         *   : DirectiveText
-         *   : DirectiveData
-         *   : DirectiveBss
+         *   : DirectiveSimple
          *   : DirectiveSection
          *   : DirectiveAlign
          *   : DirectiveBAlign
@@ -216,6 +214,17 @@ namespace Kore
                     throw new ParserSyntaxException("DirectiveCall: unexpected directive `" + _nextToken.value.Substring(1) + "`");
             }
         }
+
+
+
+        /**
+         * DirectiveSimple
+         *   : .text
+         *   : .data
+         *   : .bss
+         *   ;
+         */
+
         /// <summary>
         /// Serves Text, Data, and BSS directives
         /// </summary>
@@ -259,11 +268,21 @@ namespace Kore
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
             return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_BALIGN, value = token.value.Substring(1, token.value.Length - 2) };
         }
+
+        /**
+         * DirectiveGlobal
+         *   : .global sym
+         *   ;
+         */
         ParseData DirectiveGlobal()
         {
-            throw new NotImplementedException("Global Directive not supported yet");
+            // In out current KuickAssembler this does nothing because its a single file assembler
+            // Consume the Directive Call
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_GLOBAL, value = token.value.Substring(1, token.value.Length - 2) };
+            // Consume the Symbol Identifier
+            var sym = Identifier();
+            // return an options directive
+            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_GLOBAL, value = sym.value};
         }
         ParseData DirectiveString()
         {
@@ -311,7 +330,6 @@ namespace Kore
         {
             // Consume the Directive Call
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-
             // Consume the Option Flag
             var option = Identifier();
             // return an options directive
