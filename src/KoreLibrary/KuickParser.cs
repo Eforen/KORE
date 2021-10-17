@@ -59,7 +59,7 @@ namespace Kore
 
             // prime the look-ahead
             _nextToken = _tokenizer.readToken();
-            _voidAnyNullTokens();
+            _voidAnyWhitespaceTokens();
 
             // Initiate recurive parse and return the result
             return Page();
@@ -88,7 +88,7 @@ namespace Kore
             ArrayList expressions = new ArrayList(1);
             while(_nextToken.token != KuickTokenizer.Token.EOF)
             {
-                _voidAnyNullTokens();
+                _voidAnyWhitespaceTokens();
                 var expression = Expression();
                 if(expression.type != KuickTokenizer.Token.EOF) expressions.Add(expression);
             }
@@ -356,7 +356,7 @@ namespace Kore
         /// <returns>token data</returns>
         private KuickTokenizer.TokenData _consume(KuickTokenizer.Token expectedToken)
         {
-            _voidAnyNullTokens();
+            _voidAnyWhitespaceTokens();
 
             // if there is no next token
             if (_nextToken == KuickTokenizer.Token.NO_TOKEN)
@@ -383,10 +383,10 @@ namespace Kore
             return token;
         }
 
-        private void _voidAnyNullTokens()
+        private void _voidAnyWhitespaceTokens()
         {
             // if its a null token advance consuming all null tokens until non null token found (Whitespace and/or Comments for example)
-            while (_nextToken == KuickTokenizer.Token.NULL)
+            while (_nextToken == KuickTokenizer.Token.NULL || _nextToken == KuickTokenizer.Token.WHITESPACE || _nextToken == KuickTokenizer.Token.COMMENT )
             {
                 // Advance token loo-ahead
                 _nextToken = _tokenizer.readToken();

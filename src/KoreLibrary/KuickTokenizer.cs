@@ -15,8 +15,13 @@ namespace Kore
             /// <summary><b>IMPORTANT:</b> This must always be the 0th token so that default will return this type of token</summary>
             NO_TOKEN = 0,
             NULL,
+            COMMENT,
+            WHITESPACE,
             PAGE,
             NUMBER_INT,
+            NUMBER_FLOAT,
+            NUMBER_DOUBLE,
+            NUMBER_HEX,
             DIRECTIVE,
             STRING,
             START,
@@ -42,18 +47,29 @@ namespace Kore
             DIRECTIVE_FLOAT,
             DIRECTIVE_DOUBLE,
             DIRECTIVE_OPTION,
+            COMPILER_LOGIC,
             EOF,
             EXPRESSION_LIST
         }
 
         public TokenFinder[] Spec =
         {
-            new TokenFinder(@"^\s+", Token.NULL), // Whitespace
-            new TokenFinder(@"^\n+", Token.NULL), // Whitespace
-            new TokenFinder(@"^\/\/.*", Token.NULL), // Throw away // comments
-            new TokenFinder(@"^#.*", Token.NULL), // Throw away # comments
-            new TokenFinder(@"^\/\*[\s\S]*?\*\/", Token.NULL), // Throw away /* {ANY} */ comments
-            new TokenFinder(@"^\d+", Token.NUMBER_INT), // Number
+            new TokenFinder(@"^# ?undef", Token.COMPILER_LOGIC), // `#undef` undefine the following sym //TODO: Impliment after v1
+            new TokenFinder(@"^# ?define", Token.COMPILER_LOGIC), // `#define` define following sym //TODO: Impliment after v1
+            new TokenFinder(@"^# ?ifdef", Token.COMPILER_LOGIC), // `#ifdef` if defined //TODO: Impliment after v1
+            new TokenFinder(@"^# ?ifndef", Token.COMPILER_LOGIC), // `#ifndef` if not defined //TODO: Impliment after v1
+            new TokenFinder(@"^# ?else", Token.COMPILER_LOGIC), // `#else` if else breaker //TODO: Impliment after v1
+            new TokenFinder(@"^# ?endif", Token.COMPILER_LOGIC), // `#endif` end of a compiler if //TODO: Impliment after v1
+
+            new TokenFinder(@"^[\s\n,]+", Token.WHITESPACE), // Whitespace
+            new TokenFinder(@"^\/\/.*", Token.COMMENT), // Throw away // comments
+            new TokenFinder(@"^#.*", Token.COMMENT), // Throw away # comments
+            new TokenFinder(@"^\/\*[\s\S]*?\*\/", Token.COMMENT), // Throw away /* {ANY} */ comments
+            new TokenFinder(@"^\d+\.?\d*[fF]", Token.NUMBER_FLOAT), // NUMBER_FLOAT 0.1f || 15f
+            new TokenFinder(@"^\d+\.?\d*[dD]", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412D || 1245D
+            new TokenFinder(@"^\d+\.\d+", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412 this finder is for when its a decimal with no marker
+            new TokenFinder(@"^0x[\da-fA-F]+", Token.NUMBER_HEX), // NUMBER_HEX 0x1244
+            new TokenFinder(@"^\d+", Token.NUMBER_INT), // NUMBER_INT 12578
             new TokenFinder(@"^""[^""]*""", Token.STRING), // " String //TODO: Make this allow escapes
             new TokenFinder(@"^'[^']*'", Token.STRING), // ' String //TODO: Make this allow escapes
             new TokenFinder(@"^\.[a-zA-Z]*", Token.DIRECTIVE), // Directive
@@ -138,6 +154,41 @@ namespace Kore
         /// This holds the current position in _string that we are at in tokenization
         /// </summary>
         public int _cursor { get; private set; }
+
+        /// <summary>
+        /// An attempt to minimize the impact of a situation where there is a large source
+        /// file and _line is called multiple times at the cost of 8 bytes of ram 
+        /// because I am paranoid
+        ///    - Ariel
+        /// </summary>
+        private int _lineCursorCache = 0;
+        /// <summary>
+        /// The cursor position at last line cache
+        /// </summary>
+        private int _lineCursorCachePos = 0;
+        /// <summary>
+        /// This computes the current line of the cursor. <br/>
+        /// <b>Be careful with this call because it is computationally intensive.</b>
+        /// </summary>
+        public int _line { get; private set; }
+
+
+        /// <summary>
+        /// An attempt to minimize the impact of a situation where there is a large source
+        /// file and _col is called multiple times at the cost of 8 bytes of ram 
+        /// because I am paranoid
+        ///    - Ariel
+        /// </summary>
+        private int _colCursorCache = 0;
+        /// <summary>
+        /// The cursor position at last col cache
+        /// </summary>
+        private int _colCursorCachePos = 0;
+        /// <summary>
+        /// This computes the current line of the cursor. <br/>
+        /// <b>Be careful with this call because it is computationally intensive.</b>
+        /// </summary>
+        public int _col { get; private set; }
 
         /// <summary>
         /// Load a string into memory for tokenization
