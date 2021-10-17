@@ -257,16 +257,20 @@ namespace KoreTests
         [TestCase("fsflags", KuickTokenizer.Token.OP_PSEUDO)] // Swap FP exception flags
 
         // ----------------------------------------------------------------
-        // Optional Compressed Instructions: RV32C
-        // ----------------------------------------------------------------
-
-        // ----------------------------------------------------------------
-        // Optional Compressed Extention: RV64C
-        // ----------------------------------------------------------------
-
-        // ----------------------------------------------------------------
         // Multiply-Divide Instructions: RVM
         // ----------------------------------------------------------------
+        [TestCase("MUL", KuickTokenizer.Token.OP_R)] // Multiply
+        [TestCase("MULH", KuickTokenizer.Token.OP_R)] // Multiply High
+        [TestCase("MULHSU", KuickTokenizer.Token.OP_R)] // Multiply High Sign/Unsigned
+        [TestCase("MULHU", KuickTokenizer.Token.OP_R)] // Multiply High Unsigned
+        [TestCase("DIV", KuickTokenizer.Token.OP_R)] // Divide
+        [TestCase("DIVU", KuickTokenizer.Token.OP_R)] // Divide Unsigned
+        [TestCase("REM", KuickTokenizer.Token.OP_R)] // Remainder
+        [TestCase("REMU", KuickTokenizer.Token.OP_R)] // Remainder Unsigned
+        [TestCase("MULW", KuickTokenizer.Token.OP_R)] // Multiply Word
+        [TestCase("DIVW", KuickTokenizer.Token.OP_R)] // Divide Word
+        [TestCase("REMW", KuickTokenizer.Token.OP_R)] // Remainder Word
+        [TestCase("REMUW", KuickTokenizer.Token.OP_R)] // Remainder //TODO: Confirm this opcode I think it should be REMWU but the book "The RISC-V Reader" has it as REMUW so yeah
 
         // ----------------------------------------------------------------
         // Atomic Instructions: RVA
@@ -278,6 +282,14 @@ namespace KoreTests
 
         // ----------------------------------------------------------------
         // Vector Instructions: RVV
+        // ----------------------------------------------------------------
+
+        // ----------------------------------------------------------------
+        // Optional Compressed Instructions: RV32C
+        // ----------------------------------------------------------------
+
+        // ----------------------------------------------------------------
+        // Optional Compressed Extention: RV64C
         // ----------------------------------------------------------------
 
 
