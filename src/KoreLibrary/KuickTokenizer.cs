@@ -26,7 +26,21 @@ namespace Kore
             STRING,
             START,
             LABEL,
-            OP,
+            OP_R,
+            OP_I,
+            OP_S,
+            OP_B,
+            OP_U,
+            OP_J,
+            OP_PSEUDO,
+            OP_CR,
+            OP_CI,
+            OP_CSS,
+            OP_CIW,
+            OP_CL,
+            OP_CS,
+            OP_CB,
+            OP_CJ,
             REGISTER,
             PREPROCESSOR,
             PARREN_OPEN,
@@ -231,6 +245,11 @@ namespace Kore
                 // Go to next token if this token is not found
                 if (value == null) continue;
 
+                if (finder.token == Token.IDENTIFIER)
+                {
+                    //TODO: check if in register array and thus actually a register and return register instead
+                    //TODO: check if in op arrays (One for each type) and thus actually an OP and return Correct OP type instead
+                }
                 // We must have found a token if we made it to this line so return apropriate TokenData
                 return new TokenData(finder.token, value);
             }
