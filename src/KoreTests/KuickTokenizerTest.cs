@@ -259,26 +259,67 @@ namespace KoreTests
         // ----------------------------------------------------------------
         // Multiply-Divide Instructions: RVM
         // ----------------------------------------------------------------
+        // Multiply RV32M
         [TestCase("MUL", KuickTokenizer.Token.OP_R)] // Multiply
         [TestCase("MULH", KuickTokenizer.Token.OP_R)] // Multiply High
         [TestCase("MULHSU", KuickTokenizer.Token.OP_R)] // Multiply High Sign/Unsigned
         [TestCase("MULHU", KuickTokenizer.Token.OP_R)] // Multiply High Unsigned
+        // Divide RV32M
         [TestCase("DIV", KuickTokenizer.Token.OP_R)] // Divide
         [TestCase("DIVU", KuickTokenizer.Token.OP_R)] // Divide Unsigned
+        // Remainder RV32M
         [TestCase("REM", KuickTokenizer.Token.OP_R)] // Remainder
         [TestCase("REMU", KuickTokenizer.Token.OP_R)] // Remainder Unsigned
+        // Multiply RV64M
         [TestCase("MULW", KuickTokenizer.Token.OP_R)] // Multiply Word
+        // Divide RV64M
         [TestCase("DIVW", KuickTokenizer.Token.OP_R)] // Divide Word
+        // Remainder RV64M
         [TestCase("REMW", KuickTokenizer.Token.OP_R)] // Remainder Word
         [TestCase("REMUW", KuickTokenizer.Token.OP_R)] // Remainder //TODO: Confirm this opcode I think it should be REMWU but the book "The RISC-V Reader" has it as REMUW so yeah
 
         // ----------------------------------------------------------------
         // Atomic Instructions: RVA
         // ----------------------------------------------------------------
+        // Load RV32A
+        [TestCase("LR.W", KuickTokenizer.Token.OP_R)] // Load Reserved Word
+        // Load RV64A
+        [TestCase("LR.D", KuickTokenizer.Token.OP_R)] // Load Reserved Double Word
+        // Store RV32A
+        [TestCase("SC.W", KuickTokenizer.Token.OP_R)] // Store Reserved Word
+        // Store RV64A
+        [TestCase("SC.D", KuickTokenizer.Token.OP_R)] // Store Reserved Double Word
+        // Swap RV32A
+        [TestCase("AMOSWAP.W", KuickTokenizer.Token.OP_R)] // 
+        // Swap RV64A
+        [TestCase("AMOSWAP.D", KuickTokenizer.Token.OP_R)] // 
+        // Add RV32A
+        [TestCase("AMOADD.W", KuickTokenizer.Token.OP_R)] // 
+        // Add RV64AA
+        [TestCase("AMOADD.D", KuickTokenizer.Token.OP_R)] // 
+        // Logical RV32A
+        [TestCase("AMOXOR.W", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOAND.W", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOOR.W", KuickTokenizer.Token.OP_R)] // 
+        // Logical RV64A
+        [TestCase("AMOXOR.D", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOAND.D", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOOR.D", KuickTokenizer.Token.OP_R)] // 
+        // Min/Max RV32A
+        [TestCase("AMOMIN.W", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOMAX.W", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOMINU.W", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOMAXU.W", KuickTokenizer.Token.OP_R)] // 
+        // Min/Max RV64A
+        [TestCase("AMOMIN.D", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOMAX.D", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOMINU.D", KuickTokenizer.Token.OP_R)] // 
+        [TestCase("AMOMAXU.D", KuickTokenizer.Token.OP_R)] // 
 
         // ----------------------------------------------------------------
         // Two Optional Floating-Point Instructions: RVF & RVD
         // ----------------------------------------------------------------
+        // [TestCase("AMOMAXU.D", KuickTokenizer.Token.OP_R)] // 
 
         // ----------------------------------------------------------------
         // Vector Instructions: RVV
