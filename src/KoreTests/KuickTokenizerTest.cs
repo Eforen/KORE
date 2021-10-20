@@ -319,7 +319,87 @@ namespace KoreTests
         // ----------------------------------------------------------------
         // Two Optional Floating-Point Instructions: RVF & RVD
         // ----------------------------------------------------------------
-        // [TestCase("AMOMAXU.D", KuickTokenizer.Token.OP_R)] // 
+        // Move RV32{F|D}
+        [TestCase("FMV.W.X", KuickTokenizer.Token.OP_R)] // Move form Integer
+        [TestCase("FMV.X.W", KuickTokenizer.Token.OP_R)] // Move to Integer
+        // Move RV64{F|D}
+        [TestCase("FMV.D.X", KuickTokenizer.Token.OP_R)] // Move form Integer
+        [TestCase("FMV.X.D", KuickTokenizer.Token.OP_R)] // Move to Integer
+        // Convert RV32{F|D}
+        [TestCase("FCVT.S.W", KuickTokenizer.Token.OP_R)] // Convert form int
+        [TestCase("FCVT.D.W", KuickTokenizer.Token.OP_R)] // Convert form int
+        [TestCase("FCVT.S.WU", KuickTokenizer.Token.OP_R)] // Convert form int unsigned
+        [TestCase("FCVT.D.WU", KuickTokenizer.Token.OP_R)] // Convert form int unsigned
+        [TestCase("FCVT.W.S", KuickTokenizer.Token.OP_R)] // Convert to int
+        [TestCase("FCVT.W.D", KuickTokenizer.Token.OP_R)] // Convert to int
+        [TestCase("FCVT.WU.S", KuickTokenizer.Token.OP_R)] // Convert to int unsigned
+        [TestCase("FCVT.WU.D", KuickTokenizer.Token.OP_R)] // Convert to int unsigned
+        // Convert RV64{F|D}
+        [TestCase("FCVT.S.L", KuickTokenizer.Token.OP_R)] // Convert form int
+        [TestCase("FCVT.D.L", KuickTokenizer.Token.OP_R)] // Convert form int
+        [TestCase("FCVT.S.LU", KuickTokenizer.Token.OP_R)] // Convert form int unsigned
+        [TestCase("FCVT.D.LU", KuickTokenizer.Token.OP_R)] // Convert form int unsigned
+        [TestCase("FCVT.L.S", KuickTokenizer.Token.OP_R)] // Convert to int
+        [TestCase("FCVT.L.D", KuickTokenizer.Token.OP_R)] // Convert to int
+        [TestCase("FCVT.LU.S", KuickTokenizer.Token.OP_R)] // Convert to int unsigned
+        [TestCase("FCVT.LU.D", KuickTokenizer.Token.OP_R)] // Convert to int unsigned
+        // Load RV32{F|D}
+        [TestCase("FLW", KuickTokenizer.Token.OP_I)] // Load Word
+        [TestCase("FLD", KuickTokenizer.Token.OP_I)] // Load Double Word
+        // Store RV32{F|D}
+        [TestCase("FSW", KuickTokenizer.Token.OP_S)] // Save Word
+        [TestCase("FSD", KuickTokenizer.Token.OP_S)] // Save Double Word
+        // Arithmetic RV32{F|D}
+        [TestCase("FADD.S", KuickTokenizer.Token.OP_R)] // Add (Single Float)
+        [TestCase("FADD.D", KuickTokenizer.Token.OP_R)] // Add (Double Float)
+        [TestCase("FSUB.S", KuickTokenizer.Token.OP_R)] // Subtract (Single Float)
+        [TestCase("FSUB.D", KuickTokenizer.Token.OP_R)] // Subtract (Double Float)
+        [TestCase("FMUL.S", KuickTokenizer.Token.OP_R)] // Multiply (Single Float)
+        [TestCase("FMUL.D", KuickTokenizer.Token.OP_R)] // Multiply (Double Float)
+        [TestCase("FDIV.S", KuickTokenizer.Token.OP_R)] // Divide (Single Float)
+        [TestCase("FDIV.D", KuickTokenizer.Token.OP_R)] // Divide (Double Float)
+        [TestCase("FSQRT.S", KuickTokenizer.Token.OP_R)] // Square Root (Single Float)
+        [TestCase("FSQRT.D", KuickTokenizer.Token.OP_R)] // Square Root (Double Float)
+        // Mul-Add RV32{F|D}
+        [TestCase("FMADD.S", KuickTokenizer.Token.OP_R)] // Multiply-Add (Single Float)
+        [TestCase("FMADD.D", KuickTokenizer.Token.OP_R)] // Multiply-Add (Double Float)
+        [TestCase("FMSUB.S", KuickTokenizer.Token.OP_R)] // Multiply-Subtract (Single Float)
+        [TestCase("FMSUB.D", KuickTokenizer.Token.OP_R)] // Multiply-Subtract (Double Float)
+        [TestCase("FNMADD.S", KuickTokenizer.Token.OP_R)] // Negative Multiply-Add (Single Float)
+        [TestCase("FNMADD.D", KuickTokenizer.Token.OP_R)] // Negative Multiply-Add (Double Float)
+        [TestCase("FNMSUB.S", KuickTokenizer.Token.OP_R)] // Negative Multiply-Subtract (Single Float)
+        [TestCase("FNMSUB.D", KuickTokenizer.Token.OP_R)] // Negative Multiply-Subtract (Double Float)
+        // Sign Inject RV32{F|D}
+        [TestCase("FSGNJ.S", KuickTokenizer.Token.OP_R)] // Sign Source (Single Float)
+        [TestCase("FSGNJ.D", KuickTokenizer.Token.OP_R)] // Sign Source (Double Float)
+        [TestCase("FSGNJN.S", KuickTokenizer.Token.OP_R)] // Negative Sign Source (Single Float)
+        [TestCase("FSGNJN.D", KuickTokenizer.Token.OP_R)] // Negative Sign Source (Double Float)
+        [TestCase("FSGNJX.S", KuickTokenizer.Token.OP_R)] // XOR Sign Source (Single Float)
+        [TestCase("FSGNJX.D", KuickTokenizer.Token.OP_R)] // XOR Sign Source (Double Float)
+        // Min/Max RV32{F|D}
+        [TestCase("FMIN.S", KuickTokenizer.Token.OP_R)] // Minumum (Single Float)
+        [TestCase("FMIN.D", KuickTokenizer.Token.OP_R)] // Minumum (Double Float)
+        [TestCase("FMAX.S", KuickTokenizer.Token.OP_R)] // Maximum (Single Float)
+        [TestCase("FMAX.D", KuickTokenizer.Token.OP_R)] // Maximum (Double Float)
+        // Compare RV32{F|D}
+        [TestCase("FEQ.S", KuickTokenizer.Token.OP_R)] // Compare FLoat = (Single Float)
+        [TestCase("FEQ.D", KuickTokenizer.Token.OP_R)] // Compare FLoat = (Double Float)
+        [TestCase("FLT.S", KuickTokenizer.Token.OP_R)] // Compare FLoat < (Single Float)
+        [TestCase("FLT.D", KuickTokenizer.Token.OP_R)] // Compare FLoat < (Double Float)
+        [TestCase("FLE.S", KuickTokenizer.Token.OP_R)] // Compare FLoat >= (Single Float)
+        [TestCase("FLE.D", KuickTokenizer.Token.OP_R)] // Compare FLoat >= (Double Float)
+        // Catagorize RV32{F|D}
+        [TestCase("FCLASS.S", KuickTokenizer.Token.OP_R)] // Classify type (Single Float)
+        [TestCase("FCLASS.D", KuickTokenizer.Token.OP_R)] // Classify type (Double Float)
+        // Configure RV32{F|D}
+        [TestCase("FRCSR", KuickTokenizer.Token.OP_R)] // Read Status
+        [TestCase("FRRM", KuickTokenizer.Token.OP_R)] // Read Rounding Mode
+        [TestCase("FRFLAGS", KuickTokenizer.Token.OP_R)] // Read Flags
+        [TestCase("FSCSR", KuickTokenizer.Token.OP_R)] // Swap Status Reg
+        [TestCase("FSRM", KuickTokenizer.Token.OP_R)] // Swap Rounding Mode
+        [TestCase("FSFLAGS", KuickTokenizer.Token.OP_R)] // Swap Flags
+        [TestCase("FSRMI", KuickTokenizer.Token.OP_R)] // Swap Rounding Mode Imm
+        [TestCase("FSFLAGSI", KuickTokenizer.Token.OP_R)] // Swap Flags Imm
 
         // ----------------------------------------------------------------
         // Vector Instructions: RVV
