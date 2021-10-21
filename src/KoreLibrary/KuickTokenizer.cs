@@ -92,13 +92,21 @@ namespace Kore
         };
 
         Replacement[] REGISTER_REPLACEMENTS = new Replacement[] { new Replacement("x0", "x0"), new Replacement("x1", "x1"), new Replacement("x2", "x2"), new Replacement("x3", "x3"), new Replacement("x4", "x4"), new Replacement("x5", "x5"), new Replacement("x6", "x6"), new Replacement("x7", "x7"), new Replacement("x8", "x8"), new Replacement("x9", "x9"), new Replacement("x10", "x10"), new Replacement("x11", "x11"), new Replacement("x12", "x12"), new Replacement("x13", "x13"), new Replacement("x14", "x14"), new Replacement("x15", "x15"), new Replacement("x16", "x16"), new Replacement("x17", "x17"), new Replacement("x18", "x18"), new Replacement("x19", "x19"), new Replacement("x20", "x20"), new Replacement("x21", "x21"), new Replacement("x22", "x22"), new Replacement("x23", "x23"), new Replacement("x24", "x24"), new Replacement("x25", "x25"), new Replacement("x26", "x26"), new Replacement("x27", "x27"), new Replacement("x28", "x28"), new Replacement("x29", "x29"), new Replacement("x30", "x30"), new Replacement("x31", "x31"), new Replacement("x00", "x0"), new Replacement("x01", "x1"), new Replacement("x02", "x2"), new Replacement("x03", "x3"), new Replacement("x04", "x4"), new Replacement("x05", "x5"), new Replacement("x06", "x6"), new Replacement("x07", "x7"), new Replacement("x08", "x8"), new Replacement("x09", "x9"), new Replacement("zero", "x0"), new Replacement("ra", "x1"), new Replacement("sp", "x2"), new Replacement("gp", "x3"), new Replacement("tp", "x4"), new Replacement("t0", "x5"), new Replacement("t1", "x6"), new Replacement("t2", "x7"), new Replacement("s0", "x8"), new Replacement("fp", "x8"), new Replacement("s1", "x9"), new Replacement("a0", "x10"), new Replacement("a1", "x11"), new Replacement("a2", "x12"), new Replacement("a3", "x13"), new Replacement("a4", "x14"), new Replacement("a5", "x15"), new Replacement("a6", "x16"), new Replacement("a7", "x17"), new Replacement("s2", "x18"), new Replacement("s3", "x19"), new Replacement("s4", "x20"), new Replacement("s5", "x21"), new Replacement("s6", "x22"), new Replacement("s7", "x23"), new Replacement("s8", "x24"), new Replacement("s9", "x25"), new Replacement("s10", "x26"), new Replacement("s11", "x27"), new Replacement("s12", "x28"), new Replacement("t04", "x29"), new Replacement("t05", "x30"), new Replacement("t06", "x31"), new Replacement("s01", "x9"), new Replacement("a00", "x10"), new Replacement("a01", "x11"), new Replacement("a02", "x12"), new Replacement("a03", "x13"), new Replacement("a04", "x14"), new Replacement("a05", "x15"), new Replacement("a06", "x16"), new Replacement("a07", "x17"), new Replacement("s02", "x18"), new Replacement("s03", "x19"), new Replacement("s04", "x20"), new Replacement("s05", "x21"), new Replacement("s06", "x22"), new Replacement("s07", "x23"), new Replacement("s08", "x24"), new Replacement("s09", "x25"), new Replacement("t04", "x29"), new Replacement("t05", "x30"), new Replacement("t06", "x31") };
-        string[] OP_TYPE_R = new string[] { "SLL", "SRL", "SRA", "SLLW", "SRLW", "SRAW", "ADD", "SUB", "ADDW", "SUBW", "XOR", "OR", "AND", "SLT", "SLTU", "MRET", "SRET", "WFI", "SFENCE.VMA", "MUL", "MULH", "MULHSU", "MULHU", "DIV", "DIVU", "REM", "REMU", "MULW", "DIVW", "REMW", "REMUW", "LR.W", "LR.D", "SC.W", "SC.D", "AMOSWAP.W", "AMOSWAP.D", "AMOADD.W", "AMOADD.D", "AMOXOR.W", "AMOAND.W", "AMOOR.W", "AMOXOR.D", "AMOAND.D", "AMOOR.D", "AMOMIN.W", "AMOMAX.W", "AMOMINU.W", "AMOMAXU.W", "AMOMIN.D", "AMOMAX.D", "AMOMINU.D", "AMOMAXU.D" };
-        string[] OP_TYPE_I = new string[] { "SLLI", "SRLI", "SRAI", "SLLIW", "SRLIW", "SRAIW", "ADDI", "ADDIW", "XORI", "ORI", "ANDI", "SLTI", "SLTIU", "JALR", "FENCE", "FENCE.I", "ECALL", "EBREAK", "CSRRW", "CSRRS", "CSRRC", "CSRRWI", "CSRRSI", "CSRRCI", "LB", "LH", "LBU", "LHU", "LW", "LWU", "LD" };
+        string[] OP_TYPE_R = new string[] { "SLL", "SRL", "SRA", "SLLW", "SRLW", "SRAW", "ADD", "SUB", "ADDW", "SUBW", "XOR", "OR", "AND", "SLT", "SLTU", "MRET", "SRET", "WFI", "SFENCE.VMA", "MUL", "MULH", "MULHSU", "MULHU", "DIV", "DIVU", "REM", "REMU", "MULW", "DIVW", "REMW", "REMUW", "LR.W", "LR.D", "SC.W", "SC.D", "AMOSWAP.W", "AMOSWAP.D", "AMOADD.W", "AMOADD.D", "AMOXOR.W", "AMOAND.W", "AMOOR.W", "AMOXOR.D", "AMOAND.D", "AMOOR.D", "AMOMIN.W", "AMOMAX.W", "AMOMINU.W", "AMOMAXU.W", "AMOMIN.D", "AMOMAX.D", "AMOMINU.D", "AMOMAXU.D", "FMV.W.X", "FMV.X.W", "FMV.D.X", "FMV.X.D", "FCVT.S.W", "FCVT.D.W", "FCVT.S.WU", "FCVT.D.WU", "FCVT.W.S", "FCVT.W.D", "FCVT.WU.S", "FCVT.WU.D", "FCVT.S.L", "FCVT.D.L", "FCVT.S.LU", "FCVT.D.LU", "FCVT.L.S", "FCVT.L.D", "FCVT.LU.S", "FCVT.LU.D", "FADD.S", "FADD.D", "FSUB.S", "FSUB.D", "FMUL.S", "FMUL.D", "FDIV.S", "FDIV.D", "FSQRT.S", "FSQRT.D", "FMADD.S", "FMADD.D", "FMSUB.S", "FMSUB.D", "FNMADD.S", "FNMADD.D", "FNMSUB.S", "FNMSUB.D", "FSGNJ.S", "FSGNJ.D", "FSGNJN.S", "FSGNJN.D", "FSGNJX.S", "FSGNJX.D", "FMIN.S", "FMIN.D", "FMAX.S", "FMAX.D", "FEQ.S", "FEQ.D", "FLT.S", "FLT.D", "FLE.S", "FLE.D", "FCLASS.S", "FCLASS.D", "FRCSR", "FRRM", "FRFLAGS", "FSCSR", "FSRM", "FSFLAGS", "FSRMI", "FSFLAGSI", "SETVL", "VMULH", "VREM", "VSLL", "VSRL", "VSRA", "VLDS", "VLDX", "VSTS", "VSTX", "AMOSWAP", "AMOADD", "AMOXOR", "AMOAND", "AMOOR", "AMOMIN", "AMOMAX", "VPEQ", "VPNE", "VPLT", "VPGE", "VPAND", "VPANDN", "VPOR", "VPXOR", "VPNOT", "VPSWAP", "VMOV", "VCVT", "VADD", "VSUB", "VMUL", "VDIV", "VSQRET", "VFMADD", "VFMSUB", "VFNMADD", "VFNMSUB", "VSGNJ", "VSGNJN", "VSGNJX", "VMIN", "VMAX", "VXOR", "VOR", "VAND", "VCLASS", "VSETDCFG", "VEXTRACT", "VMERGE", "VSELECT" };
+        string[] OP_TYPE_I = new string[] { "SLLI", "SRLI", "SRAI", "SLLIW", "SRLIW", "SRAIW", "ADDI", "ADDIW", "XORI", "ORI", "ANDI", "SLTI", "SLTIU", "JALR", "FENCE", "FENCE.I", "ECALL", "EBREAK", "CSRRW", "CSRRS", "CSRRC", "CSRRWI", "CSRRSI", "CSRRCI", "LB", "LH", "LBU", "LHU", "LW", "LWU", "LD", "FLW", "FLD", "VLD" };
         string[] OP_TYPE_U = new string[] { "LUI", "AUIPC" };
         string[] OP_TYPE_B = new string[] { "BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU" };
         string[] OP_TYPE_J = new string[] { "JAL" };
-        string[] OP_TYPE_S = new string[] { "SB", "SH", "SW", "SD" };
-        string[] PSUDO_OPs = new string[] { "NOP", "NEG", "NEGW", "SNEZ", "SLTZ", "SGTZ", "BEQZ", "BNEZ", "BLEZ", "BGEZ", "BLTZ", "BGTZ", "J", "JR", "RET", "TAIL", "RDINSTRET[H]", "RDCYCLE[H]", "RDTIME[H]", "csrr", "csrw", "csrs", "csrc", "CSRWI", "CSRSI", "CSRCI", "FRCSR", "FSCSR", "FRRM", "FSRM", "FRFLAGS", "FSFLAGS", "LLA", "LA", "LB", "LH", "LW", "LD", "SB", "SH", "SW", "SD", "flw", "fld", "fsw", "fsd", "li", "mv", "not", "sext.w", "seqz", "fmv.s", "fabs.s", "fneg.s", "fmv.d", "fabs.d", "fneg.d", "bgt", "ble", "bgtu", "bleu", "jal", "jalr", "call", "fence", "fscsr", "fsrm", "fsflags" };
+        string[] OP_TYPE_S = new string[] { "SB", "SH", "SW", "SD", "FSW", "FSD", "VST" };
+        string[] PSUDO_OPs = new string[] { "NOP", "NEG", "NEGW", "SNEZ", "SLTZ", "SGTZ", "BEQZ", "BNEZ", "BLEZ", "BGEZ", "BLTZ", "BGTZ", "J", "JR", "RET", "TAIL", "RDINSTRET[H]", "RDCYCLE[H]", "RDTIME[H]", "CSRR", "CSRW", "CSRS", "CSRC", "CSRWI", "CSRSI", "CSRCI", "FRCSR", "FSCSR", "FRRM", "FSRM", "FRFLAGS", "FSFLAGS", "LLA", "LA", "LB", "LH", "LW", "LD", "SB", "SH", "SW", "SD", "FLW", "FLD", "FSW", "FSD", "LI", "MV", "NOT", "SEXT.W", "SEQZ", "FMV.S", "FABS.S", "FNEG.S", "FMV.D", "FABS.D", "FNEG.D", "BGT", "BLE", "BGTU", "BLEU", "JAL", "JALR", "CALL", "FENCE", "FSCSR", "FSRM", "FSFLAGS" };
+        string[] OP_TYPE_CR = new string[] { "C.ADD", "C.SUB", "C.AND", "C.OR", "C.XOR", "C.MV", "C.JR", "C.JALR", "C.ADDW", "C.SUBW" };
+        string[] OP_TYPE_CI = new string[] { "C.LWSP", "C.FLWSP", "C.FLDSP", "C.ADDI", "C.ADDI16SP", "C.ANDI", "C.LI", "C.LUI", "C.SLLI", "C.SRAI", "C.SRLI", "C.EBRAKE", "C.ADDIW", "C.LDSP" };
+        string[] OP_TYPE_CSS = new string[] { "C.SWSP", "C.FSWSP", "C.FSDSP", "C.SDSP" };
+        string[] OP_TYPE_CIW = new string[] { "C.ADDI4SPN" };
+        string[] OP_TYPE_CL = new string[] { "C.LW", "C.FLW", "C.FLD", "C.LD" };
+        string[] OP_TYPE_CS = new string[] { "C.SW", "C.FSW", "C.FSD", "C.SD" };
+        string[] OP_TYPE_CB = new string[] { "C.BEQZ", "C.BNEZ" };
+        string[] OP_TYPE_CJ = new string[] { "C.J", "C.JAL" };
 
 
         public class TokenSyntaxException : Exception
@@ -265,47 +273,38 @@ namespace Kore
 
                 // Go to next token if this token is not found
                 if (value == null) continue;
+                string valueLow = value.ToLower();
+                string valueUpper = value.ToUpper();
 
                 if (finder.token == Token.IDENTIFIER)
                 {
                     //TODO: check if in register array and thus actually a register and return register instead
                     foreach (Replacement replacement in REGISTER_REPLACEMENTS)
                     {
-                        if (value == replacement.test)
+                        if (valueLow == replacement.test)
                         {
                             return new TokenData(Token.REGISTER, replacement.target);
                         }
                     }
 
                     //TODO: check if in op arrays (One for each type) and thus actually an OP and return Correct OP type instead
-                    if (Array.IndexOf(OP_TYPE_R, value) >= 0)
-                    {
-                        return new TokenData(Token.OP_R, value);
-                    }
-                    if (Array.IndexOf(OP_TYPE_I, value) >= 0)
-                    {
-                        return new TokenData(Token.OP_I, value);
-                    }
-                    if (Array.IndexOf(OP_TYPE_U, value) >= 0)
-                    {
-                        return new TokenData(Token.OP_U, value);
-                    }
-                    if (Array.IndexOf(OP_TYPE_B, value) >= 0)
-                    {
-                        return new TokenData(Token.OP_B, value);
-                    }
-                    if (Array.IndexOf(OP_TYPE_J, value) >= 0)
-                    {
-                        return new TokenData(Token.OP_J, value);
-                    }
-                    if (Array.IndexOf(OP_TYPE_S, value) >= 0)
-                    {
-                        return new TokenData(Token.OP_S, value);
-                    }
-                    if (Array.IndexOf(PSUDO_OPs, value) >= 0)
-                    {
-                        return new TokenData(Token.OP_PSEUDO, value);
-                    }
+                    if (Array.IndexOf(OP_TYPE_R, valueUpper) >= 0) return new TokenData(Token.OP_R, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_I, valueUpper) >= 0) return new TokenData(Token.OP_I, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_U, valueUpper) >= 0) return new TokenData(Token.OP_U, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_B, valueUpper) >= 0) return new TokenData(Token.OP_B, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_J, valueUpper) >= 0) return new TokenData(Token.OP_J, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_S, valueUpper) >= 0) return new TokenData(Token.OP_S, valueUpper);
+                    if (Array.IndexOf(PSUDO_OPs, valueUpper) >= 0) return new TokenData(Token.OP_PSEUDO, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CR, valueUpper) >= 0) return new TokenData(Token.OP_CR, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CI, valueUpper) >= 0) return new TokenData(Token.OP_CI, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CSS, valueUpper) >= 0) return new TokenData(Token.OP_CSS, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CIW, valueUpper) >= 0) return new TokenData(Token.OP_CIW, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CL, valueUpper) >= 0) return new TokenData(Token.OP_CL, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CS, valueUpper) >= 0) return new TokenData(Token.OP_CS, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CB, valueUpper) >= 0) return new TokenData(Token.OP_CB, valueUpper);
+                    if (Array.IndexOf(OP_TYPE_CJ, valueUpper) >= 0) return new TokenData(Token.OP_CJ, valueUpper);
+
+                    if (Array.IndexOf(PSUDO_OPs, valueUpper) >= 0) return new TokenData(Token.OP_PSEUDO, valueUpper);
                 }
                 // We must have found a token if we made it to this line so return apropriate TokenData
                 return new TokenData(finder.token, value);

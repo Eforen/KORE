@@ -18,13 +18,15 @@
 * [KUICK][TOKENIZER][TOKEN] implement NUMBER_DOUBLE
 * [KUICK][TOKENIZER][TOKEN] implement NUMBER_HEX
 ### Next Commit (Eforen)
+* [KUICK][TOKENIZER] Write Tests for every Token
+* [KUICK][TOKENIZER] Implement all failing tests
 
 # Working On
 ## Working on (Eforen)
-* [KUICK][TOKENIZER] Write Tests for every Token
 
 # Todos
-* [KUICK][TOKENIZER] Implement all failing tests
+* [KUICK][PARSER] Write Tests for every Token
+* [KUICK][PARSER] Implement all failing tests
 * Implement all RISC-V ASM directives in (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
 * [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
 ## Todo

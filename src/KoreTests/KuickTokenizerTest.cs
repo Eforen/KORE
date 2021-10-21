@@ -186,14 +186,14 @@ namespace KoreTests
         [TestCase("CSRSI", KuickTokenizer.Token.OP_PSEUDO)] // Set bits in CSR, Immediate
         [TestCase("CSRCI", KuickTokenizer.Token.OP_PSEUDO)] // Clear bits in CSR, Immediate
         // --------
-        [TestCase("FRCSR", KuickTokenizer.Token.OP_PSEUDO)] // Read FP control/status register
-        [TestCase("FSCSR", KuickTokenizer.Token.OP_PSEUDO)] // Write FP control/status register
+        [TestCase("FRCSR", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Read FP control/status register
+        [TestCase("FSCSR", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Write FP control/status register
         // --------
-        [TestCase("FRRM", KuickTokenizer.Token.OP_PSEUDO)] // Read FP rounding mode
-        [TestCase("FSRM", KuickTokenizer.Token.OP_PSEUDO)] // Write FP rounding mode
+        [TestCase("FRRM", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Read FP rounding mode
+        [TestCase("FSRM", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Write FP rounding mode
         // --------
-        [TestCase("FRFLAGS", KuickTokenizer.Token.OP_PSEUDO)] // Read FP exception flags
-        [TestCase("FSFLAGS", KuickTokenizer.Token.OP_PSEUDO)] // Write FP exception flags
+        [TestCase("FRFLAGS", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Read FP exception flags
+        [TestCase("FSFLAGS", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Write FP exception flags
         // --------
         [TestCase("LLA", KuickTokenizer.Token.OP_PSEUDO)] // Load local address
         // --------
@@ -214,12 +214,12 @@ namespace KoreTests
         [TestCase("SD", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Store global double
         // --------
         //TODO: Check if these also colide with RV32V/RV64V
-        [TestCase("flw", KuickTokenizer.Token.OP_PSEUDO)] // Floating-point load global
-        [TestCase("fld", KuickTokenizer.Token.OP_PSEUDO)] // Floating-point load global
+        [TestCase("flw", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Floating-point load global
+        [TestCase("fld", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Floating-point load global
         // --------
         //TODO: Check if these also colide with RV32V/RV64V
-        [TestCase("fsw", KuickTokenizer.Token.OP_PSEUDO)] // Floating-point store global
-        [TestCase("fsd", KuickTokenizer.Token.OP_PSEUDO)] // Floating-point store global
+        [TestCase("fsw", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Floating-point store global
+        [TestCase("fsd", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Floating-point store global
         // --------
         [TestCase("li", KuickTokenizer.Token.OP_PSEUDO)] // Load immediate
         [TestCase("mv", KuickTokenizer.Token.OP_PSEUDO)] // Copy register
@@ -250,11 +250,11 @@ namespace KoreTests
         // --------
         //TODO: figure out how I want to hand these cases because they conflict
         // Fornow I am just going to ignore the pseudoinstruction in the tokenizer and it will be handeled in the parser
-        [TestCase("fence", KuickTokenizer.Token.OP_PSEUDO)] // Fence on all memory and I/O
+        [TestCase("fence", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Fence on all memory and I/O
         // --------
-        [TestCase("fscsr", KuickTokenizer.Token.OP_PSEUDO)] // Swap FP control/status register
-        [TestCase("fsrm", KuickTokenizer.Token.OP_PSEUDO)] // Swap FP rounding mode
-        [TestCase("fsflags", KuickTokenizer.Token.OP_PSEUDO)] // Swap FP exception flags
+        [TestCase("fscsr", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Swap FP control/status register
+        [TestCase("fsrm", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Swap FP rounding mode
+        [TestCase("fsflags", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // Swap FP exception flags
 
         // ----------------------------------------------------------------
         // Multiply-Divide Instructions: RVM
@@ -404,19 +404,144 @@ namespace KoreTests
         // ----------------------------------------------------------------
         // Vector Instructions: RVV
         // ----------------------------------------------------------------
+        [TestCase("SETVL", KuickTokenizer.Token.OP_R)] // Set Vector Len
+
+        [TestCase("VMULH", KuickTokenizer.Token.OP_R)] // Multiply High
+        [TestCase("VREM", KuickTokenizer.Token.OP_R)] // Remainder
+
+        [TestCase("VSLL", KuickTokenizer.Token.OP_R)] // Shift Left Logical
+        [TestCase("VSRL", KuickTokenizer.Token.OP_R)] // Shift Right Logical
+        [TestCase("VSRA", KuickTokenizer.Token.OP_R)] // Shift Right Arithmatic
+        
+        [TestCase("VLD", KuickTokenizer.Token.OP_I)] // Load
+        [TestCase("VLDS", KuickTokenizer.Token.OP_R)] // Load Strided
+        [TestCase("VLDX", KuickTokenizer.Token.OP_R)] // Load Indexed
+        
+        [TestCase("VST", KuickTokenizer.Token.OP_S)] // Store
+        [TestCase("VSTS", KuickTokenizer.Token.OP_R)] // Store Strided
+        [TestCase("VSTX", KuickTokenizer.Token.OP_R)] // Store Indexed
+
+        [TestCase("AMOSWAP", KuickTokenizer.Token.OP_R)] // AMO Swap
+        [TestCase("AMOADD", KuickTokenizer.Token.OP_R)] // AMO ADD
+        [TestCase("AMOXOR", KuickTokenizer.Token.OP_R)] // AMO XOR
+        [TestCase("AMOAND", KuickTokenizer.Token.OP_R)] // AMO AND
+        [TestCase("AMOOR", KuickTokenizer.Token.OP_R)] // AND OR
+        [TestCase("AMOMIN", KuickTokenizer.Token.OP_R)] // AMO Minimum
+        [TestCase("AMOMAX", KuickTokenizer.Token.OP_R)] // AMO Maximum
+        
+        [TestCase("VPEQ", KuickTokenizer.Token.OP_R)] // Predicate =
+        [TestCase("VPNE", KuickTokenizer.Token.OP_R)] // Predicate !=
+        [TestCase("VPLT", KuickTokenizer.Token.OP_R)] // Predicate <
+        [TestCase("VPGE", KuickTokenizer.Token.OP_R)] // Predicate >=
+
+        [TestCase("VPAND", KuickTokenizer.Token.OP_R)] // Predicate AND
+        [TestCase("VPANDN", KuickTokenizer.Token.OP_R)] // Predicate AND NOT
+        [TestCase("VPOR", KuickTokenizer.Token.OP_R)] // Predicate OR
+        [TestCase("VPXOR", KuickTokenizer.Token.OP_R)] // Predicate XOR
+        [TestCase("VPNOT", KuickTokenizer.Token.OP_R)] // Predicate NOT
+        [TestCase("VPSWAP", KuickTokenizer.Token.OP_R)] // Predicate SWAP
+
+        [TestCase("VMOV", KuickTokenizer.Token.OP_R)] // Move
+        
+        [TestCase("VCVT", KuickTokenizer.Token.OP_R)] // Convert
+        
+        [TestCase("VADD", KuickTokenizer.Token.OP_R)] // Add
+        [TestCase("VSUB", KuickTokenizer.Token.OP_R)] // Subtract
+        [TestCase("VMUL", KuickTokenizer.Token.OP_R)] // Multiply
+        [TestCase("VDIV", KuickTokenizer.Token.OP_R)] // Divide
+        [TestCase("VSQRET", KuickTokenizer.Token.OP_R)] // Square Root
+        
+        [TestCase("VFMADD", KuickTokenizer.Token.OP_R)] // Multiply-ADD
+        [TestCase("VFMSUB", KuickTokenizer.Token.OP_R)] // Multiply-SUB
+        [TestCase("VFNMADD", KuickTokenizer.Token.OP_R)] // Negated Multiply-ADD
+        [TestCase("VFNMSUB", KuickTokenizer.Token.OP_R)] // Negated Multiply-SUB
+        
+        [TestCase("VSGNJ", KuickTokenizer.Token.OP_R)] // Sign Inject
+        [TestCase("VSGNJN", KuickTokenizer.Token.OP_R)] // Negated Sign Inject
+        [TestCase("VSGNJX", KuickTokenizer.Token.OP_R)] // XOR Sign Inject
+        
+        [TestCase("VMIN", KuickTokenizer.Token.OP_R)] // Minimum
+        [TestCase("VMAX", KuickTokenizer.Token.OP_R)] // Maximum
+        
+        [TestCase("VXOR", KuickTokenizer.Token.OP_R)] // XOR
+        [TestCase("VOR", KuickTokenizer.Token.OP_R)] // OR
+        [TestCase("VAND", KuickTokenizer.Token.OP_R)] // AND
+        
+        [TestCase("VCLASS", KuickTokenizer.Token.OP_R)] // CLASS
+        
+        [TestCase("VSETDCFG", KuickTokenizer.Token.OP_R)] // Set Data Conf
+        
+        [TestCase("VEXTRACT", KuickTokenizer.Token.OP_R)] // EXTRACT
+        [TestCase("VMERGE", KuickTokenizer.Token.OP_R)] // MERGE
+        [TestCase("VSELECT", KuickTokenizer.Token.OP_R)] // SELECT
 
         // ----------------------------------------------------------------
         // Optional Compressed Instructions: RV32C
         // ----------------------------------------------------------------
+        [TestCase("C.LW", KuickTokenizer.Token.OP_CL)] // Load Word
+        [TestCase("C.LWSP", KuickTokenizer.Token.OP_CI)] // Load Word SP
+        [TestCase("C.FLW", KuickTokenizer.Token.OP_CL)] // Float Load Word
+        [TestCase("C.FLWSP", KuickTokenizer.Token.OP_CI)] // Float Load Word SP
+        [TestCase("C.FLD", KuickTokenizer.Token.OP_CL)] // Float Load Double
+        [TestCase("C.FLDSP", KuickTokenizer.Token.OP_CI)] // Float Load Double SP
+        
+        [TestCase("C.SW", KuickTokenizer.Token.OP_CS)] // Store Word
+        [TestCase("C.SWSP", KuickTokenizer.Token.OP_CSS)] // Store Word SP
+        [TestCase("C.FSW", KuickTokenizer.Token.OP_CS)] // Float Store Word
+        [TestCase("C.FSWSP", KuickTokenizer.Token.OP_CSS)] // Float Store Word SP
+        [TestCase("C.FSD", KuickTokenizer.Token.OP_CS)] //  Float Store Double
+        [TestCase("C.FSDSP", KuickTokenizer.Token.OP_CSS)] // Float Store Double SP
+        
+        [TestCase("C.ADD", KuickTokenizer.Token.OP_CR)] // ADD
+        [TestCase("C.ADDI", KuickTokenizer.Token.OP_CI)] // ADD Immediate
+        [TestCase("C.ADDI16SP", KuickTokenizer.Token.OP_CI)] // ADD SP Immediate * 16
+        [TestCase("C.ADDI4SPN", KuickTokenizer.Token.OP_CIW)] // ADD SP Immediate * 4
+        [TestCase("C.SUB", KuickTokenizer.Token.OP_CR)] // SUB
+        [TestCase("C.AND", KuickTokenizer.Token.OP_CR)] // AND
+        [TestCase("C.ANDI", KuickTokenizer.Token.OP_CI)] // AND Immediate
+        [TestCase("C.OR", KuickTokenizer.Token.OP_CR)] // OR
+        [TestCase("C.XOR", KuickTokenizer.Token.OP_CR)] // Exlusive OR
+        [TestCase("C.MV", KuickTokenizer.Token.OP_CR)] // Move
+        [TestCase("C.LI", KuickTokenizer.Token.OP_CI)] // Load Immediate
+        [TestCase("C.LUI", KuickTokenizer.Token.OP_CI)] // Load Upper Imm
+        
+        [TestCase("C.SLLI", KuickTokenizer.Token.OP_CI)] // Shift Left Immediate
+        [TestCase("C.SRAI", KuickTokenizer.Token.OP_CI)] // Shift Right Arithmetic Immediate
+        [TestCase("C.SRLI", KuickTokenizer.Token.OP_CI)] // Shift Left Logical Immediate
+        
+        [TestCase("C.BEQZ", KuickTokenizer.Token.OP_CB)] // Branch == 0
+        [TestCase("C.BNEZ", KuickTokenizer.Token.OP_CB)] // Branch != 0
+        
+        [TestCase("C.J", KuickTokenizer.Token.OP_CJ)] // Jump
+        [TestCase("C.JR", KuickTokenizer.Token.OP_CR)] // Jump Register
+        
+        [TestCase("C.JAL", KuickTokenizer.Token.OP_CJ)] // J&L
+        [TestCase("C.JALR", KuickTokenizer.Token.OP_CR)] // Jump & Link Register
+        
+        [TestCase("C.EBRAKE", KuickTokenizer.Token.OP_CI)] // Enviorment Brake
 
         // ----------------------------------------------------------------
         // Optional Compressed Extention: RV64C
         // ----------------------------------------------------------------
 
+        // RV64C does not include 
+
+        [TestCase("C.ADDW", KuickTokenizer.Token.OP_CR)] // ADD Word
+        [TestCase("C.ADDIW", KuickTokenizer.Token.OP_CI)] // ADD Immediate Word
+        
+        [TestCase("C.SUBW", KuickTokenizer.Token.OP_CR)] // Subtract Word
+        
+        [TestCase("C.LD", KuickTokenizer.Token.OP_CL)] // Load Doubleword
+        [TestCase("C.LDSP", KuickTokenizer.Token.OP_CI)] // Load Doubleword SP
+
+        [TestCase("C.SD", KuickTokenizer.Token.OP_CS)] // Store Doubleword
+        [TestCase("C.SDSP", KuickTokenizer.Token.OP_CSS)] // Store Doubleword SP
 
         public void sanityCheckOps(string test, KuickTokenizer.Token token)
         {
             readToken(test, token, test);
+            readToken(test.ToLower(), token, test);
+            readToken(test.ToUpper(), token, test);
         }
 
         // ----------------------------------------------------------------
@@ -533,7 +658,7 @@ namespace KoreTests
             tokenizer.load(test);
             KuickTokenizer.TokenData tokenData = tokenizer.readToken();
             Assert.AreEqual(token, tokenData.token);
-            Assert.AreEqual(value, tokenData.value);
+            Assert.AreEqual(value.ToLower(), tokenData.value.ToLower());
         }
 
         [Test]
