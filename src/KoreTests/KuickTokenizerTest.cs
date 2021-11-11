@@ -246,7 +246,7 @@ namespace KoreTests
         // --------
         //TODO: figure out how I want to hand these cases because they conflict
         // Fornow I am just going to ignore the pseudoinstruction in the tokenizer and it will be handeled in the parser
-        [TestCase("call", KuickTokenizer.Token.OP_PSEUDO, Ignore="Duplicate Operation Name (Handeling in Parser)")] // call by offset
+        [TestCase("call", KuickTokenizer.Token.OP_PSEUDO)] // call by offset
         // --------
         //TODO: figure out how I want to hand these cases because they conflict
         // Fornow I am just going to ignore the pseudoinstruction in the tokenizer and it will be handeled in the parser
@@ -653,6 +653,9 @@ namespace KoreTests
         [TestCase("nopic", KuickTokenizer.Token.IDENTIFIER, "nopic")]
         [TestCase(".option push", KuickTokenizer.Token.DIRECTIVE, ".option")]
         [TestCase("push", KuickTokenizer.Token.IDENTIFIER, "push")]
+
+        [TestCase(", SLL", KuickTokenizer.Token.WHITESPACE, ", ")] // Bug fix
+        [TestCase("SLL ,", KuickTokenizer.Token.OP_R, "SLL")] // Bug fix
         public void readToken(string test, KuickTokenizer.Token token, string value)
         {
             tokenizer.load(test);

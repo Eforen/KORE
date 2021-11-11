@@ -1,5 +1,6 @@
 - [Done](#done)
   - [Done 10/18/2021](#done-10182021)
+  - [Done 10/21/2021](#done-10212021)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -17,15 +18,17 @@
 * [KUICK][TOKENIZER][TOKEN] implement NUMBER_FLOAT
 * [KUICK][TOKENIZER][TOKEN] implement NUMBER_DOUBLE
 * [KUICK][TOKENIZER][TOKEN] implement NUMBER_HEX
-### Next Commit (Eforen)
+
+## Done 10/21/2021
 * [KUICK][TOKENIZER] Write Tests for every Token
 * [KUICK][TOKENIZER] Implement all failing tests
+### Next Commit (Eforen)
 
 # Working On
 ## Working on (Eforen)
+* [KUICK][PARSER] Write Tests for every Token
 
 # Todos
-* [KUICK][PARSER] Write Tests for every Token
 * [KUICK][PARSER] Implement all failing tests
 * Implement all RISC-V ASM directives in (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
 * [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]

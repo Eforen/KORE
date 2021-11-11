@@ -1,44 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Kore
 {
-    public class KuickParser
+    public partial class KuickParser
     {
-        public class ParserSyntaxException : Exception
-        {
-            public ParserSyntaxException(string message) : base(message) { }
-            public ParserSyntaxException(string message, Exception innerException) : base(message, innerException) { }
-        }
 
         string _string;
-        public struct ParseData
-        {
-            public KuickTokenizer.Token type;
-            public object value;
-            public override string ToString()
-            {
-                if(value != null && value.GetType().IsArray)
-                {
-                    string str = "[";
-                    bool first = true;
-                    foreach (object item in (object[])value)
-                    {
-                        if (item == null) continue;
-                        if (first) first = false;
-                        else str += ",";
-                        str += item.ToString();
-                    }
-                    str += "]";
-                    return "[" + Enum.GetName(typeof(KuickTokenizer.Token), type) + "|" + str + "]";
-                }
-                return "[" + Enum.GetName(typeof(KuickTokenizer.Token), type) + (value == null ? "" : "|" + value.ToString()) +"]";
-            }
-        }
 
         KuickTokenizer _tokenizer = new KuickTokenizer();
         /// <summary>
@@ -74,7 +47,7 @@ namespace Kore
          */
         ParseData Page()
         {
-            return new ParseData { type = KuickTokenizer.Token.PAGE, value = ExpressionList() };
+            return new ParseData { type = StatementType.PAGE, value = ExpressionList() };
         }
 
         /**
@@ -90,10 +63,10 @@ namespace Kore
             {
                 _voidAnyWhitespaceTokens();
                 var expression = Expression();
-                if(expression.type != KuickTokenizer.Token.EOF) expressions.Add(expression);
+                if(expression.type != StatementType.EOF) expressions.Add(expression);
             }
             if (expressions.Count == 1) return (ParseData)expressions[0];
-            return new ParseData() { type = KuickTokenizer.Token.EXPRESSION_LIST, value = expressions.ToArray() };
+            return new ParseData() { type = StatementType.EXPRESSION_LIST, value = expressions.ToArray() };
         }
 
         /**
@@ -108,14 +81,199 @@ namespace Kore
             {
                 case KuickTokenizer.Token.DIRECTIVE:
                     return DirectiveCall();
+                case KuickTokenizer.Token.OP_R:
+                case KuickTokenizer.Token.OP_I:
+                case KuickTokenizer.Token.OP_S:
+                case KuickTokenizer.Token.OP_B:
+                case KuickTokenizer.Token.OP_U:
+                case KuickTokenizer.Token.OP_J:
+                case KuickTokenizer.Token.OP_PSEUDO:
+                case KuickTokenizer.Token.OP_CR:
+                case KuickTokenizer.Token.OP_CI:
+                case KuickTokenizer.Token.OP_CSS:
+                case KuickTokenizer.Token.OP_CIW:
+                case KuickTokenizer.Token.OP_CL:
+                case KuickTokenizer.Token.OP_CS:
+                case KuickTokenizer.Token.OP_CB:
+                case KuickTokenizer.Token.OP_CJ:
+                    return Operation();
                 case KuickTokenizer.Token.NUMBER_INT:
                 case KuickTokenizer.Token.STRING:
                     return Literal();
                 case KuickTokenizer.Token.EOF:
-                    return new ParseData() { type = KuickTokenizer.Token.EOF, value = null };
+                    return new ParseData() { type = StatementType.EOF, value = null };
                 default:
                     throw new ParserSyntaxException("Expression: unexpected expression `" + _nextToken.value + "`");
             }
+        }
+
+        /**
+         * OperationLiteral
+         *    : Operation_Type_R (OP_R rd, rs1, rs2)
+         *    : Operation_Type_I (OP_I rd, rs1, shamt)
+         *    : Operation_Type_S (OP_S rd, rs2, imm)
+         *    : Operation_Type_B (OP_B rs1, rs2, imm)
+         *    : Operation_Type_U (OP_U rd, imm)
+         *    : Operation_Type_J (OP_J rd, imm)
+         *    : OP_PSEUDO
+         *    : OP_CR
+         *    : OP_CI
+         *    : OP_CSS
+         *    : OP_CIW
+         *    : OP_CL
+         *    : OP_CS
+         *    : OP_CB
+         *    : OP_CJ
+         *    ;
+         */
+        ParseData Operation()
+        {
+            switch (_nextToken.token)
+            {
+                case KuickTokenizer.Token.OP_R:
+                    return Operation_Type_R();
+                case KuickTokenizer.Token.OP_I:
+                    return Operation_Type_I();
+                case KuickTokenizer.Token.OP_S:
+                    return Operation_Type_S();
+                case KuickTokenizer.Token.OP_B:
+                    return Operation_Type_B();
+                case KuickTokenizer.Token.OP_J:
+                    return Operation_Type_J();
+                case KuickTokenizer.Token.OP_U:
+                    return Operation_Type_U();
+                default:
+                    throw new ParserSyntaxException("OperationLiteral: unexpected operation `" + _nextToken.value + "`");
+            }
+        }
+
+
+        /**
+         * Operation_Type_R
+         *    : OP_R rd, rs1, rs2
+         */
+        ParseData Operation_Type_R()
+        {
+            var op = _consume(KuickTokenizer.Token.OP_R);
+            var rd = _consume(KuickTokenizer.Token.REGISTER);
+            var rs1 = _consume(KuickTokenizer.Token.REGISTER);
+            var rs2 = _consume(KuickTokenizer.Token.REGISTER);
+
+            return new ParseData(
+                StatementType.OP_R,
+                new ParseData[] {
+                    new ParseData(StatementType.OP, op.value),
+                    new ParseData(StatementType.REGISTER, rd.value),
+                    new ParseData(StatementType.REGISTER, rs1.value),
+                    new ParseData(StatementType.REGISTER, rs2.value)
+                }
+            );
+        }
+
+        /**
+         * Operation_Type_I
+         *    : OP_I rd, rs1, shamt
+         */
+        ParseData Operation_Type_I()
+        {
+            var op = _consume(KuickTokenizer.Token.OP_I);
+            var rd = _consume(KuickTokenizer.Token.REGISTER);
+            var rs1 = _consume(KuickTokenizer.Token.REGISTER);
+            ParseData shamt = HexLiteral();
+
+            return new ParseData(
+                StatementType.OP_I,
+                new ParseData[] {
+                    new ParseData(StatementType.OP, op.value),
+                    new ParseData(StatementType.REGISTER, rd.value),
+                    new ParseData(StatementType.REGISTER, rs1.value),
+                    shamt
+                }
+            );
+        }
+
+        /**
+         * Operation_Type_S
+         *    : OP_S rd, rs2, imm
+         */
+        ParseData Operation_Type_S()
+        {
+            var op = _consume(KuickTokenizer.Token.OP_S);
+            var rd = _consume(KuickTokenizer.Token.REGISTER);
+            var rs2 = _consume(KuickTokenizer.Token.REGISTER);
+            ParseData imm = HexLiteral();
+
+            return new ParseData(
+                StatementType.OP_S,
+                new ParseData[] {
+                    new ParseData(StatementType.OP, op.value),
+                    new ParseData(StatementType.REGISTER, rd.value),
+                    new ParseData(StatementType.REGISTER, rs2.value),
+                    imm
+                }
+            );
+        }
+
+        /**
+         * Operation_Type_B
+         *    : OP_B rs1, rs2, imm
+         */
+        ParseData Operation_Type_B()
+        {
+            var op = _consume(KuickTokenizer.Token.OP_B);
+            var rs1 = _consume(KuickTokenizer.Token.REGISTER);
+            var rs2 = _consume(KuickTokenizer.Token.REGISTER);
+            ParseData imm = HexLiteral();
+
+            return new ParseData(
+                StatementType.OP_B,
+                new ParseData[] {
+                    new ParseData(StatementType.OP, op.value),
+                    new ParseData(StatementType.REGISTER, rs1.value),
+                    new ParseData(StatementType.REGISTER, rs2.value),
+                    imm
+                }
+            );
+        }
+
+        /**
+         * Operation_Type_J
+         *    : OP_J rd, imm
+         */
+        ParseData Operation_Type_J()
+        {
+            var op = _consume(KuickTokenizer.Token.OP_J);
+            var rd = _consume(KuickTokenizer.Token.REGISTER);
+            ParseData imm = HexLiteral();
+
+            return new ParseData(
+                StatementType.OP_J,
+                new ParseData[] {
+                    new ParseData(StatementType.OP, op.value),
+                    new ParseData(StatementType.REGISTER, rd.value),
+                    imm
+                }
+            );
+        }
+
+        /**
+         * Operation_Type_U
+         *    : OP_U rd, imm
+         */
+        ParseData Operation_Type_U()
+        {
+            var op = _consume(KuickTokenizer.Token.OP_U);
+            var rd = _consume(KuickTokenizer.Token.REGISTER);
+            ParseData imm = HexLiteral();
+
+            return new ParseData(
+                StatementType.OP_J,
+                new ParseData[] {
+                    new ParseData(StatementType.OP, op.value),
+                    new ParseData(StatementType.REGISTER, rd.value),
+                    imm
+                }
+            );
         }
 
         /**
@@ -139,13 +297,30 @@ namespace Kore
 
         /**
          * NumericLiteral
+         *   : NumericLiteral
+         *   : HexLiteral
+         *   ;
+         */
+        ParseData NumericLiteral()
+        {
+            if (_nextToken.token == KuickTokenizer.Token.NUMBER_INT) return new ParseData { type = StatementType.NUMBER_LITERAL, value = _consume(KuickTokenizer.Token.NUMBER_INT).value };
+            return new ParseData { type = StatementType.NUMBER_LITERAL, value = _consume(KuickTokenizer.Token.NUMBER_HEX).value };
+        }
+
+        /**
+         * NumericLiteral
          *   : NUMBER
          *   ;
          */
         ParseData IntLiteral()
         {
             var token = _consume(KuickTokenizer.Token.NUMBER_INT);
-            return new ParseData { type = KuickTokenizer.Token.NUMBER_INT, value = Int32.Parse(token.value) };
+            return new ParseData { type = StatementType.NUMBER_INT, value = Int32.Parse(token.value) };
+        }
+        ParseData HexLiteral()
+        {
+            var token = _consume(KuickTokenizer.Token.NUMBER_HEX, KuickTokenizer.Token.NUMBER_INT);
+            return new ParseData { type = StatementType.NUMBER_HEX, value = Convert.ToInt64(token.value.Replace("0x", ""), 16) };
         }
 
         /**
@@ -156,7 +331,7 @@ namespace Kore
         ParseData StringLiteral()
         {
             var token = _consume(KuickTokenizer.Token.STRING);
-            return new ParseData { type = KuickTokenizer.Token.STRING, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.STRING, value = token.value.Substring(1, token.value.Length - 2) };
         }
 
         /**
@@ -232,41 +407,43 @@ namespace Kore
         ParseData DirectiveSimple()
         {
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            StatementType type = StatementType.NO_STATEMENT;
 
             switch (token.value.ToLower().Substring(1))
             {
                 case "text":
-                    token.token = KuickTokenizer.Token.DIRECTIVE_TEXT;
+                    type = StatementType.DIRECTIVE_TEXT;
                     break;
                 case "data":
-                    token.token = KuickTokenizer.Token.DIRECTIVE_DATA;
+                    type = StatementType.DIRECTIVE_DATA;
                     break;
                 case "bss":
-                    token.token = KuickTokenizer.Token.DIRECTIVE_BSS;
+                    type = StatementType.DIRECTIVE_BSS;
                     break;
                 default:
                     throw new ParserSyntaxException("DirectiveSimple: unexpected directive `" + token.value.Substring(1) + "`");
             }
-            return new ParseData { type = token.token, value = null };
+            if(type == StatementType.NO_STATEMENT) throw new ParserSyntaxException("Unsupported compiler directive, `" + Enum.GetName(typeof(KuickTokenizer.Token), token.token) + "`");
+            return new ParseData(type, token.value.Substring(1));
         }
 
         ParseData DirectiveSection()
         {
             throw new NotImplementedException("Section Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_SECTION, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_SECTION, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveAlign()
         {
             throw new NotImplementedException("Align Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_ALIGN, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_ALIGN, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveBAlign()
         {
             throw new NotImplementedException("BAlign Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_BALIGN, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_BALIGN, value = token.value.Substring(1, token.value.Length - 2) };
         }
 
         /**
@@ -282,49 +459,49 @@ namespace Kore
             // Consume the Symbol Identifier
             var sym = Identifier();
             // return an options directive
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_GLOBAL, value = sym.value};
+            return new ParseData { type = StatementType.DIRECTIVE_GLOBAL, value = sym.value};
         }
         ParseData DirectiveString()
         {
             throw new NotImplementedException("String Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_STRING, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_STRING, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveByte()
         {
             throw new NotImplementedException("Byte Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_BYTE, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_BYTE, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveHalf()
         {
             throw new NotImplementedException("Half Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_HALF, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_HALF, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveWord()
         {
             throw new NotImplementedException("Word Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_WORD, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_WORD, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveDword()
         {
             throw new NotImplementedException("Dword Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_DWORD, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_DWORD, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveFloat()
         {
             throw new NotImplementedException("Float Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_FLOAT, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_FLOAT, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveDouble()
         {
             throw new NotImplementedException("Double Directive not supported yet");
             var token = _consume(KuickTokenizer.Token.DIRECTIVE);
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_DOUBLE, value = token.value.Substring(1, token.value.Length - 2) };
+            return new ParseData { type = StatementType.DIRECTIVE_DOUBLE, value = token.value.Substring(1, token.value.Length - 2) };
         }
         ParseData DirectiveOption()
         {
@@ -333,7 +510,7 @@ namespace Kore
             // Consume the Option Flag
             var option = Identifier();
             // return an options directive
-            return new ParseData { type = KuickTokenizer.Token.DIRECTIVE_OPTION, value = ((string)(option.value)).ToLower() };
+            return new ParseData { type = StatementType.DIRECTIVE_OPTION, value = ((string)(option.value)).ToLower() };
         }
 
 
@@ -345,7 +522,7 @@ namespace Kore
         ParseData Identifier()
         {
             var token = _consume(KuickTokenizer.Token.IDENTIFIER);
-            return new ParseData { type = KuickTokenizer.Token.IDENTIFIER, value = token.value };
+            return new ParseData { type = StatementType.IDENTIFIER, value = token.value };
         }
 
 
@@ -354,7 +531,7 @@ namespace Kore
         /// </summary>
         /// <param name="expectedToken">The expected token type</param>
         /// <returns>token data</returns>
-        private KuickTokenizer.TokenData _consume(KuickTokenizer.Token expectedToken)
+        private KuickTokenizer.TokenData _consume(params KuickTokenizer.Token[] expectedTokens)
         {
             _voidAnyWhitespaceTokens();
 
@@ -362,14 +539,14 @@ namespace Kore
             if (_nextToken == KuickTokenizer.Token.NO_TOKEN)
             {
                 // Throw sytax error
-                throw new ParserSyntaxException("Unexpected end of input, expected `" + Enum.GetName(typeof(KuickTokenizer.Token), expectedToken) + "`");
+                throw new ParserSyntaxException("TokenConsumer: Unexpected end of input, expected `" + getTokenStrings(expectedTokens) + "`");
             }
 
             // If the token is not what we expected to come next
-            if (_nextToken.token != expectedToken)
+            if (expectedTokens.Contains(_nextToken.token) == false)
             {
                 // Throw sytax error
-                throw new ParserSyntaxException("Unexpected token `" + Enum.GetName(typeof(KuickTokenizer.Token), _nextToken.token) + "`, expected `" + Enum.GetName(typeof(KuickTokenizer.Token), expectedToken) + "`");
+                throw new ParserSyntaxException("TokenConsumer: Unexpected token `" + getTokenStrings(_nextToken.token) + "`, expected `" + getTokenStrings(expectedTokens) + "`");
             }
 
 
@@ -381,6 +558,25 @@ namespace Kore
 
             // Return our cached token to caller
             return token;
+        }
+
+        private String getTokenStrings(params KuickTokenizer.Token[] tokens)
+        {
+            string r = "";
+            bool first = true;
+            foreach (var token in tokens)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    r += ", ";
+                }
+                r += Enum.GetName(typeof(KuickTokenizer.Token), token);
+            }
+            return r;
         }
 
         private void _voidAnyWhitespaceTokens()

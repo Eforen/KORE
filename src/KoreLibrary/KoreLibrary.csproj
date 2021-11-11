@@ -43,8 +43,16 @@
   <ItemGroup>
     <Compile Include="ALU.cs" />
     <Compile Include="CPU.cs" />
+    <Compile Include="KuickParser.ParseData.cs" />
+    <Compile Include="KuickParser.ParserSyntaxException.cs" />
+    <Compile Include="KuickParser.StatementType.cs" />
     <Compile Include="KuickTokenizer.cs" />
     <Compile Include="KuickParser.cs" />
+    <Compile Include="KuickTokenizer.Replacement.cs" />
+    <Compile Include="KuickTokenizer.Token.cs" />
+    <Compile Include="KuickTokenizer.TokenData.cs" />
+    <Compile Include="KuickTokenizer.TokenFinder.cs" />
+    <Compile Include="KuickTokenizer.TokenSyntaxException.cs" />
     <Compile Include="MainBus.cs" />
     <Compile Include="MainBusComponent.cs" />
     <Compile Include="MiscUtilities.cs" />
