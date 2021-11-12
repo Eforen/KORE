@@ -32,6 +32,7 @@ namespace Kore
             OP_CB,
             OP_CJ,
             REGISTER,
+            CSR,
             IDENTIFIER,
             COMPILER_LOGIC,
             EOF

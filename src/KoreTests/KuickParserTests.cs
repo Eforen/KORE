@@ -739,6 +739,10 @@ namespace KoreTests
         // [TestCase("C.SD", KuickTokenizer.Token.OP_CS)] // Store Doubleword
         // [TestCase("C.SDSP", KuickTokenizer.Token.OP_CSS)] // Store Doubleword SP
 
+        // ----------------------------------------------------------------
+        // CSRs (These are all reserved words)
+        // ----------------------------------------------------------------
+
         public void sanityCheckOps(string test, string output, bool debug = false)
         {
             for (int i = 0; i < 10; i++)
