@@ -5,7 +5,7 @@ using Kore.RiscMeta;
 using NUnit.Framework;
 
 namespace Kore.Kuick.Tests {
-    public class Tests {
+    public class TestRTypeInstructions {
         [SetUp]
         public void Setup() {
         }
