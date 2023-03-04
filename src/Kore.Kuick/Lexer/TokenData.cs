@@ -1,16 +1,19 @@
-namespace Kore
-{
-    public partial class KuickTokenizer
+namespace Kore.Kuick {
+    public partial class Lexer
     {
         public struct TokenData
         {
-            public TokenData(Token token, string value)
+            public TokenData(Token token, string value, int lineNumber, int columnNumber)
             {
                 this.token = token;
                 this.value = value;
+                this.lineNumber = lineNumber;
+                this.columnNumber = columnNumber;
             }
             public Token token;
             public string value;
+            public int lineNumber;
+            public int columnNumber;
             public override bool Equals(object obj)
             {
                 // if its a token just compair it to our token type

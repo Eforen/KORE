@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Kore.RiscISA;
 
+using Kore.RiscMeta;
+
 namespace Kore
 {
     public class RegisterFile

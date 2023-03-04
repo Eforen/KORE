@@ -1,4 +1,5 @@
-﻿using Kore;
+﻿/*
+using Kore;
 using Kore.RiscISA.Instruction;
 using NSubstitute;
 using NUnit.Framework;
@@ -16,12 +17,6 @@ namespace KoreTests
     {
         private static Random rand = new Random();
         KuickTokenizer tokenizer = new KuickTokenizer();
-
-        /*
-        [TestCase(".text", new Type[] { typeof(KuickDirectiveToken)})] 
-        [TestCase(".global _start", new KuickLexerToken[] { new KuickDirectiveToken(".text"), new KuickLexerToken("_start") })]
-        [TestCase(".type _start, @function", new KuickLexerToken[] { new KuickDirectiveToken(".text"), new KuickLexerToken("_start"), new KuickLexerToken("@function") })]
-*/
 
         // ----------------------------------------------------------------
         // RISC-V Registers
@@ -790,7 +785,7 @@ namespace KoreTests
         )]
         [TestCase("yolo:",
             new KuickTokenizer.Token[] { KuickTokenizer.Token.LABEL, KuickTokenizer.Token.EOF, KuickTokenizer.Token.EOF, KuickTokenizer.Token.EOF },
-            new string[] { "yolo:", default(string), default(string), default(string) }
+            new string[] { "yolo", default(string), default(string), default(string) }
         )]
         [TestCase("yolo",
             new KuickTokenizer.Token[] { KuickTokenizer.Token.IDENTIFIER, KuickTokenizer.Token.EOF, KuickTokenizer.Token.EOF, KuickTokenizer.Token.EOF },
@@ -881,11 +876,7 @@ namespace KoreTests
         // .option pic
         // .option nopic
         // .option push
-        /* .repeat
-         * asm
-         * .endr
-         * this will not be implimented until later down the road
-         * */
         // .option push
     }
 }
+*/

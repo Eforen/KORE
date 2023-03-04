@@ -1,6 +1,7 @@
 - [Done](#done)
   - [Done 10/18/2021](#done-10182021)
   - [Done 10/21/2021](#done-10212021)
+  - [Done 02/25/2023](#done-02252023)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -22,10 +23,15 @@
 ## Done 10/21/2021
 * [KUICK][TOKENIZER] Write Tests for every Token
 * [KUICK][TOKENIZER] Implement all failing tests
+
+## Done 02/25/2023
 ### Next Commit (Eforen)
 
 # Working On
 ## Working on (Eforen)
+* [KUICK][LEXER] Change to using a lexer that makes an intermediary AST (Abstract Syntax Tree)
+* [KUICK][LEXER] Rewrite tests to take in string and output AST
+* [KUICK][PARSER] Rewrite tests to take in AST and output binary
 * [KUICK][PARSER] Write Tests for every Token
 
 # Todos

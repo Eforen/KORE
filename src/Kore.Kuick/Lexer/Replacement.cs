@@ -1,6 +1,5 @@
-namespace Kore
-{
-    public partial class KuickTokenizer
+namespace Kore.Kuick {
+    public partial class Lexer
     {
         public struct Replacement
         {

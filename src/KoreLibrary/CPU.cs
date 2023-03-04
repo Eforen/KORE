@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Kore.RiscISA;
 using Kore.RiscISA.Instruction;
+using Kore.RiscMeta;
 
 namespace Kore
 {

@@ -5,6 +5,7 @@ using System.Text;
 using Kore.RiscISA;
 using Kore.RiscISA.Instruction;
 using Kore;
+using Kore.RiscMeta;
 
 namespace KoreTests
 {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Kore.RiscISA;
+using Kore.RiscMeta;
 
 namespace KoreTests
 {

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3B46AD76-BBB2-4293-B0BD-D61AB39A411E}</ProjectGuid>
+    <ProjectGuid>{1BB25104-8E3A-4EF4-BDE4-0674C2A70CD2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Kore</RootNamespace>
-    <AssemblyName>Kore</AssemblyName>
+    <RootNamespace>Kore.Utility</RootNamespace>
+    <AssemblyName>Kore.Utility</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,30 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ALU.cs" />
-    <Compile Include="CPU.cs" />
-    <Compile Include="KuickParser.ParseData.cs" />
-    <Compile Include="KuickParser.ParserSyntaxException.cs" />
-    <Compile Include="KuickParser.StatementType.cs" />
-    <Compile Include="KuickParser.cs" />
-    <Compile Include="MainBus.cs" />
-    <Compile Include="MainBusComponent.cs" />
-    <Compile Include="MiscUtilities.cs" />
-    <Compile Include="KuickCompiler.cs" />
-    <Compile Include="RamController.cs" />
+    <Compile Include="StringValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegisterFile.cs" />
-    <Compile Include="RiscISA.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Kore.RiscMeta\Kore.RiscMeta.csproj">
-      <Project>{134dae66-6fe1-4df1-b392-3658c48825c0}</Project>
-      <Name>Kore.RiscMeta</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kore.Utility\Kore.Utility.csproj">
-      <Project>{1bb25104-8e3a-4ef4-bde4-0674c2a70cd2}</Project>
-      <Name>Kore.Utility</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
