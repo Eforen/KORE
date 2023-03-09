@@ -118,33 +118,13 @@ namespace Kore.Kuick {
         }
 
         private static InstructionNodeTypeR ParseRInstruction(Lexer.TokenData currentToken, Lexer lexer) {
-            if(currentToken.token != Lexer.Token.OP_R) throw ThrowUnexpected(currentToken, "OP_R");
-
             // add x1, x2, x3
             // OP  rd, rs1, rs2
 
-            //var OP = currentToken.value;
-            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Instructions.TypeR op) == false) {
-                throw ThrowUnexpected(currentToken, "OP_R");
-            }
-
-            // Get Expect rd
-            currentToken = ExpectToken(lexer, Lexer.Token.REGISTER);
-            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Register rd) == false) {
-                throw ThrowUnexpected(currentToken, "Register");
-            }
-
-            // Get Expect rd1
-            currentToken = ExpectToken(lexer, Lexer.Token.REGISTER);
-            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Register rd1) == false) {
-                throw ThrowUnexpected(currentToken, "Register");
-            }
-
-            // Get Expect rd2
-            currentToken = ExpectToken(lexer, Lexer.Token.REGISTER);
-            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Register rd2) == false) {
-                throw ThrowUnexpected(currentToken, "Register");
-            }
+            var op = ParseOP<Kore.RiscMeta.Instructions.TypeR>(currentToken, lexer, Lexer.Token.OP_R);
+            var rd = ParseRegister(lexer); // Get the destination register (rd)
+            var rd1 = ParseRegister(lexer); // Get the destination register (rd1)
+            var rd2 = ParseRegister(lexer); // Get the destination register (rd2)
 
             return expectReturnEOL(new InstructionNodeTypeR(op, rd, rd1, rd2), lexer);
         }
@@ -153,17 +133,10 @@ namespace Kore.Kuick {
             // addi x1, x2, 15
             // OP  rd, rs, imm
 
-            //var OP = currentToken.value;
             var op = ParseOP<Kore.RiscMeta.Instructions.TypeI>(currentToken, lexer, Lexer.Token.OP_I);
-
-            // Get the destination register (rd)
-            var rd = ParseRegister(lexer);
-
-            // Get the source register (rs)
-            var rs = ParseRegister(lexer);
-
-            // Get the immediate value, which can be in decimal or hexadecimal format
-            int imm = ParseImmediate(lexer);
+            var rd = ParseRegister(lexer); // Get the destination register (rd)
+            var rs = ParseRegister(lexer); // Get the source register (rs)
+            int imm = ParseImmediate(lexer); // Get the immediate value, which can be in decimal or hexadecimal format
 
             return expectReturnEOL(new InstructionNodeTypeI(op, rd, rs, imm), lexer);
         }
