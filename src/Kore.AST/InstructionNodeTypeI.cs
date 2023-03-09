@@ -13,23 +13,23 @@ namespace Kore.AST {
         /// <summary>
         /// The destination register for the instruction.
         /// </summary>
-        public Register Rd { get; set; }
+        public Register rd { get; set; }
 
         /// <summary>
         /// The source register for the instruction.
         /// </summary>
-        public Register Rs1 { get; set; }
+        public Register rs { get; set; }
 
         /// <summary>
         /// The immediate value for the instruction.
         /// </summary>
-        public int Immediate { get; set; }
+        public int immediate { get; set; }
 
-        public InstructionNodeTypeI(Kore.RiscMeta.Instructions.TypeI op, Register rd, Register rs1, int immediate)
+        public InstructionNodeTypeI(Kore.RiscMeta.Instructions.TypeI op, Register rd, Register rs, int immediate)
             : base(op) {
-            Rd = rd;
-            Rs1 = rs1;
-            Immediate = immediate;
+            this.rd = rd;
+            this.rs = rs;
+            this.immediate = immediate;
         }
 
         public override void CallProcessor(ASTProcessor processor) {

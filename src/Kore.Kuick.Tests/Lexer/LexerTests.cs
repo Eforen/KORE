@@ -751,6 +751,7 @@ namespace Kore.Kuick.Tests.LexerTests {
         [TestCase("4.5d, 2.4d, 2414.125125d", Lexer.Token.NUMBER_DOUBLE, "4.5d")]
         [TestCase("2.4d, 2414.125125d", Lexer.Token.NUMBER_DOUBLE, "2.4d")]
         [TestCase("2414.125125d", Lexer.Token.NUMBER_DOUBLE, "2414.125125d")]
+        [TestCase("242", Lexer.Token.NUMBER_INT, "242")]
         [TestCase(".option rvc", Lexer.Token.DIRECTIVE, ".option")]
         [TestCase("rvc", Lexer.Token.IDENTIFIER, "rvc")]
         [TestCase(".option norvc", Lexer.Token.DIRECTIVE, ".option")]

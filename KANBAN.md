@@ -2,6 +2,7 @@
   - [Done 10/18/2021](#done-10182021)
   - [Done 10/21/2021](#done-10212021)
   - [Done 02/25/2023](#done-02252023)
+  - [Done 2023/03/08](#done-20230308)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -25,17 +26,23 @@
 * [KUICK][TOKENIZER] Implement all failing tests
 
 ## Done 02/25/2023
+* [KUICK][LEXER] Refactor switch the name of the parser and lexer because I had the definitions backwards
+* [KUICK][PARSER] Change to using a parser that makes an intermediary AST (Abstract Syntax Tree)
+* [KUICK][PARSER] Write Test for R Type Instruction
+
+## Done 2023/03/08
 ### Next Commit (Eforen)
+* [KUICK][PARSER] Write Test for I Type Instruction
 
 # Working On
 ## Working on (Eforen)
-* [KUICK][LEXER] Change to using a lexer that makes an intermediary AST (Abstract Syntax Tree)
-* [KUICK][LEXER] Rewrite tests to take in string and output AST
-* [KUICK][PARSER] Rewrite tests to take in AST and output binary
-* [KUICK][PARSER] Write Tests for every Token
+* Refactor KUICK into its own library
+* [KUICK][PARSER] Rewrite tests to take in string and output AST
+* [KUICK][ASSEMBLER] Rewrite tests to take in AST and output binary
+* [KUICK][ASSEMBLER] Write Tests for every Token
 
 # Todos
-* [KUICK][PARSER] Implement all failing tests
+* [KUICK][ASSEMBLER] Implement all failing tests
 * Implement all RISC-V ASM directives in (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
 * [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
 ## Todo
