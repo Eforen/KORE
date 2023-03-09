@@ -1,6 +1,7 @@
 ﻿/*
 */
 using Kore.AST;
+using Kore.RiscMeta;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,13 @@ using System.Threading.Tasks;
 
 namespace Kore.Kuick {
     public static class Parser {
-        public class SyntaxException : Exception { public SyntaxException(string msg) : base(msg) { } }
+        #region Utilities
+            public class SyntaxException : Exception { public SyntaxException(string msg) : base(msg) { } }
         private static Exception ThrowUnexpected(Lexer.TokenData currentToken, string expectation) {
             throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}. Expected {expectation}.");
+        }
+        private static Exception ThrowParserPanic(Lexer.TokenData currentToken) {
+            throw new SyntaxException($"PARSER PANIC: Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}.");
         }
 
         /// <summary>
@@ -48,6 +53,36 @@ namespace Kore.Kuick {
 
             throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}. Expected {string.Join(" or ", expectedTokens.Select(e => e.ToString()))}.");
         }
+
+        private static T ParseOP<T>(Lexer.TokenData currentToken, Lexer lexer, Lexer.Token expectedToken)
+        where T : struct, Enum {
+            if(currentToken.token != expectedToken) {
+                throw ThrowUnexpected(currentToken, expectedToken.ToString());
+            }
+
+            if(Enum.TryParse(currentToken.value, true, out T op) == false) {
+                throw ThrowUnexpected(currentToken, "OP");
+            }
+
+            return op;
+        }
+
+        private static Register ParseRegister(Lexer lexer) {
+            var currentToken = ExpectToken(lexer, Lexer.Token.REGISTER);
+            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Register reg) == false) {
+                throw ThrowUnexpected(currentToken, "Register");
+            }
+            return reg;
+        }
+
+        private static int ParseImmediate(Lexer lexer) {
+            var currentToken = ExpectToken(lexer, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            if(currentToken.token == Lexer.Token.NUMBER_INT) return int.Parse(currentToken.value);
+            if(currentToken.token == Lexer.Token.NUMBER_HEX) return Convert.ToInt32(currentToken.value, 16);
+            throw ThrowParserPanic(currentToken);
+        }
+
+        #endregion
 
 
         private static LabelNode ParseNodeLabel(Lexer.TokenData currentToken, Lexer lexer) {
@@ -153,6 +188,18 @@ namespace Kore.Kuick {
 
             return expectReturnEOL(new InstructionNodeTypeI(op, rd, rs, imm), lexer);
         }
+        private static InstructionNodeTypeS ParseSInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+            var op = ParseOP<Kore.RiscMeta.Instructions.TypeS>(currentToken, lexer, Lexer.Token.OP_S);
+
+            var rs2 = ParseRegister(lexer);
+            var imm = ParseImmediate(lexer);
+            ExpectToken(lexer, Lexer.Token.PARREN_OPEN);
+            var rs1 = ParseRegister(lexer);
+            ExpectToken(lexer, Lexer.Token.PARREN_CLOSE);
+
+            return expectReturnEOL(new InstructionNodeTypeS(op, rs1, rs2, imm), lexer);
+        }
+
 
         private static SectionNode ParseNodeSection(SectionNode section, Lexer.TokenData currentToken, Lexer lexer) {
             // Get the next token
@@ -169,6 +216,7 @@ namespace Kore.Kuick {
                     (currentToken.token == Lexer.Token.DIRECTIVE && getSectionFromDirectiveToken(currentToken) != default(string))
                     ) return section;
 
+                //TODO: Refactor to a switch statement
                 // Label
                 if(currentToken.token == Lexer.Token.LABEL) {
                     section.Contents.Add(ParseNodeLabel(currentToken, lexer)); //TODO: Maybe should cascade into this processor and only process instructions there but that would mean no double labels though I don't know if thats valid anyhow.
@@ -188,6 +236,12 @@ namespace Kore.Kuick {
                 // Instruction
                 if(currentToken.token == Lexer.Token.OP_I) {
                     var instructionNode = ParseIInstruction(currentToken, lexer);
+                    section.Contents.Add(instructionNode);
+                    continue;
+                }
+                // Instruction
+                if(currentToken.token == Lexer.Token.OP_S) {
+                    var instructionNode = ParseSInstruction(currentToken, lexer);
                     section.Contents.Add(instructionNode);
                     continue;
                 }

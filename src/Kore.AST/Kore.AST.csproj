@@ -50,6 +50,7 @@
     <Compile Include="InstructionNodeTypeI.cs" />
     <Compile Include="InstructionNodeTypeJ.cs" />
     <Compile Include="InstructionNodeTypeMisc.cs" />
+    <Compile Include="InstructionNodeTypeS.cs" />
     <Compile Include="InstructionNodeTypeU.cs" />
     <Compile Include="IntDirectiveNode.cs" />
     <Compile Include="LabelNode.cs" />

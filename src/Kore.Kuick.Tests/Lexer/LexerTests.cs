@@ -862,6 +862,24 @@ namespace Kore.Kuick.Tests.LexerTests {
             }
         }
 
+        [Test]
+        [TestCase(" sh x2, 0(x1)",
+            new Lexer.Token[] { Lexer.Token.OP_S, Lexer.Token.REGISTER, Lexer.Token.NUMBER_INT, Lexer.Token.PARREN_OPEN, Lexer.Token.REGISTER, Lexer.Token.PARREN_CLOSE, Lexer.Token.EOF, Lexer.Token.EOF, Lexer.Token.EOF },
+            new string[] { "SH", "x2", "0", "(", "x1", ")", default(string), default(string), default(string) }
+        )]
+        [TestCase(" sh x2, 0x10(x1)",
+            new Lexer.Token[] { Lexer.Token.OP_S, Lexer.Token.REGISTER, Lexer.Token.NUMBER_HEX, Lexer.Token.PARREN_OPEN, Lexer.Token.REGISTER, Lexer.Token.PARREN_CLOSE, Lexer.Token.EOF, Lexer.Token.EOF, Lexer.Token.EOF },
+            new string[] { "SH", "x2", "0x10", "(", "x1", ")", default(string), default(string), default(string) }
+        )]
+        public void noWhiteSpaceReadTokens(string test, Lexer.Token[] tokens, string[] values) {
+            tokenizer.Load(test);
+            for(int i = 0; i < tokens.Length; i++) {
+                Lexer.TokenData tokenData = tokenizer.ReadToken(true);
+                Assert.AreEqual(tokens[i], tokenData.token);
+                Assert.AreEqual(values[i], tokenData.value);
+            }
+        }
+
         [TestCase(".option push\n.option nopic",
             new Lexer.Token[] { Lexer.Token.DIRECTIVE, Lexer.Token.WHITESPACE, Lexer.Token.IDENTIFIER, Lexer.Token.EOL, Lexer.Token.DIRECTIVE, Lexer.Token.WHITESPACE, Lexer.Token.IDENTIFIER, Lexer.Token.EOF, Lexer.Token.EOF, Lexer.Token.EOF },
             new int[] { 0, 0, 0,  0, 1, 1, 1,  1,  1,  1 },

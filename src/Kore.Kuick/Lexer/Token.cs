@@ -96,7 +96,13 @@ namespace Kore.Kuick {
             /// <summary>Represents the end of the input stream.</summary>
             EOF,
             /// <summary> End of Line </summary>
-            EOL
+            EOL,
+
+            /// <summary> The Char "{" </summary>
+            PARREN_OPEN,
+
+            /// <summary> The Char "}" </summary>
+            PARREN_CLOSE
         }
     }
 }
