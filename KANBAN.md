@@ -32,10 +32,11 @@
 
 ## Done 2023/03/08
 * [KUICK][PARSER] Write Test for I Type Instruction `ADDI`
-### Next Commit (Eforen)
 * [KUICK][PARSER] Write Test for S Type Instruction `SW`
 * [KUICK][PARSER] Write Test for S Type Instruction `SH`
 * [KUICK][PARSER] Write Test for S Type Instruction `SB`
+### Next Commit (Eforen)
+* [KUICK][PARSER] Refactor ParseIInstruction to use the new ParseOP, ParseRegister, and ParseImmediate functions
 
 # Working On
 ## Working on (Eforen)
@@ -47,7 +48,6 @@
 # Todos
 * [KUICK][PARSER] Refactor ParseNodeSection to use a switch statement instead of ifs
 * [KUICK][PARSER] Refactor ParseNodeSection to Reduce code dupliaction in the difrent OP types
-* [KUICK][PARSER] Refactor ParseIInstruction to use the new ParseOP, ParseRegister, and ParseImmediate functions
 * [KUICK][PARSER] Refactor ParseRInstruction to use the new ParseOP, ParseRegister, and ParseImmediate functions
 * [KUICK][PARSER] Write Test for B Type Instruction `BEQ`
 * [KUICK][PARSER] Write Test for B Type Instruction `BNE`

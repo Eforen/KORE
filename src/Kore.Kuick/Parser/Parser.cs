@@ -150,41 +150,20 @@ namespace Kore.Kuick {
         }
 
         private static InstructionNodeTypeI ParseIInstruction(Lexer.TokenData currentToken, Lexer lexer) {
-            if(currentToken.token != Lexer.Token.OP_I) throw ThrowUnexpected(currentToken, "OP_I");
-
             // addi x1, x2, 15
             // OP  rd, rs, imm
 
             //var OP = currentToken.value;
-            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Instructions.TypeI op) == false) {
-                throw ThrowUnexpected(currentToken, "OP_R");
-            }
+            var op = ParseOP<Kore.RiscMeta.Instructions.TypeI>(currentToken, lexer, Lexer.Token.OP_I);
 
             // Get the destination register (rd)
-            currentToken = ExpectToken(lexer, Lexer.Token.REGISTER);
-            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Register rd) == false) {
-                throw ThrowUnexpected(currentToken, "Register");
-            }
+            var rd = ParseRegister(lexer);
 
             // Get the source register (rs)
-            currentToken = ExpectToken(lexer, Lexer.Token.REGISTER);
-            if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.Register rs) == false) {
-                throw ThrowUnexpected(currentToken, "Register");
-            }
+            var rs = ParseRegister(lexer);
 
             // Get the immediate value, which can be in decimal or hexadecimal format
-            currentToken = ExpectToken(lexer, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
-            int imm;
-            if(currentToken.token == Lexer.Token.NUMBER_INT) {
-                if(!int.TryParse(currentToken.value, out imm)) {
-                    throw new SyntaxException($"Invalid integer immediate value: {currentToken.value}");
-                }
-            } else // Lexer.Token.NUMBER_HEX
-              {
-                if(!int.TryParse(currentToken.value.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out imm)) {
-                    throw new SyntaxException($"Invalid hexadecimal immediate value: {currentToken.value}");
-                }
-            }
+            int imm = ParseImmediate(lexer);
 
             return expectReturnEOL(new InstructionNodeTypeI(op, rd, rs, imm), lexer);
         }
