@@ -36,8 +36,11 @@
 * [KUICK][PARSER] Write Test for S Type Instruction `SH`
 * [KUICK][PARSER] Write Test for S Type Instruction `SB`
 * [KUICK][PARSER] Refactor ParseIInstruction to use the new ParseOP, ParseRegister, and ParseImmediate functions
-### Next Commit (Eforen)
 * [KUICK][PARSER] Refactor ParseRInstruction to use the new ParseOP, ParseRegister, and ParseImmediate functions
+### Next Commit (Eforen)
+* [KUICK][PARSER] Write Test for R Type Instruction `SUB`
+* [KUICK][PARSER] Write Test for R Type Instruction `AND`
+* [KUICK][PARSER] Write Test for R Type Instruction `OR`
 
 # Working On
 ## Working on (Eforen)
@@ -59,9 +62,6 @@
 * [KUICK][PARSER] Write Test for J Type Instruction `JALR`
 * [KUICK][PARSER] Write Test for F Type Instruction `FADD.S`
 * [KUICK][PARSER] Write Test for F Type Instruction `FMUL.D`
-* [KUICK][PARSER] Write Test for R Type Instruction `SUB`
-* [KUICK][PARSER] Write Test for R Type Instruction `AND`
-* [KUICK][PARSER] Write Test for R Type Instruction `OR`
 * [KUICK][PARSER] Write Test for I Type Instruction `SLTI`
 * [KUICK][PARSER] Write Test for I Type Instruction `XORI`
 * [KUICK][PARSER] Write Test for I Type Instruction `SLLI`

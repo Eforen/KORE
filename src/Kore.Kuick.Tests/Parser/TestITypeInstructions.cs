@@ -1,6 +1,4 @@
-﻿/*
-*/
-using Kore.AST;
+﻿using Kore.AST;
 using Kore.RiscMeta;
 using NUnit.Framework;
 
@@ -33,12 +31,6 @@ namespace Kore.Kuick.Tests.Parser {
             var textSection = programNode.Sections[0];
             Assert.IsInstanceOf<SectionNode>(textSection);
             Assert.AreEqual(".text", textSection.Name);
-
-            /*
-            var startLabel = textSection.Contents[0];
-            Assert.IsInstanceOf<LabelNode>(startLabel);
-            Assert.AreEqual("_start", ((LabelNode)startLabel).Name);
-             */
 
             // Inst 1
             var iInstruction1 = textSection.Contents[0];
