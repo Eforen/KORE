@@ -24,11 +24,11 @@ namespace Kore.Kuick
             new TokenFinder(@"^\/\/.*", Token.COMMENT), // Throw away // comments
             new TokenFinder(@"^#.*", Token.COMMENT), // Throw away # comments
             new TokenFinder(@"^\/\*[\s\S]*?\*\/", Token.COMMENT), // Throw away /* {ANY} */ comments
-            new TokenFinder(@"^\d+\.?\d*[fF]", Token.NUMBER_FLOAT), // NUMBER_FLOAT 0.1f || 15f
-            new TokenFinder(@"^\d+\.?\d*[dD]", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412D || 1245D
-            new TokenFinder(@"^\d+\.\d+", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412 this finder is for when its a decimal with no marker
+            new TokenFinder(@"^-?\d+\.?\d*[fF]", Token.NUMBER_FLOAT), // NUMBER_FLOAT 0.1f || 15f
+            new TokenFinder(@"^-?\d+\.?\d*[dD]", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412D || 1245D
+            new TokenFinder(@"^-?\d+\.\d+", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412 this finder is for when its a decimal with no marker
             new TokenFinder(@"^0x[\da-fA-F]+", Token.NUMBER_HEX), // NUMBER_HEX 0x1244
-            new TokenFinder(@"^\d+", Token.NUMBER_INT), // NUMBER_INT 12578
+            new TokenFinder(@"^-?\d+", Token.NUMBER_INT), // NUMBER_INT 12578
             new TokenFinder(@"^""[^""]*""", Token.STRING), // " String //TODO: Make this allow escapes
             new TokenFinder(@"^'[^']*'", Token.STRING), // ' String //TODO: Make this allow escapes
             new TokenFinder(@"^\.[a-zA-Z]*", Token.DIRECTIVE), // Directive
@@ -190,6 +190,20 @@ namespace Kore.Kuick
             return str.Substring(0, 1);
         }
 
+        public TokenData PeakToken(bool ignoreWitespace = true) {
+            int x = _colCursorCachePos;
+            int y = _lineCursorCachePos;
+            int cursor = __cursor;
+
+            TokenData tokenData = ReadToken(ignoreWitespace);
+
+            _colCursorCachePos = x;
+            _lineCursorCachePos = y;
+            __cursor = cursor;
+
+            return tokenData;
+        }
+
         /// <summary>
         /// Obtain next token from current _cursor position
         /// </summary>
@@ -252,7 +266,7 @@ namespace Kore.Kuick
                 return new TokenData(finder.token, value, y, x);
             }
 
-            throw new TokenSyntaxException("Unexpected token: `" + nextChar + "`");
+            throw new TokenSyntaxException("Unexpected char: `" + nextChar + "`");
         }
 
         private string _match(TokenFinder finder, string target)

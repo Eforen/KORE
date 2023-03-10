@@ -11,9 +11,12 @@ using System.Threading.Tasks;
 namespace Kore.Kuick {
     public static class Parser {
         #region Utilities
-            public class SyntaxException : Exception { public SyntaxException(string msg) : base(msg) { } }
+        public class SyntaxException : Exception { public SyntaxException(string msg) : base(msg) { } }
         private static Exception ThrowUnexpected(Lexer.TokenData currentToken, string expectation) {
             throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}. Expected {expectation}.");
+        }
+        private static Exception ThrowUnimplemented(Lexer.TokenData currentToken) {
+            throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}. Operation Not implimented.");
         }
         private static Exception ThrowParserPanic(Lexer.TokenData currentToken) {
             throw new SyntaxException($"PARSER PANIC: Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}.");
@@ -35,6 +38,10 @@ namespace Kore.Kuick {
             return currentToken;
         }
 
+        private static Lexer.TokenData ExpectToken(Lexer lexer, params Lexer.Token[] expectedTokens) {
+            return ExpectToken(lexer, false, expectedTokens);
+        }
+
         /// <summary>
         /// Expects a token of any of the specified types from the lexer and returns it. If the token read from the lexer does not match any of the
         /// expected types, a SyntaxException will be thrown.
@@ -42,8 +49,8 @@ namespace Kore.Kuick {
         /// <param name="lexer">The lexer to read the next token from.</param>
         /// <param name="expectedTypes">The expected token types.</param>
         /// <returns>The next token in the lexer's stream if it matches any of the expected types.</returns>
-        private static Lexer.TokenData ExpectToken(Lexer lexer, params Lexer.Token[] expectedTokens) {
-            var currentToken = lexer.ReadToken(true);
+        private static Lexer.TokenData ExpectToken(Lexer lexer, bool peak, params Lexer.Token[] expectedTokens) {
+            var currentToken = peak ? lexer.PeakToken(true) : lexer.ReadToken(true);
 
             foreach(var expectation in expectedTokens) {
                 if(currentToken.token == expectation) {
@@ -129,6 +136,7 @@ namespace Kore.Kuick {
             return expectReturnEOL(new InstructionNodeTypeR(op, rd, rd1, rd2), lexer);
         }
 
+
         private static InstructionNodeTypeI ParseIInstruction(Lexer.TokenData currentToken, Lexer lexer) {
             // addi x1, x2, 15
             // OP  rd, rs, imm
@@ -151,6 +159,74 @@ namespace Kore.Kuick {
 
             return expectReturnEOL(new InstructionNodeTypeS(op, rs1, rs2, imm), lexer);
         }
+        private static InstructionNode<Kore.RiscMeta.Instructions.TypeB> ParseBInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+            // bne x1, x2, label
+            // OP  rs1, rs2, offset
+
+            var op = ParseOP<Kore.RiscMeta.Instructions.TypeB>(currentToken, lexer, Lexer.Token.OP_B);
+            var rs1 = ParseRegister(lexer); // Get the first source register (rs1)
+            var rs2 = ParseRegister(lexer); // Get the second source register (rs2)
+
+            var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            switch(token.token) {
+                case Lexer.Token.NUMBER_INT:
+                case Lexer.Token.NUMBER_HEX:
+                    return expectReturnEOL(new InstructionNodeTypeBImmidiate(op, rs1, rs2, ParseImmediate(lexer)), lexer);
+                case Lexer.Token.IDENTIFIER:
+                    return expectReturnEOL(new InstructionNodeTypeBLabel(op, rs1, rs2, lexer.ReadToken(true).value), lexer);
+                default:
+                    throw ThrowUnexpected(currentToken, "Label Identifier or Number");
+            }
+
+        }
+        private static InstructionNode<Kore.RiscMeta.Instructions.TypeJ> ParseJInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+            // bne x1, x2, label
+            // OP  rs1, rs2, offset
+
+            var op = ParseOP<Kore.RiscMeta.Instructions.TypeJ>(currentToken, lexer, Lexer.Token.OP_J);
+            var rd = ParseRegister(lexer); // Get the destination register (rd)
+
+            var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            switch(token.token) {
+                case Lexer.Token.NUMBER_INT:
+                case Lexer.Token.NUMBER_HEX:
+                    return expectReturnEOL(new InstructionNodeTypeJImmidiate(op, rd, ParseImmediate(lexer)), lexer);
+                case Lexer.Token.IDENTIFIER:
+                    return expectReturnEOL(new InstructionNodeTypeJLabel(op, rd, lexer.ReadToken(true).value), lexer);
+                default:
+                    throw ThrowUnexpected(currentToken, "Label Identifier or Number");
+            }
+
+        }
+
+        private static InstructionNodeTypeU ParseUInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+            var op = ParseOP<RiscMeta.Instructions.TypeU>(currentToken, lexer, Lexer.Token.OP_U);
+            var rd = ParseRegister(lexer);
+            var immediate = ParseImmediate(lexer);
+
+            return expectReturnEOL(new InstructionNodeTypeU(op, rd, immediate), lexer);
+        }
+
+        private static AstNode ParseInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+            switch (currentToken.token)
+            {
+                
+                case Lexer.Token.OP_B:
+                    return ParseBInstruction(currentToken, lexer);
+                case Lexer.Token.OP_I:
+                    return ParseIInstruction(currentToken, lexer);
+                case Lexer.Token.OP_J:
+                    return ParseJInstruction(currentToken, lexer);
+                case Lexer.Token.OP_R:
+                    return ParseRInstruction(currentToken, lexer);
+                case Lexer.Token.OP_S:
+                    return ParseSInstruction(currentToken, lexer);
+                case Lexer.Token.OP_U:
+                    return ParseUInstruction(currentToken, lexer);
+                default:
+                    throw ThrowUnimplemented(currentToken);
+            }
+        }
 
 
         private static SectionNode ParseNodeSection(SectionNode section, Lexer.TokenData currentToken, Lexer lexer) {
@@ -169,40 +245,37 @@ namespace Kore.Kuick {
                     ) return section;
 
                 //TODO: Refactor to a switch statement
-                // Label
-                if(currentToken.token == Lexer.Token.LABEL) {
-                    section.Contents.Add(ParseNodeLabel(currentToken, lexer)); //TODO: Maybe should cascade into this processor and only process instructions there but that would mean no double labels though I don't know if thats valid anyhow.
-                    continue;
+                switch(currentToken.token) {
+                    case Lexer.Token.LABEL: // Label
+                        section.Contents.Add(ParseNodeLabel(currentToken, lexer)); //TODO: Maybe should cascade into this processor and only process instructions there but that would mean no double labels though I don't know if thats valid anyhow.
+                        continue;
+                    case Lexer.Token.DIRECTIVE:
+                        section.Contents.Add(ParseNodeDirective(currentToken, lexer)); // Directive
+                        continue;
+                    case Lexer.Token.OP_B:
+                    case Lexer.Token.OP_CB:
+                    case Lexer.Token.OP_CI:
+                    case Lexer.Token.OP_CIW:
+                    case Lexer.Token.OP_CJ:
+                    case Lexer.Token.OP_CL:
+                    case Lexer.Token.OP_CR:
+                    case Lexer.Token.OP_CS:
+                    case Lexer.Token.OP_CSS:
+                    case Lexer.Token.OP_I:
+                    case Lexer.Token.OP_J:
+                    case Lexer.Token.OP_R:
+                    case Lexer.Token.OP_S:
+                    case Lexer.Token.OP_U:
+                        section.Contents.Add(ParseInstruction(currentToken, lexer)); // Instruction
+                        continue;
+                    case Lexer.Token.OP_PSEUDO:
+                        throw ThrowUnimplemented(currentToken);
+                    case Lexer.Token.COMMENT:
+                        section.Contents.Add(ProcessNodeComment(currentToken, lexer)); // Comment
+                        continue;
+                    default:
+                        throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}.");
                 }
-                // Directive
-                if(currentToken.token == Lexer.Token.DIRECTIVE) {
-                    section.Contents.Add(ParseNodeDirective(currentToken, lexer));
-                    continue;
-                }
-                // Instruction
-                if(currentToken.token == Lexer.Token.OP_R) {
-                    var instructionNode = ParseRInstruction(currentToken, lexer);
-                    section.Contents.Add(instructionNode);
-                    continue;
-                }
-                // Instruction
-                if(currentToken.token == Lexer.Token.OP_I) {
-                    var instructionNode = ParseIInstruction(currentToken, lexer);
-                    section.Contents.Add(instructionNode);
-                    continue;
-                }
-                // Instruction
-                if(currentToken.token == Lexer.Token.OP_S) {
-                    var instructionNode = ParseSInstruction(currentToken, lexer);
-                    section.Contents.Add(instructionNode);
-                    continue;
-                }
-                // Comment
-                if(currentToken.token == Lexer.Token.COMMENT) {
-                    section.Contents.Add(ProcessNodeComment(currentToken, lexer));
-                    continue;
-                }
-                throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}.");
             }
 
             //TODO: Read the other nodes and add them to the section

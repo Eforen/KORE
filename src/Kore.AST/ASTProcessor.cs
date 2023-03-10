@@ -1,16 +1,18 @@
 ﻿namespace Kore.AST {
     public interface ASTProcessor {
-        void ProcessASTNode(ProgramNode programNode);
-        void ProcessASTNode(SectionNode sectionNode);
-        void ProcessASTNode(DirectiveNode directiveNode);
-        void ProcessASTNode<T>(InstructionNode<T> instructionNode);
-        void ProcessASTNode(InstructionNodeTypeR instructionNodeTypeR);
-        void ProcessASTNode(InstructionNodeTypeI instructionNodeTypeI);
-        void ProcessASTNode(InstructionNodeTypeU instructionNodeTypeU);
-        void ProcessASTNode(InstructionNodeTypeB instructionNodeTypeB);
-        void ProcessASTNode(InstructionNodeTypeJ instructionNodeTypeJ);
-        void ProcessASTNode(InstructionNodeTypeMisc miscInstructionNode);
-        void ProcessASTNode(LabelNode labelNode);
-        void ProcessASTNode(CommentNode commentNode);
+        void ProcessASTNode(ProgramNode node);
+        void ProcessASTNode(SectionNode node);
+        void ProcessASTNode(DirectiveNode node);
+        void ProcessASTNode<T>(InstructionNode<T> node);
+        void ProcessASTNode(InstructionNodeTypeR node);
+        void ProcessASTNode(InstructionNodeTypeI node);
+        void ProcessASTNode(InstructionNodeTypeU node);
+        void ProcessASTNode(InstructionNodeTypeBImmidiate node);
+        void ProcessASTNode(InstructionNodeTypeBLabel node);
+        void ProcessASTNode(InstructionNodeTypeJImmidiate node);
+        void ProcessASTNode(InstructionNodeTypeJLabel node);
+        void ProcessASTNode(InstructionNodeTypeMisc node);
+        void ProcessASTNode(LabelNode node);
+        void ProcessASTNode(CommentNode node);
     }
 }
