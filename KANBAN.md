@@ -3,6 +3,7 @@
   - [Done 10/21/2021](#done-10212021)
   - [Done 02/25/2023](#done-02252023)
   - [Done 2023/03/08](#done-20230308)
+  - [Done 2023/05/20](#done-20230520)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -40,7 +41,6 @@
 * [KUICK][PARSER] Write Test for R Type Instruction `SUB`
 * [KUICK][PARSER] Write Test for R Type Instruction `AND`
 * [KUICK][PARSER] Write Test for R Type Instruction `OR`
-### Next Commit (Eforen)
 * [KUICK][PARSER] Write Test for I Type Instruction `SLTI`
 * [KUICK][PARSER] Write Test for I Type Instruction `XORI`
 * [KUICK][PARSER] Write Test for I Type Instruction `ORI`
@@ -55,25 +55,45 @@
 * [KUICK][PARSER] Write Test for U Type Instruction `LUI`
 * [KUICK][PARSER] Write Test for U Type Instruction `AUIPC`
 * [KUICK][PARSER] Write Test for J Type Instruction `JAL`
+* [KUICK][PARSER] Rewrite tests to take in string and output AST
+## Done 2023/05/20
+### Next Commit (Eforen)
+* [KUICK][PARSER] Implement Pseudo Instruction: `nop`
+* [KUICK][PARSER] Implement Pseudo Instruction: `neg`
+* [KUICK][PARSER] Implement Pseudo Instruction: `seqz`
+* [KUICK][PARSER] Implement Pseudo Instruction: `snez`
+* [KUICK][PARSER] Implement Pseudo Instruction: `sltz`
+* [KUICK][PARSER] Implement Pseudo Instruction: `sgtz`
+* [KUICK][PARSER] Implement Pseudo Instruction: `beqz`
+* [KUICK][PARSER] Implement Pseudo Instruction: `bnez`
+* [KUICK][PARSER] Implement Pseudo Instruction: `blez`
+* [KUICK][PARSER] Implement Pseudo Instruction: `bgez`
+* [KUICK][PARSER] Implement Pseudo Instruction: `bltz`
+* [KUICK][PARSER] Implement Pseudo Instruction: `bgtz`
 
 # Working On
 ## Working on (Eforen)
+* [KIUCK][PARSER] Implement Pseudo Instructions
+* [KANBAN][KIUCK][PARSER] Add Tasks for remaining Pseudo Instruction implementations
+* Confirm that all the tests for the previous Pseudo Instruction implementations exist (Rushed atm)
 
 * Refactor KUICK into its own library
-* [KUICK][PARSER] Rewrite tests to take in string and output AST
 * [KUICK][ASSEMBLER] Rewrite tests to take in AST and output binary
 * [KUICK][ASSEMBLER] Write Tests for every Token
 
 # Todos
+* [KUICK][PARSER] Impliment `%hi(msg)`
+* [KUICK][PARSER] Impliment `%lo(msg)`
+* [KUICK][PARSER] Impliment `msg: .string "Hello World\n"`
 * [KUICK][ASSEMBLER] Implement all failing tests
-* Implement all RISC-V ASM directives in (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
+* Implement all RISC-V ASM directives in (RISC-V ASSEMBLY LANGUAGE Programmer Manual - Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf] (contact @ shakti[dot]iitm[@]gmail[dot]com)
 * [KUICK][PARSER] Write Test for F Type Instruction `FADD.S`
 * [KUICK][PARSER] Write Test for F Type Instruction `FMUL.D`
 * [KUICK][PARSER] Write Test for RV32I/E Instruction Set Instruction `LW`
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `ADDIW`
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `LD`
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `SD`
-* [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual- Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
+* [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual - Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
 ## Todo
 ## Planned for some time later
 ## Wishlist

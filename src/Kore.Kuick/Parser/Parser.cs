@@ -171,7 +171,7 @@ namespace Kore.Kuick {
             switch(token.token) {
                 case Lexer.Token.NUMBER_INT:
                 case Lexer.Token.NUMBER_HEX:
-                    return expectReturnEOL(new InstructionNodeTypeBImmidiate(op, rs1, rs2, ParseImmediate(lexer)), lexer);
+                    return expectReturnEOL(new InstructionNodeTypeBImmediate(op, rs1, rs2, ParseImmediate(lexer)), lexer);
                 case Lexer.Token.IDENTIFIER:
                     return expectReturnEOL(new InstructionNodeTypeBLabel(op, rs1, rs2, lexer.ReadToken(true).value), lexer);
                 default:
@@ -190,7 +190,7 @@ namespace Kore.Kuick {
             switch(token.token) {
                 case Lexer.Token.NUMBER_INT:
                 case Lexer.Token.NUMBER_HEX:
-                    return expectReturnEOL(new InstructionNodeTypeJImmidiate(op, rd, ParseImmediate(lexer)), lexer);
+                    return expectReturnEOL(new InstructionNodeTypeJImmediate(op, rd, ParseImmediate(lexer)), lexer);
                 case Lexer.Token.IDENTIFIER:
                     return expectReturnEOL(new InstructionNodeTypeJLabel(op, rd, lexer.ReadToken(true).value), lexer);
                 default:
@@ -228,7 +228,66 @@ namespace Kore.Kuick {
             }
         }
 
+        private static AstNode ParsePseudoInstruction(Lexer.TokenData currentToken, Lexer lexer) {
 
+            switch(currentToken.value.ToUpper()){
+                case "NOP": // Pseduo instruction: NOP -> ADDI x0, x0, 0 [TYPE I]
+                    return expectReturnEOL(new InstructionNodeTypeI(RiscMeta.Instructions.TypeI.addi, Register.x0, Register.x0, 0), lexer);
+                case "NEG": // Pseduo instruction: NEG rd, rs -> SUB rd, x0, rs [TYPE R]
+                    return expectReturnEOL(new InstructionNodeTypeR(RiscMeta.Instructions.TypeR.sub, ParseRegister(lexer), Register.x0, ParseRegister(lexer)), lexer);
+                // TODO: RV54I
+                // case "NEGW": // Pseduo instruction: NEGW rd, rs -> SUBW rd, x0, rs [TYPE R][RV64I]
+                //     return expectReturnEOL(new InstructionNodeTypeR(RiscMeta.Instructions.TypeR.subw, ParseRegister(lexer), Register.x0, ParseRegister(lexer)), lexer);
+                ////////////////////////////////////////////////////////////////////////
+                case "SNEZ": // Pseduo instruction: SNEZ rd, rs -> SLTU rd, x0, rs [TYPE R]
+                    return expectReturnEOL(new InstructionNodeTypeR(RiscMeta.Instructions.TypeR.sltu, ParseRegister(lexer), Register.x0, ParseRegister(lexer)), lexer);
+                case "SLTZ": // Pseduo instruction: SLTZ rd, rs -> SLT rd, rs, x0 [TYPE R]
+                    return expectReturnEOL(new InstructionNodeTypeR(RiscMeta.Instructions.TypeR.slt, ParseRegister(lexer), ParseRegister(lexer), Register.x0), lexer);
+                case "SGTZ": // Pseduo instruction: SGTZ rd, rs -> SLT rd, x0, rs [TYPE R]
+                    return expectReturnEOL(new InstructionNodeTypeR(RiscMeta.Instructions.TypeR.slt, ParseRegister(lexer), Register.x0, ParseRegister(lexer)), lexer);
+                ////////////////////////////////////////////////////////////////////////
+                case "BEQZ": // Pseduo instruction: BEQZ rs, offset/label -> BEQ rs, x0, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.beq, false, lexer);
+                case "BNEZ": // Pseduo instruction: BNEZ rs, offset/label -> BNE rs, x0, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bne, false, lexer);
+                case "BLEZ": // Pseduo instruction: BLEZ rs, offset/label -> BGE x0, rs, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bge, true, lexer);
+                case "BGEZ": // Pseduo instruction: BGEZ rs, offset/label -> BGE rs, x0, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bge, false, lexer);
+                case "BLTZ": // Pseduo instruction: BLTZ rs, offset/label -> BLT rs, x0, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.blt, false, lexer);
+                case "BGTZ": // Pseduo instruction: BGTZ rs, offset/label -> BLT x0, rs, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.blt, true, lexer);
+                ////////////////////////////////////////////////////////////////////////
+                default:
+                    throw ThrowUnimplemented(currentToken);
+            }
+        }
+
+        private static AstNode ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB op, bool firstRegister, Lexer lexer){
+            var rs1 = ParseRegister(lexer); // Get the first source register (rs1)
+            // Skip the second register because its hardcoded to x0
+            var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            switch(token.token) {
+                case Lexer.Token.NUMBER_INT:
+                case Lexer.Token.NUMBER_HEX:
+                    return expectReturnEOL(new InstructionNodeTypeBImmediate(
+                        op, 
+                        firstRegister == true ? rs1 : Register.x0, 
+                        firstRegister == false ? rs1 : Register.x0, 
+                        ParseImmediate(lexer
+                    )), lexer);
+                case Lexer.Token.IDENTIFIER:
+                    return expectReturnEOL(new InstructionNodeTypeBLabel(
+                        op, 
+                        firstRegister == true ? rs1 : Register.x0, 
+                        firstRegister == false ? rs1 : Register.x0, 
+                        lexer.ReadToken(true).value
+                    ), lexer);
+                default:
+                    throw ThrowUnexpected(token, "Label Identifier or Offset Number");
+            }
+        }
         private static SectionNode ParseNodeSection(SectionNode section, Lexer.TokenData currentToken, Lexer lexer) {
             // Get the next token
             //currentToken = lexer.ReadToken();// EOL
@@ -269,7 +328,8 @@ namespace Kore.Kuick {
                         section.Contents.Add(ParseInstruction(currentToken, lexer)); // Instruction
                         continue;
                     case Lexer.Token.OP_PSEUDO:
-                        throw ThrowUnimplemented(currentToken);
+                        section.Contents.Add(ParsePseudoInstruction(currentToken, lexer));
+                        continue;
                     case Lexer.Token.COMMENT:
                         section.Contents.Add(ProcessNodeComment(currentToken, lexer)); // Comment
                         continue;

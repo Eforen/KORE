@@ -24,8 +24,25 @@ namespace Kore.AST {
         /// The integer value of the directive, if any. The interpretation of the value depends on the directive.
         /// </summary>
         public int Value { get; set; }
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            IntDirectiveNode other = (IntDirectiveNode)obj;
+            return Name == other.Name && Value == other.Value;
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                int hash = base.GetHashCode();
+                hash = (hash * 397) ^ Name.GetHashCode();
+                hash = (hash * 397) ^ Value.GetHashCode();
+                return hash;
+            }
         }
     }
 }

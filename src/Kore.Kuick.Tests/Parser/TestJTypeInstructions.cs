@@ -63,8 +63,8 @@ namespace Kore.Kuick.Tests.Parser {
             Assert.AreEqual(".text", textSection.Name);
 
             var rInstruction = textSection.Contents[0];
-            Assert.IsInstanceOf<InstructionNodeTypeJImmidiate>(rInstruction);
-            var instruction = (InstructionNodeTypeJImmidiate)rInstruction;
+            Assert.IsInstanceOf<InstructionNodeTypeJImmediate>(rInstruction);
+            var instruction = (InstructionNodeTypeJImmediate)rInstruction;
             Assert.AreEqual(opType, instruction.op);
             Assert.AreEqual(expectedRd, instruction.rd);
             Assert.AreEqual(expected, instruction.imm);

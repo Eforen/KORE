@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Kore.AST {
     /// <summary>
@@ -19,8 +21,38 @@ namespace Kore.AST {
             Name = name;
             Contents = new List<AstNode>();
         }
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            SectionNode other = (SectionNode)obj;
+
+            if (Name != other.Name)
+                return false;
+
+            if (Contents.Count != other.Contents.Count)
+                return false;
+
+            for (int i = 0; i < Contents.Count; i++) {
+                if (!Contents[i].Equals(other.Contents[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode() {
+            int hash = Name.GetHashCode();
+
+            foreach (AstNode content in Contents) {
+                hash ^= content.GetHashCode();
+            }
+
+            return hash;
         }
     }
 }

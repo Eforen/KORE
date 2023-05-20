@@ -24,8 +24,20 @@ namespace Kore.AST {
         /// The string value of the directive, if any. The interpretation of the value depends on the directive.
         /// </summary>
         public string Value { get; set; }
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            StringDirectiveNode other = (StringDirectiveNode)obj;
+            return Value == other.Value;
+        }
+
+        public override int GetHashCode() {
+            return Value.GetHashCode();
         }
     }
 }

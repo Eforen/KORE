@@ -1,15 +1,10 @@
 ﻿using Kore.RiscMeta;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kore.AST {
     /// <summary>
     /// Represents a J-type instruction in the RISC-V assembly language.
     /// </summary>
-    public class InstructionNodeTypeJImmidiate : InstructionNode<Kore.RiscMeta.Instructions.TypeJ> {
+    public class InstructionNodeTypeJImmediate : InstructionNode<Kore.RiscMeta.Instructions.TypeJ> {
         /// <summary>
         /// The destination register for the result of the instruction.
         /// </summary>
@@ -20,13 +15,30 @@ namespace Kore.AST {
         /// </summary>
         public int imm { get; set; }
 
-        public InstructionNodeTypeJImmidiate(Kore.RiscMeta.Instructions.TypeJ op, Register rd, int immediate) : base(op) {
+        public InstructionNodeTypeJImmediate(Kore.RiscMeta.Instructions.TypeJ op, Register rd, int immediate) : base(op) {
             this.rd = rd;
             this.imm = immediate;
         }
 
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            InstructionNodeTypeJImmediate other = (InstructionNodeTypeJImmediate)obj;
+            return base.Equals(other) && rd == other.rd && imm == other.imm;
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                int hash = base.GetHashCode();
+                hash = (hash * 397) ^ rd.GetHashCode();
+                hash = (hash * 397) ^ imm.GetHashCode();
+                return hash;
+            }
         }
     }
     /// <summary>
@@ -48,8 +60,25 @@ namespace Kore.AST {
             this.label = label;
         }
 
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            InstructionNodeTypeJLabel other = (InstructionNodeTypeJLabel)obj;
+            return base.Equals(other) && rd == other.rd && label == other.label;
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                int hash = base.GetHashCode();
+                hash = (hash * 397) ^ rd.GetHashCode();
+                hash = (hash * 397) ^ label.GetHashCode();
+                return hash;
+            }
         }
     }
 }

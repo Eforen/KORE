@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assembler\Assembler.cs" />
+    <Compile Include="Assembler\CodeGenerator.cs" />
     <Compile Include="Lexer\Main.cs" />
     <Compile Include="Lexer\Replacement.cs" />
     <Compile Include="Lexer\Token.cs" />

@@ -22,5 +22,21 @@ namespace Kore.AST {
         public InstructionNode(T op) {
             this.op = op;
         }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            InstructionNode<T> other = (InstructionNode<T>)obj;
+            return op.Equals(other.op);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                int hash = base.GetHashCode();
+                hash = (hash * 397) ^ op.GetHashCode();
+                return hash;
+            }
+        }
     }
 }

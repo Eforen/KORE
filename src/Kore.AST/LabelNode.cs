@@ -14,8 +14,20 @@
             Name = name;
         }
 
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            LabelNode other = (LabelNode)obj;
+            return Name == other.Name;
+        }
+
+        public override int GetHashCode() {
+            return Name.GetHashCode();
         }
     }
 }

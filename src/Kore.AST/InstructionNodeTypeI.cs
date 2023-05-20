@@ -32,8 +32,26 @@ namespace Kore.AST {
             this.immediate = immediate;
         }
 
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            InstructionNodeTypeI other = (InstructionNodeTypeI)obj;
+            return base.Equals(other) && rd == other.rd && rs == other.rs && immediate == other.immediate;
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                int hash = base.GetHashCode();
+                hash = (hash * 397) ^ rd.GetHashCode();
+                hash = (hash * 397) ^ rs.GetHashCode();
+                hash = (hash * 397) ^ immediate.GetHashCode();
+                return hash;
+            }
         }
     }
 }

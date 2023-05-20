@@ -14,8 +14,20 @@
             Text = text;
         }
 
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            CommentNode other = (CommentNode)obj;
+            return Text == other.Text;
+        }
+
+        public override int GetHashCode() {
+            return Text.GetHashCode();
         }
     }
 }

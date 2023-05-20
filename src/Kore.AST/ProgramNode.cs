@@ -12,8 +12,33 @@ namespace Kore.AST {
         public ProgramNode() {
             Sections = new List<SectionNode>();
         }
-        public override void CallProcessor(ASTProcessor processor) {
-            processor.ProcessASTNode(this);
+        public override AstNode CallProcessor(ASTProcessor processor) {
+            return processor.ProcessASTNode(this);
+        }
+
+        // override object.Equals
+        public override bool Equals(object obj) {
+            if(obj == null || GetType() != obj.GetType()) {
+                return false;
+            }
+            ProgramNode node = obj as ProgramNode;
+
+            if(Sections.Count != node.Sections.Count) return false;
+
+            foreach(SectionNode section in Sections) {
+                string name = section.Name;
+                SectionNode otherSection = node.Sections.Find(s => s.Name == name);
+                if(otherSection == null) return false;
+                if(!section.Equals(otherSection)) return false;
+            }
+
+            return base.Equals(obj);
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode() {
+            Sections.GetHashCode();
+            return base.GetHashCode();
         }
     }
 }
