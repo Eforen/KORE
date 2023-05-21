@@ -4,6 +4,7 @@
   - [Done 02/25/2023](#done-02252023)
   - [Done 2023/03/08](#done-20230308)
   - [Done 2023/05/20](#done-20230520)
+  - [Done 2023/05/21](#done-20230521)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -57,7 +58,6 @@
 * [KUICK][PARSER] Write Test for J Type Instruction `JAL`
 * [KUICK][PARSER] Rewrite tests to take in string and output AST
 ## Done 2023/05/20
-### Next Commit (Eforen)
 * [KUICK][PARSER] Implement Pseudo Instruction: `nop`
 * [KUICK][PARSER] Implement Pseudo Instruction: `neg`
 * [KUICK][PARSER] Implement Pseudo Instruction: `seqz`
@@ -71,9 +71,18 @@
 * [KUICK][PARSER] Implement Pseudo Instruction: `bltz`
 * [KUICK][PARSER] Implement Pseudo Instruction: `bgtz`
 
+## Done 2023/05/21
+### Next Commit (Eforen)
+
 # Working On
 ## Working on (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
+* [KIUCK][PARSER][TEST] Pseudo Instruction `beqz`
+* [KIUCK][PARSER][TEST] Pseudo Instruction `bnez`
+* [KIUCK][PARSER][TEST] Pseudo Instruction `blez`
+* [KIUCK][PARSER][TEST] Pseudo Instruction `bgez`
+* [KIUCK][PARSER][TEST] Pseudo Instruction `bltz`
+* [KIUCK][PARSER][TEST] Pseudo Instruction `bgtz`
 * [KANBAN][KIUCK][PARSER] Add Tasks for remaining Pseudo Instruction implementations
 * Confirm that all the tests for the previous Pseudo Instruction implementations exist (Rushed atm)
 
