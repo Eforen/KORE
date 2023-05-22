@@ -73,6 +73,7 @@
 
 ## Done 2023/05/21
 ### Next Commit (Eforen)
+* [KIUCK][PARSER][BUG] `BEQZ` type instructions not working for some reason. Figure out why and fix it.
 
 # Working On
 ## Working on (Eforen)

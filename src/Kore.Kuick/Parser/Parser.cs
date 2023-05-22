@@ -247,17 +247,17 @@ namespace Kore.Kuick {
                     return expectReturnEOL(new InstructionNodeTypeR(RiscMeta.Instructions.TypeR.slt, ParseRegister(lexer), Register.x0, ParseRegister(lexer)), lexer);
                 ////////////////////////////////////////////////////////////////////////
                 case "BEQZ": // Pseduo instruction: BEQZ rs, offset/label -> BEQ rs, x0, offset/label [TYPE B]
-                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.beq, false, lexer);
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.beq, true, lexer);
                 case "BNEZ": // Pseduo instruction: BNEZ rs, offset/label -> BNE rs, x0, offset/label [TYPE B]
-                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bne, false, lexer);
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bne, true, lexer);
                 case "BLEZ": // Pseduo instruction: BLEZ rs, offset/label -> BGE x0, rs, offset/label [TYPE B]
-                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bge, true, lexer);
-                case "BGEZ": // Pseduo instruction: BGEZ rs, offset/label -> BGE rs, x0, offset/label [TYPE B]
                     return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bge, false, lexer);
+                case "BGEZ": // Pseduo instruction: BGEZ rs, offset/label -> BGE rs, x0, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bge, true, lexer);
                 case "BLTZ": // Pseduo instruction: BLTZ rs, offset/label -> BLT rs, x0, offset/label [TYPE B]
-                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.blt, false, lexer);
-                case "BGTZ": // Pseduo instruction: BGTZ rs, offset/label -> BLT x0, rs, offset/label [TYPE B]
                     return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.blt, true, lexer);
+                case "BGTZ": // Pseduo instruction: BGTZ rs, offset/label -> BLT x0, rs, offset/label [TYPE B]
+                    return ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.blt, false, lexer);
                 ////////////////////////////////////////////////////////////////////////
                 default:
                     throw ThrowUnimplemented(currentToken);
