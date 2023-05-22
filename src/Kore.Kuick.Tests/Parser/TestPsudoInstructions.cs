@@ -62,7 +62,7 @@ namespace Kore.Kuick.Tests.Parser {
         [TestCase("bgez x3, 0x00000001", "bge x3, x0, 0x00000001", "Branch if greater than or equal zero")]
         [TestCase("bltz x1, 0x00000003", "blt x1, x0, 0x00000003", "Branch if less than zero")]
         [TestCase("bltz x2, 0x00000002", "blt x2, x0, 0x00000002", "Branch if less than zero")]
-        [TestCase("bltz x3, 0x00000001", "blt x0, x3, 0x00000001", "Branch if less than zero")]
+        [TestCase("bltz x3, 0x00000001", "blt x3, x0, 0x00000001", "Branch if less than zero")]
         [TestCase("bgtz x1, 0x00000003", "blt x0, x1, 0x00000003", "Branch if greater than zero")]
         [TestCase("bgtz x2, 0x00000002", "blt x0, x2, 0x00000002", "Branch if greater than zero")]
         ///////////////////////////////////////////////////////////////////////////////
@@ -73,6 +73,8 @@ namespace Kore.Kuick.Tests.Parser {
         [TestCase("ret", "jalr x0, x1, 0x0", "Return from subroutine")]
         ///////////////////////////////////////////////////////////////////////////////
         [TestCase("tail 0x74543765", "auipc x6, 0x74543000\n    jal x0, 0x765", "Tail call arr-away subroutine")] // 0xFFFFF000 is offset[31:12] and 0x00000FFF is offset[11:0]
+        [TestCase("tail 0x4262fb3f", "auipc x6, 0x4262f000\n    jal x0, 0xb3f", "Tail call arr-away subroutine")] // 0xFFFFF000 is offset[31:12] and 0x00000FFF is offset[11:0]
+        [TestCase("tail 0x81C45C2C", "auipc x6, 0x81C45000\n    jal x0, 0xC2C", "Tail call arr-away subroutine")] // 0xFFFFF000 is offset[31:12] and 0x00000FFF is offset[11:0]
         ///////////////////////////////////////////////////////////////////////////////
         [TestCase("rdinstret x1", "csrrs x1, instret, x0", "Read instruction count")]
         [TestCase("rdinstret x2", "csrrs x2, instret, x0", "Read instruction count")]

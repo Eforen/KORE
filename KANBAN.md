@@ -72,8 +72,9 @@
 * [KUICK][PARSER] Implement Pseudo Instruction: `bgtz`
 
 ## Done 2023/05/21
-### Next Commit (Eforen)
 * [KIUCK][PARSER][BUG] `BEQZ` type instructions not working for some reason. Figure out why and fix it.
+### Next Commit (Eforen)
+* [KIUCK][PARSER][BUG] Fix test case for `bltz x3, 0x00000001`
 
 # Working On
 ## Working on (Eforen)
