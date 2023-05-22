@@ -66,7 +66,20 @@ namespace Kore.Kuick.Tests.Parser {
         [TestCase("bgtz x1, 0x00000003", "blt x0, x1, 0x00000003", "Branch if greater than zero")]
         [TestCase("bgtz x2, 0x00000002", "blt x0, x2, 0x00000002", "Branch if greater than zero")]
         ///////////////////////////////////////////////////////////////////////////////
-
+        [TestCase("j 0x8", "jal x0, 0x8", "Jump 8 bytes")]
+        [TestCase("j 0x16", "jal x0, 0x8", "Jump 16 bytes")]
+        [TestCase("jr x1", "jalr x0, x1, 0x0", "Jump register")]
+        [TestCase("jr x7", "jalr x0, x7, 0x0", "Jump register")]
+        [TestCase("ret", "jalr x0, x1, 0x0", "Return from subroutine")]
+        ///////////////////////////////////////////////////////////////////////////////
+        [TestCase("tail 0x74543765", "auipc x6, 0x74543000\n    jal x0, 0x765", "Tail call arr-away subroutine")] // 0xFFFFF000 is offset[31:12] and 0x00000FFF is offset[11:0]
+        ///////////////////////////////////////////////////////////////////////////////
+        [TestCase("rdinstret x1", "csrrs x1, instret, x0", "Read instruction count")]
+        [TestCase("rdinstret x2", "csrrs x2, instret, x0", "Read instruction count")]
+        [TestCase("rdinstret x3", "csrrs x3, instret, x0", "Read instruction count")]
+        [TestCase("rdinstreth x1", "csrrs x1, instreth, x0", "Read instruction count")]
+        [TestCase("rdinstreth x2", "csrrs x2, instreth, x0", "Read instruction count")]
+        [TestCase("rdinstreth x3", "csrrs x3, instreth, x0", "Read instruction count")]
         public void PseudoInstructions(string pseudoInstruction, string trueInstruction, string description) {
 
             // Setup the lexer and parse the input into tokens
