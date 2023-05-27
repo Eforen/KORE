@@ -98,8 +98,10 @@ namespace Kore.RiscMeta.Instructions {
     public enum TypeI {
         jalr,
         lb,
+        lbu,
         lh,
         lw,
+        lwu,
         ld,
         lhu,
         addi,

@@ -3,6 +3,7 @@
         AstNode ProcessASTNode(ProgramNode node);
         AstNode ProcessASTNode(SectionNode node);
         AstNode ProcessASTNode(DirectiveNode node);
+        AstNode ProcessASTNode(InlineDirectiveNode node);
         AstNode ProcessASTNode<T>(InstructionNode<T> node);
         AstNode ProcessASTNode(InstructionNodeTypeR node);
         AstNode ProcessASTNode(InstructionNodeTypeI node);

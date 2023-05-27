@@ -772,6 +772,92 @@ namespace Kore.Kuick.Tests.LexerTests {
 
         [TestCase(", SLL", Lexer.Token.WHITESPACE, ", ")] // Bug fix
         [TestCase("SLL ,", Lexer.Token.OP_R, "SLL")] // Bug fix
+
+        // ---------------------------------------------------------------
+        // RISC-V ASM Number Format Tests
+        // ---------------------------------------------------------------
+        // Hex Tests (Base 16)
+        [TestCase("0x0", Lexer.Token.NUMBER_HEX, "0x0")]
+        [TestCase("0x1", Lexer.Token.NUMBER_HEX, "0x1")]
+        [TestCase("0x2", Lexer.Token.NUMBER_HEX, "0x2")]
+        [TestCase("0x3", Lexer.Token.NUMBER_HEX, "0x3")]
+        [TestCase("0x4", Lexer.Token.NUMBER_HEX, "0x4")]
+        [TestCase("0x5", Lexer.Token.NUMBER_HEX, "0x5")]
+        [TestCase("0x6", Lexer.Token.NUMBER_HEX, "0x6")]
+        [TestCase("0x7", Lexer.Token.NUMBER_HEX, "0x7")]
+        [TestCase("0x8", Lexer.Token.NUMBER_HEX, "0x8")]
+        [TestCase("0x9", Lexer.Token.NUMBER_HEX, "0x9")]
+        [TestCase("0xa", Lexer.Token.NUMBER_HEX, "0xa")]
+        [TestCase("0xb", Lexer.Token.NUMBER_HEX, "0xb")]
+        [TestCase("0xc", Lexer.Token.NUMBER_HEX, "0xc")]
+        [TestCase("0xd", Lexer.Token.NUMBER_HEX, "0xd")]
+        [TestCase("0xe", Lexer.Token.NUMBER_HEX, "0xe")]
+        [TestCase("0xf", Lexer.Token.NUMBER_HEX, "0xf")]
+        [TestCase("0x10", Lexer.Token.NUMBER_HEX, "0x10")]
+        [TestCase("0x11", Lexer.Token.NUMBER_HEX, "0x11")]
+        // Binary Tests (Base 2)
+        [TestCase("0b0", Lexer.Token.NUMBER_BIN, "0b0")]
+        [TestCase("0b1", Lexer.Token.NUMBER_BIN, "0b1")]
+        [TestCase("0b10", Lexer.Token.NUMBER_BIN, "0b10")]
+        [TestCase("0b11", Lexer.Token.NUMBER_BIN, "0b11")]
+        [TestCase("0b100", Lexer.Token.NUMBER_BIN, "0b100")]
+        [TestCase("0b101", Lexer.Token.NUMBER_BIN, "0b101")]
+        [TestCase("0b110", Lexer.Token.NUMBER_BIN, "0b110")]
+        [TestCase("0b111", Lexer.Token.NUMBER_BIN, "0b111")]
+        [TestCase("0b1000", Lexer.Token.NUMBER_BIN, "0b1000")]
+        [TestCase("0b1001", Lexer.Token.NUMBER_BIN, "0b1001")]
+        // Decimal Tests (Base 10)
+        [TestCase("0", Lexer.Token.NUMBER_INT, "0")]
+        [TestCase("1", Lexer.Token.NUMBER_INT, "1")]
+        [TestCase("2", Lexer.Token.NUMBER_INT, "2")]
+        [TestCase("3", Lexer.Token.NUMBER_INT, "3")]
+        [TestCase("4", Lexer.Token.NUMBER_INT, "4")]
+        [TestCase("5", Lexer.Token.NUMBER_INT, "5")]
+        [TestCase("6", Lexer.Token.NUMBER_INT, "6")]
+        [TestCase("7", Lexer.Token.NUMBER_INT, "7")]
+        [TestCase("8", Lexer.Token.NUMBER_INT, "8")]
+        [TestCase("9", Lexer.Token.NUMBER_INT, "9")]
+        [TestCase("10", Lexer.Token.NUMBER_INT, "10")]
+        [TestCase("11", Lexer.Token.NUMBER_INT, "11")]
+        [TestCase("12", Lexer.Token.NUMBER_INT, "12")]
+        [TestCase("13", Lexer.Token.NUMBER_INT, "13")]
+        [TestCase("14", Lexer.Token.NUMBER_INT, "14")]
+        // Floating Point Tests
+        [TestCase("0.0f", Lexer.Token.NUMBER_FLOAT, "0.0f")]
+        [TestCase("1.0f", Lexer.Token.NUMBER_FLOAT, "1.0f")]
+        [TestCase("2.0f", Lexer.Token.NUMBER_FLOAT, "2.0f")]
+        [TestCase("3.0f", Lexer.Token.NUMBER_FLOAT, "3.0f")]
+        [TestCase("4.0f", Lexer.Token.NUMBER_FLOAT, "4.0f")]
+        [TestCase("5.0f", Lexer.Token.NUMBER_FLOAT, "5.0f")]
+        [TestCase("6.0f", Lexer.Token.NUMBER_FLOAT, "6.0f")]
+        [TestCase("7.0f", Lexer.Token.NUMBER_FLOAT, "7.0f")]
+        [TestCase("8.0f", Lexer.Token.NUMBER_FLOAT, "8.0f")]
+        [TestCase("9.0f", Lexer.Token.NUMBER_FLOAT, "9.0f")]
+        [TestCase("10.0f", Lexer.Token.NUMBER_FLOAT, "10.0f")]
+        [TestCase("11.0f", Lexer.Token.NUMBER_FLOAT, "11.0f")]
+        [TestCase("12.0f", Lexer.Token.NUMBER_FLOAT, "12.0f")]
+        [TestCase("13.0f", Lexer.Token.NUMBER_FLOAT, "13.0f")]
+        [TestCase("14.0f", Lexer.Token.NUMBER_FLOAT, "14.0f")]
+        // %pcrel_hi(myVar)
+        [TestCase("%pcrel_hi(myVar)", Lexer.Token.INLINE_DIRECTIVE, "pcrel_hi")]
+        // %pcrel_lo(myVar)
+        [TestCase("%pcrel_lo(myVar)", Lexer.Token.INLINE_DIRECTIVE, "pcrel_lo")]
+        // %hi(myVar)
+        [TestCase("%hi(myVar)", Lexer.Token.INLINE_DIRECTIVE, "hi")]
+        // %lo(myVar)
+        [TestCase("%lo(myVar)", Lexer.Token.INLINE_DIRECTIVE, "lo")]
+        // GOT Tests are only relevant for PIC code so are not implemented for now but lets properly lex their tokens anyway
+        // %got(myVar)
+        [TestCase("%got(myVar)", Lexer.Token.INLINE_DIRECTIVE, "got")]
+        // %got_pcrel(myVar)
+        [TestCase("%got_pcrel(myVar)", Lexer.Token.INLINE_DIRECTIVE, "got_pcrel")]
+        // %got_pcrel_hi(myVar)
+        [TestCase("%got_pcrel_hi(myVar)", Lexer.Token.INLINE_DIRECTIVE, "got_pcrel_hi")]
+        // %got_pcrel_lo(myVar)
+        [TestCase("%got_pcrel_lo(myVar)", Lexer.Token.INLINE_DIRECTIVE, "got_pcrel_lo")]
+        // TODO: Consider the rest %pcrel_hi() %pcrel_lo() %hi() %lo() %got() %gotpcrel() %tls_ie() %tls_gd() %tprel_hi() %tprel_lo() %dtprel_hi() %dtprel_lo() %gottprel() %call26() %call_lo() %call_hi() %call20() %call12() %call16() %callhi() %calllo() %add_pc() %got_disp() %got_lo() %got_hi() %gotoff_lo() %gotoff_hi() %gotpc_rel() %gotpc_lo() %gotpc_hi() %tls_gottprel() %tls_ldm() %tls_ldo() %tls_ie_ld() %tls_le() %tls_ie_le() %tls_tpoff() %tls_ie_tpoff() %tls_tprel_hi() %tls_tprel_lo() %tls_tpoff_hi() %tls_tpoff_lo() %tls_ld() %tls_ie_ld() %tls_ie_ldx() %tls_ie_ldx_hi() %tls_ie_ldx_lo() %tls_ie_add() %tls_ie_add_hi() %tls_ie_add_lo() %tls_gd_add() %tls_gd_add_hi() %tls_gd_add_lo() %tls_gd_ldm() %tls_gd_ldm_hi() %tls_gd_ldm_lo() %tls_gd_ldo() %tls_gd_addtprel() %tls_gd_addtprel_hi() %tls_gd_addtprel_lo() %tls_gd_tpoff() %tls_gd_tpoff_hi() %tls_gd_tpoff_lo() %tls_ie_tpoff() %tls_ie_tpoff_hi() %tls_ie_tpoff_lo() %tls_ie_ldp() %tls_ie_ldp_hi() %tls_ie_ldp_lo() %tls_ie_ldp_x() %tls_ie_ldp_x_hi() %tls_ie_ldp_x_lo() %tls_ie_ldp_pc() %tls_ie_ldp_pc_hi() %tls_ie_ldp_pc_lo() %tls_ie_ldp_got() %tls_ie_ldp_got_hi() %tls_ie_ldp_got_lo() %tls_ie_ldp_gottprel() %tls_ie_ldp_gottprel_hi() %tls_ie_ldp_gottprel_lo() %tls_ie_ldp_tpoff() %tls_ie
+
+
         public void readToken(string test, Lexer.Token token, string value) {
             tokenizer.Load(test);
             Lexer.TokenData tokenData = tokenizer.ReadToken();

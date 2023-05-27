@@ -61,6 +61,12 @@ namespace Kore.Kuick {
             throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}. Expected {string.Join(" or ", expectedTokens.Select(e => e.ToString()))}.");
         }
 
+        private static T ParseOP<T>(Lexer lexer, Lexer.Token expectedToken)
+        where T : struct, Enum {
+            Lexer.TokenData currentToken = ExpectToken(lexer, expectedToken);
+            return ParseOP<T>(currentToken, lexer, expectedToken);
+        }
+
         private static T ParseOP<T>(Lexer.TokenData currentToken, Lexer lexer, Lexer.Token expectedToken)
         where T : struct, Enum {
             if(currentToken.token != expectedToken) {
@@ -92,7 +98,14 @@ namespace Kore.Kuick {
         #endregion
 
 
+        private static LabelNode ParseNodeLabel(Lexer lexer) {
+            Lexer.TokenData currentToken = ExpectToken(lexer, Lexer.Token.LABEL);
+            return ParseNodeLabel(currentToken, lexer);
+        }
+
         private static LabelNode ParseNodeLabel(Lexer.TokenData currentToken, Lexer lexer) {
+            //TODO: Get rid of this signature, it was needed when the lexer had no peak function. 
+            // (We should also get rid of all the other signatures that take a Lexer.TokenData currentToken)
             if(currentToken.token != Lexer.Token.LABEL) throw ThrowUnexpected(currentToken, "LABEL");
             // Make the node
             var labelNode = new LabelNode(currentToken.value);
@@ -137,29 +150,72 @@ namespace Kore.Kuick {
         }
 
 
-        private static InstructionNodeTypeI ParseIInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static dynamic ParseIInstruction(Lexer.TokenData currentToken, Lexer lexer) {
             // addi x1, x2, 15
             // OP  rd, rs, imm
+            // OR
+            // LX rd, imm(rs)
 
             var op = ParseOP<Kore.RiscMeta.Instructions.TypeI>(currentToken, lexer, Lexer.Token.OP_I);
             var rd = ParseRegister(lexer); // Get the destination register (rd)
-            var rs = ParseRegister(lexer); // Get the source register (rs)
-            int imm = ParseImmediate(lexer); // Get the immediate value, which can be in decimal or hexadecimal format
+            Register rs = Register.x0; // Storage Point for later use
+            int imm = 0; // Storage Point for later use
+            switch(op) {
+                case RiscMeta.Instructions.TypeI.lb:
+                case RiscMeta.Instructions.TypeI.lbu:
+                case RiscMeta.Instructions.TypeI.ld:
+                case RiscMeta.Instructions.TypeI.lh:
+                case RiscMeta.Instructions.TypeI.lhu:
+                case RiscMeta.Instructions.TypeI.lw:
+                case RiscMeta.Instructions.TypeI.lwu:
+                    LabeledInlineDirectiveNode<InstructionNodeTypeI> wrapper = null;
+                    if(PeakLabelInlineDirective(lexer)){
+                        wrapper = ParseNWrapLabelInlineDirective(lexer, new InstructionNodeTypeI(op, rd, rs, 0));
+                    } else {
+                        imm = ParseImmediate(lexer); // Get the immediate value, which can be in decimal or hexadecimal format
+                    }
+                    ExpectToken(lexer, Lexer.Token.PARREN_OPEN);
+                    var rs1 = ParseRegister(lexer);
+                    ExpectToken(lexer, Lexer.Token.PARREN_CLOSE);
+                    if(wrapper != null){
+                        (wrapper.WrappedInstruction as InstructionNodeTypeI).rs = rs1;
+                        return expectReturnEOL(wrapper, lexer);
+                    }
+                    return(expectReturnEOL(new InstructionNodeTypeI(op, rd, rs1, imm), lexer));
+                default:
+                    rs = ParseRegister(lexer); // Get the source register (rs)
+                    if(PeakLabelInlineDirective(lexer)){
+                        return expectReturnEOL(ParseNWrapLabelInlineDirective(lexer, new InstructionNodeTypeI(op, rd, rs, 0)), lexer);
+                    }
+                    imm = ParseImmediate(lexer); // Get the immediate value, which can be in decimal or hexadecimal format
 
-            return expectReturnEOL(new InstructionNodeTypeI(op, rd, rs, imm), lexer);
+                    return expectReturnEOL(new InstructionNodeTypeI(op, rd, rs, imm), lexer);
+            }
         }
-        private static InstructionNodeTypeS ParseSInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static dynamic ParseSInstruction(Lexer.TokenData currentToken, Lexer lexer) {
             var op = ParseOP<Kore.RiscMeta.Instructions.TypeS>(currentToken, lexer, Lexer.Token.OP_S);
 
             var rs2 = ParseRegister(lexer);
-            var imm = ParseImmediate(lexer);
+            LabeledInlineDirectiveNode<InstructionNodeTypeS> labelInlineDirective = null;
+            int imm = 0;
+            if(PeakLabelInlineDirective(lexer)){
+                labelInlineDirective = ParseNWrapLabelInlineDirective<InstructionNodeTypeS>(lexer, null);
+            } else {
+                imm = ParseImmediate(lexer);
+            }
             ExpectToken(lexer, Lexer.Token.PARREN_OPEN);
             var rs1 = ParseRegister(lexer);
             ExpectToken(lexer, Lexer.Token.PARREN_CLOSE);
+            
+            var node = new InstructionNodeTypeS(op, rs1, rs2, imm);
+            if(labelInlineDirective != null){
+                labelInlineDirective.WrappedInstruction = node;
+                return expectReturnEOL(labelInlineDirective, lexer);
+            }
 
-            return expectReturnEOL(new InstructionNodeTypeS(op, rs1, rs2, imm), lexer);
+            return expectReturnEOL(node, lexer);
         }
-        private static InstructionNode<Kore.RiscMeta.Instructions.TypeB> ParseBInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static dynamic ParseBInstruction(Lexer.TokenData currentToken, Lexer lexer) {
             // bne x1, x2, label
             // OP  rs1, rs2, offset
 
@@ -167,10 +223,17 @@ namespace Kore.Kuick {
             var rs1 = ParseRegister(lexer); // Get the first source register (rs1)
             var rs2 = ParseRegister(lexer); // Get the second source register (rs2)
 
+            if(PeakLabelInlineDirective(lexer)){
+                return expectReturnEOL(ParseNWrapLabelInlineDirective<InstructionNodeTypeBImmediate>(lexer, new InstructionNodeTypeBImmediate(op, rs1, rs2, 0)), lexer);
+            }
+
             var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
             switch(token.token) {
                 case Lexer.Token.NUMBER_INT:
                 case Lexer.Token.NUMBER_HEX:
+                case Lexer.Token.NUMBER_BIN:
+                // case Lexer.Token.NUMBER_OCT:
+                case Lexer.Token.NUMBER_DOUBLE: //TODO: Evaluate if we want to support doubles in another way
                     return expectReturnEOL(new InstructionNodeTypeBImmediate(op, rs1, rs2, ParseImmediate(lexer)), lexer);
                 case Lexer.Token.IDENTIFIER:
                     return expectReturnEOL(new InstructionNodeTypeBLabel(op, rs1, rs2, lexer.ReadToken(true).value), lexer);
@@ -179,12 +242,16 @@ namespace Kore.Kuick {
             }
 
         }
-        private static InstructionNode<Kore.RiscMeta.Instructions.TypeJ> ParseJInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static dynamic ParseJInstruction(Lexer.TokenData currentToken, Lexer lexer) {
             // bne x1, x2, label
             // OP  rs1, rs2, offset
 
             var op = ParseOP<Kore.RiscMeta.Instructions.TypeJ>(currentToken, lexer, Lexer.Token.OP_J);
             var rd = ParseRegister(lexer); // Get the destination register (rd)
+
+            if(PeakLabelInlineDirective(lexer)){
+                return expectReturnEOL(ParseNWrapLabelInlineDirective<InstructionNodeTypeJImmediate>(lexer, new InstructionNodeTypeJImmediate(op, rd, 0)), lexer);
+            }
 
             var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
             switch(token.token) {
@@ -199,12 +266,32 @@ namespace Kore.Kuick {
 
         }
 
-        private static InstructionNodeTypeU ParseUInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static dynamic ParseUInstruction(Lexer.TokenData currentToken, Lexer lexer) {
             var op = ParseOP<RiscMeta.Instructions.TypeU>(currentToken, lexer, Lexer.Token.OP_U);
             var rd = ParseRegister(lexer);
+            if(PeakLabelInlineDirective(lexer)){
+                return expectReturnEOL(ParseNWrapLabelInlineDirective(lexer, new InstructionNodeTypeU(op, rd, 0)), lexer);
+            }
             var immediate = ParseImmediate(lexer);
 
             return expectReturnEOL(new InstructionNodeTypeU(op, rd, immediate), lexer);
+        }
+
+        private static bool PeakLabelInlineDirective(Lexer lexer) {
+            var token = lexer.PeakToken();
+            return token.token == Lexer.Token.INLINE_DIRECTIVE;
+        }
+
+        private static LabeledInlineDirectiveNode<T> ParseNWrapLabelInlineDirective<T>(Lexer lexer, T instruction) where T : InstructionNode{
+            // var directive = ExpectToken(lexer, Lexer.Token.INLINE_DIRECTIVE);
+            var op = ParseOP<InlineDirectiveNode.InlineDirectiveType>(lexer, Lexer.Token.INLINE_DIRECTIVE);
+            ExpectToken(lexer, Lexer.Token.PARREN_OPEN); // (
+            var label = ExpectToken(lexer, Lexer.Token.IDENTIFIER);
+            ExpectToken(lexer, Lexer.Token.PARREN_CLOSE); // )
+            return new LabeledInlineDirectiveNode<T>(){
+                Name = op,
+                Label = label.value,
+                WrappedInstruction = instruction};
         }
 
         private static AstNode ParseInstruction(Lexer.TokenData currentToken, Lexer lexer) {

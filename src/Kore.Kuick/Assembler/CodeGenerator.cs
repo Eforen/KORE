@@ -248,6 +248,10 @@ namespace Kore.Kuick.Assembler {
             throw new NotImplementedException();
         }
 
+        public AstNode ProcessASTNode(InlineDirectiveNode node) {
+            throw new NotImplementedException();
+        }
+
         public AstNode ProcessASTNode(LabelNode node) {
             if(phase != GeneratorPass.LineNumber) return null;
             assignLineNumber(node);

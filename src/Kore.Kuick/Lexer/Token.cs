@@ -15,6 +15,9 @@ namespace Kore.Kuick {
             /// <summary>Represents whitespace.</summary>
             WHITESPACE,
 
+            /// <summary>Represents a binary number.</summary>
+            NUMBER_BIN,
+
             /// <summary>Represents an integer number.</summary>
             NUMBER_INT,
 
@@ -102,7 +105,8 @@ namespace Kore.Kuick {
             PARREN_OPEN,
 
             /// <summary> The Char "}" </summary>
-            PARREN_CLOSE
+            PARREN_CLOSE,
+            INLINE_DIRECTIVE
         }
     }
 }

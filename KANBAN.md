@@ -5,6 +5,7 @@
   - [Done 2023/03/08](#done-20230308)
   - [Done 2023/05/20](#done-20230520)
   - [Done 2023/05/21](#done-20230521)
+  - [Done 2023/05/26](#done-20230526)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -73,8 +74,22 @@
 
 ## Done 2023/05/21
 * [KIUCK][PARSER][BUG] `BEQZ` type instructions not working for some reason. Figure out why and fix it.
-### Next Commit (Eforen)
 * [KIUCK][PARSER][BUG] Fix test case for `bltz x3, 0x00000001`
+
+## Done 2023/05/26
+### Next Commit (Eforen)
+* [KUICK][LEXER] Implement Binary Literals
+* [KUICK][PARSER] Implement Inline Directive `%hi`
+* [KUICK][PARSER] Implement Inline Directive `%lo`
+* [KUICK][PARSER] Implement Inline Directive `%pcrel_hi`
+* [KUICK][PARSER] Implement Inline Directive `%pcrel_lo`
+* [KUICK][PARSER] Implement `LB`
+* [KUICK][PARSER] Implement `LBU`
+* [KUICK][PARSER] Implement `LH`
+* [KUICK][PARSER] Implement `LHU`
+* [KUICK][PARSER] Implement `LW`
+* [KUICK][PARSER] Implement `LWU`
+* [KUICK][PARSER] Implement `LD`
 
 # Working On
 ## Working on (Eforen)

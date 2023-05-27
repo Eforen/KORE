@@ -37,7 +37,11 @@ namespace Kore.AST {
         }
 
         public override int GetHashCode() {
-            return Value.GetHashCode();
+            unchecked {
+                int hash = base.GetHashCode();
+                hash = (hash * 397) ^ Value.GetHashCode();
+                return hash;
+            }
         }
     }
 }

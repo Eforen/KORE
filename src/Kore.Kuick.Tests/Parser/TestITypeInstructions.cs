@@ -37,7 +37,10 @@ namespace Kore.Kuick.Tests.Parser {
         [TestCase(RiscMeta.Instructions.TypeI.srli, ".text\nsrli x1, x0, 0", Register.x1, Register.x0, 0)]
         [TestCase(RiscMeta.Instructions.TypeI.srli, ".text\nsrli x1, x0, 5", Register.x1, Register.x0, 5)]
         [TestCase(RiscMeta.Instructions.TypeI.srli, ".text\nsrli x2, x3, 10", Register.x2, Register.x3, 10)]
-
+        [TestCase(RiscMeta.Instructions.TypeI.ld, ".text\nld x1, 0(x0)", Register.x1, Register.x0, 0)]
+        [TestCase(RiscMeta.Instructions.TypeI.ld, ".text\nld x1, 0x7f(x0)", Register.x1, Register.x0, 0x7f)]
+        [TestCase(RiscMeta.Instructions.TypeI.ld, ".text\nld x1, 0x80(x0)", Register.x1, Register.x0, 0x80)]
+        [TestCase(RiscMeta.Instructions.TypeI.ld, ".text\nld x1, 0x7ff(x0)", Register.x1, Register.x0, 0x7ff)]
         public void TestParseAddiInstruction(RiscMeta.Instructions.TypeI opType, string input, Register expectedRd, Register expectedRs1, int expectedImmediate) {
             // Setup the lexer and parse the input into tokens
             var lexer = new Lexer();

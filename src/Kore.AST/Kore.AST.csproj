@@ -44,6 +44,7 @@
     <Compile Include="ASTProcessor.cs" />
     <Compile Include="AstNode.cs" />
     <Compile Include="CommentNode.cs" />
+    <Compile Include="InlineDirectiveNode.cs" />
     <Compile Include="DirectiveNode.cs" />
     <Compile Include="InstructionNode.cs" />
     <Compile Include="InstructionNodeTypeB.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="InstructionNodeTypeS.cs" />
     <Compile Include="InstructionNodeTypeU.cs" />
     <Compile Include="IntDirectiveNode.cs" />
+    <Compile Include="LabeledInlineDirectiveNode.cs" />
     <Compile Include="LabelNode.cs" />
     <Compile Include="ProgramNode.cs" />
     <Compile Include="InstructionNodeTypeR.cs" />
