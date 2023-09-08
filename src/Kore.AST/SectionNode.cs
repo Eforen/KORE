@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Kore.AST {
     /// <summary>
@@ -53,6 +54,14 @@ namespace Kore.AST {
             }
 
             return hash;
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            addDebugTextHeader(indentLevel, builder).AppendLine($"SECTION {Name} [{Contents.Count}]{{");
+            foreach(var node in Contents) {
+                node.getDebugText(indentLevel + 1, builder);
+            }
+            return addDebugTextHeader(indentLevel, builder).AppendLine("}");
         }
     }
 }

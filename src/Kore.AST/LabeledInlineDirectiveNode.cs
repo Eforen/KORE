@@ -29,6 +29,10 @@ namespace Kore.AST {
                 return hash;
             }
         }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).Append($"INLINE DIRECTIVE {Name} LABEL:{Label}");
+        }
     }
     public class LabeledInlineDirectiveNode<T> : LabeledInlineDirectiveNode where T : InstructionNode {
         /// <summary>
@@ -53,6 +57,12 @@ namespace Kore.AST {
                 hash = (hash * 397) ^ WrappedInstruction.GetHashCode();
                 return hash;
             }
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            addDebugTextHeader(indentLevel, builder).AppendLine($"INLINE DIRECTIVE {Name} LABEL:{Label} {{");
+            WrappedInstruction.getDebugText(indentLevel + 1, builder);
+            return addDebugTextHeader(indentLevel, builder).AppendLine("}");
         }
     }
 }

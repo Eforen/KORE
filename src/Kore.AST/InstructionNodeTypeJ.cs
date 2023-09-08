@@ -1,4 +1,5 @@
 ﻿using Kore.RiscMeta;
+using System.Text;
 
 namespace Kore.AST {
     /// <summary>
@@ -40,9 +41,14 @@ namespace Kore.AST {
                 return hash;
             }
         }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).Append($"TypeJ {op} RD:{rd} IMM:{imm}");
+        }
     }
     /// <summary>
     /// Represents a J-type instruction in the RISC-V assembly language.
+    /// TODO: This should likely be changed to the wrapper type of instruction so that we don't have this redundency
     /// </summary>
     public class InstructionNodeTypeJLabel : InstructionNode<Kore.RiscMeta.Instructions.TypeJ> {
         /// <summary>
@@ -79,6 +85,10 @@ namespace Kore.AST {
                 hash = (hash * 397) ^ label.GetHashCode();
                 return hash;
             }
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).AppendLine($"TypeJ {op} RD:{rd} LABEL:{label}");
         }
     }
 }

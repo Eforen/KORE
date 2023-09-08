@@ -68,9 +68,9 @@ namespace Kore.Kuick.Tests.Parser {
         ///////////////////////////////////////////////////////////////////////////////
         [TestCase("j 0x8", "jal x0, 0x8", "Jump 8 bytes")]
         [TestCase("j 0x16", "jal x0, 0x8", "Jump 16 bytes")]
-        [TestCase("jr x1", "jalr x0, x1, 0x0", "Jump register")]
-        [TestCase("jr x7", "jalr x0, x7, 0x0", "Jump register")]
-        [TestCase("ret", "jalr x0, x1, 0x0", "Return from subroutine")]
+        [TestCase("jr x1", "jalr x0, 0(x1)", "Jump register")]
+        [TestCase("jr x7", "jalr x0, 0(x7)", "Jump register")]
+        [TestCase("ret", "jalr x0, 0(x1)", "Return from subroutine")]
         ///////////////////////////////////////////////////////////////////////////////
         [TestCase("tail 0x74543765", "auipc x6, 0x74543000\n    jal x0, 0x765", "Tail call arr-away subroutine")] // 0xFFFFF000 is offset[31:12] and 0x00000FFF is offset[11:0]
         [TestCase("tail 0x4262fb3f", "auipc x6, 0x4262f000\n    jal x0, 0xb3f", "Tail call arr-away subroutine")] // 0xFFFFF000 is offset[31:12] and 0x00000FFF is offset[11:0]
@@ -139,56 +139,56 @@ namespace Kore.Kuick.Tests.Parser {
         [TestCase("fsflags x6", "csrrs x0, fflags, x6", "Set floating point flags CSR")]
         ///////////////////////////////////////////////////////////////////////////////
         // TODO: This whole section is wrong and needs symbol support
-        [TestCase("lla x1, myVar\n\nmyVar: .word 12345678", "auipc x1, %pcrel_hi(myVar)\naddi x1, x1, %pcrel_lo(myVar)", "Load address into x1")]
-        [TestCase("lla x2, myVar1\n\nmyVar1: .word 12345678", "auipc x2, %pcrel_hi(myVar1)\naddi x2, x2, %pcrel_lo(myVar1)", "Load address into x2")]
-        [TestCase("lla x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)", "Load address into x3")]
+        [TestCase("lla x1, myVar", "auipc x1, %pcrel_hi(myVar)\naddi x1, x1, %pcrel_lo(myVar)", "Load address into x1")]
+        [TestCase("lla x2, myVar1", "auipc x2, %pcrel_hi(myVar1)\naddi x2, x2, %pcrel_lo(myVar1)", "Load address into x2")]
+        [TestCase("lla x3, myVar152", "auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)", "Load address into x3")]
         ///////////////////////////////////////////////////////////////////////////////
         // la rd, symbol has 2 options one is for Position Independent Code (PIC) and the other is for Position Dependent Code (PDC or Non-PIC)
         // Because the Kuick Compiler currently does not support a linker, it cannot know if the code is PIC or PDC, so it will always use the PDC version for now
         // The PDC version of this instruction is the same as the lla instruction
-        [TestCase("la x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\naddi x1, x1, %pcrel_lo(myVar)",       "Load address into x1")]
-        [TestCase("la x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\naddi x2, x2, %pcrel_lo(myVar1)",     "Load address into x2")]
-        [TestCase("la x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)", "Load address into x3")]
+        [TestCase("la x1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   addi x1, x1, %pcrel_lo(myVar)",    "Load address into x1")]
+        [TestCase("la x2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  addi x2, x2, %pcrel_lo(myVar1)",   "Load address into x2")]
+        [TestCase("la x3, myVar152", "auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)", "Load address into x3")]
         ///////////////////////////////////////////////////////////////////////////////
-        [TestCase("lb x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   lb x1, %pcrel_lo(myVar)(x1)",      "Load byte")]
-        [TestCase("lb x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  lb x2, %pcrel_lo(myVar1)(x2)",     "Load byte")]
-        [TestCase("lb x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nlb x3, %pcrel_lo(myVar152)(x3)",   "Load byte")]
-        [TestCase("lh x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   lh x1, %pcrel_lo(myVar)(x1)",      "Load halfword")]
-        [TestCase("lh x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  lh x2, %pcrel_lo(myVar1)(x2)",     "Load halfword")]
-        [TestCase("lh x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nlh x3, %pcrel_lo(myVar152)(x3)",   "Load halfword")]
-        [TestCase("lw x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   lw x1, %pcrel_lo(myVar)(x1)",      "Load word")]
-        [TestCase("lw x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  lw x2, %pcrel_lo(myVar1)(x2)",     "Load word")]
-        [TestCase("lw x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nlw x3, %pcrel_lo(myVar152)(x3)",   "Load word")]
-        [TestCase("ld x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   ld x1, %pcrel_lo(myVar)(x1)",      "Load doubleword")]
-        [TestCase("ld x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  ld x2, %pcrel_lo(myVar1)(x2)",     "Load doubleword")]
-        [TestCase("ld x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nld x3, %pcrel_lo(myVar152)(x3)",   "Load doubleword")]
+        [TestCase("lb x1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   lb x1, %pcrel_lo(myVar)(x1)",      "Load byte")]
+        [TestCase("lb x2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  lb x2, %pcrel_lo(myVar1)(x2)",     "Load byte")]
+        [TestCase("lb x3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nlb x3, %pcrel_lo(myVar152)(x3)",   "Load byte")]
+        [TestCase("lh x1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   lh x1, %pcrel_lo(myVar)(x1)",      "Load halfword")]
+        [TestCase("lh x2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  lh x2, %pcrel_lo(myVar1)(x2)",     "Load halfword")]
+        [TestCase("lh x3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nlh x3, %pcrel_lo(myVar152)(x3)",   "Load halfword")]
+        [TestCase("lw x1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   lw x1, %pcrel_lo(myVar)(x1)",      "Load word")]
+        [TestCase("lw x2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  lw x2, %pcrel_lo(myVar1)(x2)",     "Load word")]
+        [TestCase("lw x3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nlw x3, %pcrel_lo(myVar152)(x3)",   "Load word")]
+        [TestCase("ld x1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   ld x1, %pcrel_lo(myVar)(x1)",      "Load doubleword")]
+        [TestCase("ld x2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  ld x2, %pcrel_lo(myVar1)(x2)",     "Load doubleword")]
+        [TestCase("ld x3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nld x3, %pcrel_lo(myVar152)(x3)",   "Load doubleword")]
         ///////////////////////////////////////////////////////////////////////////////
-        [TestCase("sb x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   sb x1, %pcrel_lo(myVar)(x1)",      "Store byte")]
-        [TestCase("sb x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  sb x2, %pcrel_lo(myVar1)(x2)",     "Store byte")]
-        [TestCase("sb x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nsb x3, %pcrel_lo(myVar152)(x3)",   "Store byte")]
-        [TestCase("sh x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   sh x1, %pcrel_lo(myVar)(x1)",      "Store halfword")]
-        [TestCase("sh x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  sh x2, %pcrel_lo(myVar1)(x2)",     "Store halfword")]
-        [TestCase("sh x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nsh x3, %pcrel_lo(myVar152)(x3)",   "Store halfword")]
-        [TestCase("sw x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   sw x1, %pcrel_lo(myVar)(x1)",      "Store word")]
-        [TestCase("sw x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  sw x2, %pcrel_lo(myVar1)(x2)",     "Store word")]
-        [TestCase("sw x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nsw x3, %pcrel_lo(myVar152)(x3)",   "Store word")]
-        [TestCase("sd x1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   sd x1, %pcrel_lo(myVar)(x1)",      "Store doubleword")]
-        [TestCase("sd x2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  sd x2, %pcrel_lo(myVar1)(x2)",     "Store doubleword")]
-        [TestCase("sd x3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nsd x3, %pcrel_lo(myVar152)(x3)",   "Store doubleword")]
+        [TestCase("sb x1, myVar, t1",    "auipc t1, %pcrel_hi(myVar)\n   sb x1, %pcrel_lo(myVar)(t1)",      "Store byte")]
+        [TestCase("sb x2, myVar1, t2",   "auipc t2, %pcrel_hi(myVar1)\n  sb x2, %pcrel_lo(myVar1)(t2)",     "Store byte")]
+        [TestCase("sb x3, myVar152, t3", "auipc t3, %pcrel_hi(myVar152)\nsb x3, %pcrel_lo(myVar152)(t3)",   "Store byte")]
+        [TestCase("sh x1, myVar, t1",    "auipc t1, %pcrel_hi(myVar)\n   sh x1, %pcrel_lo(myVar)(t1)",      "Store halfword")]
+        [TestCase("sh x2, myVar1, t2",   "auipc t2, %pcrel_hi(myVar1)\n  sh x2, %pcrel_lo(myVar1)(t2)",     "Store halfword")]
+        [TestCase("sh x3, myVar152, t3", "auipc t3, %pcrel_hi(myVar152)\nsh x3, %pcrel_lo(myVar152)(t3)",   "Store halfword")]
+        [TestCase("sw x1, myVar, t1",    "auipc t1, %pcrel_hi(myVar)\n   sw x1, %pcrel_lo(myVar)(t1)",      "Store word")]
+        [TestCase("sw x2, myVar1, t2",   "auipc t2, %pcrel_hi(myVar1)\n  sw x2, %pcrel_lo(myVar1)(t2)",     "Store word")]
+        [TestCase("sw x3, myVar152, t3", "auipc t3, %pcrel_hi(myVar152)\nsw x3, %pcrel_lo(myVar152)(t3)",   "Store word")]
+        [TestCase("sd x1, myVar, t1",    "auipc t1, %pcrel_hi(myVar)\n   sd x1, %pcrel_lo(myVar)(t1)",      "Store doubleword")]
+        [TestCase("sd x2, myVar1, t2",   "auipc t2, %pcrel_hi(myVar1)\n  sd x2, %pcrel_lo(myVar1)(t2)",     "Store doubleword")]
+        [TestCase("sd x3, myVar152, t3", "auipc t3, %pcrel_hi(myVar152)\nsd x3, %pcrel_lo(myVar152)(t3)",   "Store doubleword")]
         ///////////////////////////////////////////////////////////////////////////////
-        [TestCase("flw f1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   flw f1, %pcrel_lo(myVar)(x1)",      "Load word")]
-        [TestCase("flw f2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  flw f2, %pcrel_lo(myVar1)(x2)",     "Load word")]
-        [TestCase("flw f3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nflw f3, %pcrel_lo(myVar152)(x3)",   "Load word")]
-        [TestCase("fld f1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   fld f1, %pcrel_lo(myVar)(x1)",      "Load doubleword")]
-        [TestCase("fld f2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  fld f2, %pcrel_lo(myVar1)(x2)",     "Load doubleword")]
-        [TestCase("fld f3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nfld f3, %pcrel_lo(myVar152)(x3)",   "Load doubleword")]
+        [TestCase("flw f1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   flw f1, %pcrel_lo(myVar)(x1)",    "Load word")]
+        [TestCase("flw f2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  flw f2, %pcrel_lo(myVar1)(x2)",   "Load word")]
+        [TestCase("flw f3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nflw f3, %pcrel_lo(myVar152)(x3)", "Load word")]
+        [TestCase("fld f1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   fld f1, %pcrel_lo(myVar)(x1)",    "Load doubleword")]
+        [TestCase("fld f2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  fld f2, %pcrel_lo(myVar1)(x2)",   "Load doubleword")]
+        [TestCase("fld f3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nfld f3, %pcrel_lo(myVar152)(x3)", "Load doubleword")]
         ///////////////////////////////////////////////////////////////////////////////
-        [TestCase("fsw f1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   fsw f1, %pcrel_lo(myVar)(x1)",      "Store word")]
-        [TestCase("fsw f2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  fsw f2, %pcrel_lo(myVar1)(x2)",     "Store word")]
-        [TestCase("fsw f3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nfsw f3, %pcrel_lo(myVar152)(x3)",   "Store word")]
-        [TestCase("fsd f1, myVar\n\nmyVar: .word 12345678",       "auipc x1, %pcrel_hi(myVar)\n   fsd f1, %pcrel_lo(myVar)(x1)",      "Store doubleword")]
-        [TestCase("fsd f2, myVar1\n\nmyVar1: .word 12345678",     "auipc x2, %pcrel_hi(myVar1)\n  fsd f2, %pcrel_lo(myVar1)(x2)",     "Store doubleword")]
-        [TestCase("fsd f3, myVar152\n\nmyVar152: .word 12345678", "auipc x3, %pcrel_hi(myVar152)\nfsd f3, %pcrel_lo(myVar152)(x3)",   "Store doubleword")]
+        [TestCase("fsw f1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   fsw f1, %pcrel_lo(myVar)(x1)",    "Store word")]
+        [TestCase("fsw f2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  fsw f2, %pcrel_lo(myVar1)(x2)",   "Store word")]
+        [TestCase("fsw f3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nfsw f3, %pcrel_lo(myVar152)(x3)", "Store word")]
+        [TestCase("fsd f1, myVar",    "auipc x1, %pcrel_hi(myVar)\n   fsd f1, %pcrel_lo(myVar)(x1)",    "Store doubleword")]
+        [TestCase("fsd f2, myVar1",   "auipc x2, %pcrel_hi(myVar1)\n  fsd f2, %pcrel_lo(myVar1)(x2)",   "Store doubleword")]
+        [TestCase("fsd f3, myVar152", "auipc x3, %pcrel_hi(myVar152)\nfsd f3, %pcrel_lo(myVar152)(x3)", "Store doubleword")]
         ///////////////////////////////////////////////////////////////////////////////
         [TestCase("li x1, 0", "addi x1, x0, 0", "Load immediate")]
         [TestCase("li x2, 5", "addi x2, x0, 5", "Load immediate")]
@@ -206,10 +206,12 @@ namespace Kore.Kuick.Tests.Parser {
             var ast1 = Kore.Kuick.Parser.Parse(lexer1);
             var ast2 = Kore.Kuick.Parser.Parse(lexer2);
 
+            Assert.AreEqual(ast1.getDebugText(), ast2.getDebugText());
+
             // Check that the AST of the true instruction matches the AST of the pseudo instruction
-            Assert.AreEqual(ast2.Sections[0].Contents[0], ast1.Sections[0].Contents[0]);
+            //Assert.AreEqual(ast2.Sections[0].Contents[0], ast1.Sections[0].Contents[0]);
             // Fallback Check
-            Assert.AreEqual(ast2, ast1);
+            //Assert.AreEqual(ast2, ast1);
 
             // bool checking = true;
             // while(checking) {

@@ -27,6 +27,7 @@ namespace Kore.RiscMeta.Instructions {
         lui = (byte)INST_TYPE.UType,
         auipc = (byte)INST_TYPE.UType,
         jal = (byte)INST_TYPE.JType,
+        /// <summary> jalr rd, offset(rs1) # Jump and Link</summary>
         jalr = (byte)INST_TYPE.IType,
         beq = (byte)INST_TYPE.BType,
         bne = (byte)INST_TYPE.BType,
@@ -76,6 +77,7 @@ namespace Kore.RiscMeta.Instructions {
         ecall = (byte)INST_TYPE.IType,
         ebreak = (byte)INST_TYPE.IType,
         csrrw = (byte)INST_TYPE.IType,
+        csrrs = (byte)INST_TYPE.IType,
         csrrc = (byte)INST_TYPE.IType,
         csrrwi = (byte)INST_TYPE.IType,
         csrrsi = (byte)INST_TYPE.IType,
@@ -96,6 +98,7 @@ namespace Kore.RiscMeta.Instructions {
         bgeu
     }
     public enum TypeI {
+        /// <summary> jalr rd, offset(rs1) # Jump and Link</summary>
         jalr,
         lb,
         lbu,
@@ -127,16 +130,21 @@ namespace Kore.RiscMeta.Instructions {
         ecall,
         ebreak,
         csrrw,
+        csrrs,
         csrrc,
         csrrwi,
         csrrsi,
-        csrrci
+        csrrci,
+        flw,
+        fld,
     }
     public enum TypeS {
         sb,
         sh,
         sw,
-        sd
+        sd,
+        fsw,
+        fsd
     }
     public enum TypeR {
         add,
@@ -155,6 +163,7 @@ namespace Kore.RiscMeta.Instructions {
         lui
     }
     public enum TypeJ {
+        /// <summary> jal rd, offset # Jump and Link</summary>
         jal
     }
     

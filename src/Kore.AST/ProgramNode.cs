@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Text;
+
 namespace Kore.AST {
     /// <summary>
     /// The root node of the AST, representing a RISC-V program.
@@ -39,6 +41,14 @@ namespace Kore.AST {
         public override int GetHashCode() {
             Sections.GetHashCode();
             return base.GetHashCode();
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            addDebugTextHeader(indentLevel, builder).AppendLine($"PROGRAM [{Sections.Count}]{{");
+            foreach(var section in Sections) {
+                section.getDebugText(indentLevel+1, builder);
+            }
+            return addDebugTextHeader(indentLevel, builder).AppendLine("}");
         }
     }
 }

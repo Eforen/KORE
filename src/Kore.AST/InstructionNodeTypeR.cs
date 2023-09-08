@@ -1,5 +1,6 @@
 ﻿using Kore.RiscMeta;
 using Kore.RiscMeta.Instructions;
+using System.Text;
 
 namespace Kore.AST {
     /// <summary>
@@ -47,6 +48,10 @@ namespace Kore.AST {
                 hash = (hash * 397) ^ rs2.GetHashCode();
                 return hash;
             }
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).AppendLine($"TypeR {op} RD:{rd} RS1:{rs1} RS2:{rs2}");
         }
     }
 }

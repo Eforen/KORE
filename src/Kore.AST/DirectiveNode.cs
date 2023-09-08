@@ -39,5 +39,9 @@ namespace Kore.AST {
         public override int GetHashCode() {
             return Name.GetHashCode();
         }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).AppendLine($"DIRECTIVE {Name}");
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Kore.AST {
+﻿using System.Text;
+
+namespace Kore.AST {
 
     /// <summary>
     /// Node representing a comment in the assembly code.
@@ -28,6 +30,10 @@
 
         public override int GetHashCode() {
             return Text.GetHashCode();
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).AppendLine($"COMMENT {Text}");
         }
     }
 }

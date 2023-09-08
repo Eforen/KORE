@@ -1,4 +1,5 @@
 ﻿using Kore.RiscMeta;
+using System.Text;
 
 namespace Kore.AST {
     /// <summary>
@@ -48,9 +49,14 @@ namespace Kore.AST {
                 return hash;
             }
         }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).Append($"TypeB {op} RS1:{rs1} RS2:{rs2} IMM:{imm}");
+        }
     }
     /// <summary>
     /// Represents a B-Type RISC-V instruction.
+    /// TODO: This should likely be changed to the wrapper type of instruction so that we don't have this redundency
     /// </summary>
     public class InstructionNodeTypeBLabel : InstructionNode<Kore.RiscMeta.Instructions.TypeB> {
         /// <summary>
@@ -95,6 +101,10 @@ namespace Kore.AST {
                 hash = (hash * 397) ^ label.GetHashCode();
                 return hash;
             }
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).AppendLine($"TypeB {op} RS1:{rs1} RS2:{rs2} LABEL:{label}");
         }
     }
 }

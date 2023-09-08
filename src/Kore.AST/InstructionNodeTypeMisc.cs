@@ -1,4 +1,6 @@
-﻿namespace Kore.AST {
+﻿using System.Text;
+
+namespace Kore.AST {
     /// <summary>
     /// Represents a miscellaneous instruction in the RISC-V assembly language.
     /// </summary>
@@ -19,6 +21,10 @@
 
         public override int GetHashCode() {
             return op.GetHashCode();
+        }
+
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+            return addDebugTextHeader(indentLevel, builder).AppendLine($"TypeMisc {op}");
         }
     }
 }
