@@ -1,0 +1,17 @@
+/* start from read-the-docs' standard theme: */
+@import url("theme.css");
+@import url("kos_theme.css");
+
+table.right-align-table-cell td,
+table.right-align-table-cell td > p {
+    text-align: right
+}
+
+table.center-align-table-cell td,
+table.center-align-table-cell td > p {
+    text-align: center;
+}
+
+table.table-cell-small-text p {
+    font-size: small !important;
+}

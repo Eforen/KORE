@@ -1,0 +1,1059 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Control and Status Registers &mdash; KORE  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/kore_theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> KORE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Module Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/keyboard.html">Keyboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/screen.html">Screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/terminal.html">Terminal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">KS++ Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../kpp/plans.html">1. KS++ Specification Design Ideas</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Virtual Mechine Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../vm/spec.html">1. Virtual Mechine Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vm/structure.html">2. Virtual Mechine Structural Elements</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Assembly Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="spec.html">1. Assembly Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">2. Assembly Structural Elements</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../instructions/catalog.html">1. Assembly Instruction Catalog</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Machine Instruction Format (1s and 0s)</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../instruction_encoding/data_format.html">1. RISC V Data Format</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Architecture Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/design.html">1. Architecture Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/structure.html">2. Architecture Structural Elements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">KORE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Control and Status Registers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/assembly/csrs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="control-and-status-registers">
+<h1>Control and Status Registers<a class="headerlink" href="#control-and-status-registers" title="Permalink to this headline">¶</a></h1>
+<p>For those familiar with x84 or x64 assembly architecture you may find some differences in the KORE (RISC-V) Cpu architecture or assembly.
+In this page we will examine the following differences.
+* There are no operations dedicated to getting status or setting control vars this is all handeled by a common set of operations and a set of addresses mapped to verious bits of control or status such as the cpu cycle counter (0xB00 mcycle)</p>
+<div class="section" id="permissions">
+<h2>Permissions<a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h2>
+<p>The CSR addresses are mapped to 4 permission levels.
+The CSR addresses are further mapped to 2 classifications Standard and Custom.
+Standard CSRs are defined by the RISC-V ISA and have special defined uses.
+Custom CSRs are not defined by the RISC-V ISA and are open to use by the the CPU/OS/Software/User</p>
+<p>Notes:
+* Any attempt to access a CSR that does not exist will raise an Illegal Instruction exception.
+* Any attempt to access a CSR that the software context does not have permission to access will raise an Illegal Instruction exception.
+* Any attempt to write to a CSR that that is read-only will raise an Illegal Instruction exception.
+* Some writeable CSRs will have bits that are read-only writes to these bits will be ignored and will not raise an Illegal Instruction exception.
+* The CSRs from 0x7A0 to 0x7AF are debug csrs that are shared between Mechine Mode and Debug Mode.
+* The CSRs from 0x7B0 to 0x7BF only exist in debug mode (Mechine mode software attempting to access these will raise an Illegal Instruction exception).</p>
+<div class="section" id="permission-address-map">
+<h3>Permission Address Map<a class="headerlink" href="#permission-address-map" title="Permalink to this headline">¶</a></h3>
+<p>The 4096 possible CSR addresses are divided as follows:</p>
+</div>
+<div class="section" id="permission-levels">
+<h3>Permission Levels<a class="headerlink" href="#permission-levels" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="user-mode">
+<h4>User Mode<a class="headerlink" href="#user-mode" title="Permalink to this headline">¶</a></h4>
+<p>User CSRs are used by any software in User Permission Mode (The least permissive level)</p>
+<p>These are the CSRs that standard non-admin/non-root software running in the OS would have access to.</p>
+<p>In User Mode the following Standard CSRs are currently allocated for use:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Number</p></th>
+<th class="head"><p>Privilege</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="4"><p>User Trap Setup</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x000</p></td>
+<td><p>URW</p></td>
+<td><p>ustatus</p></td>
+<td><p>User status register.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x004</p></td>
+<td><p>URW</p></td>
+<td><p>uie</p></td>
+<td><p>User interrupt-enable register.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x005</p></td>
+<td><p>URW</p></td>
+<td><p>utvec</p></td>
+<td><p>User trap handler base address.</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>User Trap Handling</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x040</p></td>
+<td><p>URW</p></td>
+<td><p>uscratch</p></td>
+<td><p>Scratch register for user trap handlers.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x041</p></td>
+<td><p>URW</p></td>
+<td colspan="2"><p>uepc           | User exception program counter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x042</p></td>
+<td><p>URW</p></td>
+<td colspan="2"><p>ucause         | User trap cause.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x043</p></td>
+<td><p>URW</p></td>
+<td colspan="2"><p>utval          | User bad address or instruction.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x044</p></td>
+<td><p>URW</p></td>
+<td colspan="2"><p>uip            | User interrupt pending.</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>User Floating-Point CSRs</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x001</p></td>
+<td><p>URW</p></td>
+<td><p>fflags</p></td>
+<td><p>Floating-Point Accrued Exceptions.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x002</p></td>
+<td><p>URW</p></td>
+<td><p>frm</p></td>
+<td><p>Floating-Point Dynamic Rounding Mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x003</p></td>
+<td><p>URW</p></td>
+<td><p>fcsr</p></td>
+<td><p>Floating-Point Control and Status Register.</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>User Counter/Timer</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xC00</p></td>
+<td><p>URO</p></td>
+<td><p>cycle</p></td>
+<td><p>Cycle counter for RDCYCLE instruction.</p></td>
+</tr>
+<tr class="row-even"><td><p>0xC01</p></td>
+<td><p>URO</p></td>
+<td><p>time</p></td>
+<td><p>Timer for RDTIME instruction.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xC02</p></td>
+<td><p>URO</p></td>
+<td><p>instret</p></td>
+<td><p>Instructions-retired counter for RDINSTRET instruction</p></td>
+</tr>
+<tr class="row-even"><td><p>0xC03</p></td>
+<td><p>URO</p></td>
+<td><p>hpmcounter3</p></td>
+<td><p>Performance-monitoring counter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xC04</p></td>
+<td><p>URO</p></td>
+<td><p>hpmcounter4</p></td>
+<td><p>Performance-monitoring counter.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>hpmcounter#</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xC1F</p></td>
+<td><p>URO</p></td>
+<td><p>hpmcounter31</p></td>
+<td><p>Performance-monitoring counter.</p></td>
+</tr>
+<tr class="row-even"><td><p>0xC80</p></td>
+<td><p>URO</p></td>
+<td><p>cycleh</p></td>
+<td><p>Upper 32 bits of cycle, RV32 only</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xC81</p></td>
+<td><p>URO</p></td>
+<td><p>timeh</p></td>
+<td><p>Upper 32 bits of time, RV32 only</p></td>
+</tr>
+<tr class="row-even"><td><p>0xC82</p></td>
+<td><p>URO</p></td>
+<td><p>instreth</p></td>
+<td><p>Upper 32 bits of instret, RV32 only</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xC83</p></td>
+<td><p>URO</p></td>
+<td><p>hpmcounter3h</p></td>
+<td><p>Upper 32 bits of hpmcounter3, RV32 only</p></td>
+</tr>
+<tr class="row-even"><td><p>0xC84</p></td>
+<td><p>URO</p></td>
+<td><p>hpmcounter4h</p></td>
+<td><p>Upper 32 bits of hpmcounter4, RV32 only</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td><p>hpmcounter#h</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-even"><td><p>0xC9F</p></td>
+<td><p>URO</p></td>
+<td><p>hpmcounter31h</p></td>
+<td><p>Upper 32 bits of hpmcounter31, RV32 only</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="supervisor-mode">
+<h4>Supervisor Mode<a class="headerlink" href="#supervisor-mode" title="Permalink to this headline">¶</a></h4>
+<p>Supervisor CSRs are used by any software in Supervisor Permission Mode (The 2nd least permissive level)</p>
+<p>These are the CSRs that standard admin/root software running in the OS would have access to.</p>
+<p>In Supervisor Mode the following Standard CSRs are currently allocated for use:</p>
+<p>Notes:
+* All User Mode CSRs are also accessible in this mode</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Number</p></th>
+<th class="head"><p>Privilege</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="4"><p>Supervisor Trap Setup</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x100</p></td>
+<td><p>SRW</p></td>
+<td><p>sstatus</p></td>
+<td><p>Supervisor status register.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x102</p></td>
+<td><p>SRW</p></td>
+<td><p>sedeleg</p></td>
+<td><p>Supervisor exception delegation register.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x103</p></td>
+<td><p>SRW</p></td>
+<td><p>sideleg</p></td>
+<td><p>Supervisor interrupt delegation register.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x104</p></td>
+<td><p>SRW</p></td>
+<td><p>sie</p></td>
+<td><p>Supervisor interrupt-enable register.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x105</p></td>
+<td><p>SRW</p></td>
+<td><p>stvec</p></td>
+<td><p>Supervisor trap handler base address.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x106</p></td>
+<td><p>SRW</p></td>
+<td><p>scounteren</p></td>
+<td><p>Supervisor counter enable.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>Supervisor Trap Handling</p></td>
+</tr>
+<tr class="row-even"><td><p>0x140</p></td>
+<td><p>SRW</p></td>
+<td><p>sscratch</p></td>
+<td><p>Scratch register for supervisor trap handlers.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x141</p></td>
+<td><p>SRW</p></td>
+<td><p>sepc</p></td>
+<td><p>Supervisor exception program counter.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x142</p></td>
+<td><p>SRW</p></td>
+<td><p>scause</p></td>
+<td><p>Supervisor trap cause.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x143</p></td>
+<td><p>SRW</p></td>
+<td><p>stval</p></td>
+<td><p>Supervisor bad address or instruction.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x144</p></td>
+<td><p>SRW</p></td>
+<td><p>sip</p></td>
+<td><p>Supervisor interrupt pending.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>Supervisor Protection and Translation</p></td>
+</tr>
+<tr class="row-even"><td><p>0x180</p></td>
+<td><p>SRW</p></td>
+<td><p>satp</p></td>
+<td><p>Supervisor address translation and protection.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>Debug/Trace Registers</p></td>
+</tr>
+<tr class="row-even"><td><p>0x5A8</p></td>
+<td><p>SRW</p></td>
+<td><p>scontext</p></td>
+<td><p>Supervisor-mode context register.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="hypervisor-mode">
+<h4>Hypervisor Mode<a class="headerlink" href="#hypervisor-mode" title="Permalink to this headline">¶</a></h4>
+<p>Hypervisor CSRs are used by any software in Hypervisor Permission Mode (The 3nd least permissive level)</p>
+<p>These are the CSRs that software running as the OS would have access to.</p>
+<p>In Hypervisor Mode the following Standard CSRs are currently allocated for use:</p>
+<p>Notes:
+* All User Mode CSRs are also accessible in this mode
+* All Supervisor Mode CSRs are also accessible in this mode</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Number</p></th>
+<th class="head"><p>Privilege</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="4"><p>Hypervisor Trap Setup</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x600</p></td>
+<td><p>HRW</p></td>
+<td><p>hstatus</p></td>
+<td><p>Hypervisor status register.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x602</p></td>
+<td><p>HRW</p></td>
+<td><p>hedeleg</p></td>
+<td><p>Hypervisor exception delegation register.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x603</p></td>
+<td><p>HRW</p></td>
+<td><p>hideleg</p></td>
+<td><p>Hypervisor interrupt delegation register.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x604</p></td>
+<td><p>HRW</p></td>
+<td><p>hie</p></td>
+<td><p>Hypervisor interrupt-enable register.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x606</p></td>
+<td><p>HRW</p></td>
+<td><p>hcounteren</p></td>
+<td><p>Hypervisor counter enable.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x607</p></td>
+<td><p>HRW</p></td>
+<td><p>htegie</p></td>
+<td><p>Hypervisor guest external interrupt-enable register</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>Hypervisor Trap Handling</p></td>
+</tr>
+<tr class="row-even"><td><p>0x643</p></td>
+<td><p>HRW</p></td>
+<td><p>htval</p></td>
+<td><p>Hypervisor bad address or instruction.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x644</p></td>
+<td><p>HRW</p></td>
+<td><p>hip</p></td>
+<td><p>Hypervisor interrupt pending.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x645</p></td>
+<td><p>HRW</p></td>
+<td><p>hvip</p></td>
+<td><p>Hypervisor virtual interrupt pending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x64A</p></td>
+<td><p>HRW</p></td>
+<td><p>htinst</p></td>
+<td><p>Hypervisor trap instruction (transformed)</p></td>
+</tr>
+<tr class="row-even"><td><p>0xE12</p></td>
+<td><p>HRO</p></td>
+<td><p>hgeip</p></td>
+<td><p>Hypervisor guest external interrupt pending.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>Hypervisor Protection and Translation</p></td>
+</tr>
+<tr class="row-even"><td><p>0x680</p></td>
+<td><p>HRW</p></td>
+<td><p>hgatp</p></td>
+<td><p>Hypervisor guest address translation and protection.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>Debug/Trace Registers</p></td>
+</tr>
+<tr class="row-even"><td><p>0x6A8</p></td>
+<td><p>HRW</p></td>
+<td><p>hcontext</p></td>
+<td><p>Hypervisor-mode context register.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>Hypervisor Counter/Timer Virtualization Registers</p></td>
+</tr>
+<tr class="row-even"><td><p>0x605</p></td>
+<td><p>HRW</p></td>
+<td><p>htimedelta</p></td>
+<td><p>Delta for VS/VU-mode timer.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x615</p></td>
+<td><p>HRW</p></td>
+<td><p>htimedeltah</p></td>
+<td><p>Upper 32 bits of htimedelta, RV32 only.</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>Virtual Supervisor Registers</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x200</p></td>
+<td><p>HRW</p></td>
+<td><p>vsstatus</p></td>
+<td><p>Virtual supervisor status register</p></td>
+</tr>
+<tr class="row-even"><td><p>0x204</p></td>
+<td><p>HRW</p></td>
+<td><p>vsie</p></td>
+<td><p>Virtual supervisor interrupt-enable register</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x205</p></td>
+<td><p>HRW</p></td>
+<td><p>vstvec</p></td>
+<td><p>Virtual supervisor trap handler base address.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x240</p></td>
+<td><p>HRW</p></td>
+<td><p>vsscratch</p></td>
+<td><p>Virtual supervisor scratch register.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x241</p></td>
+<td><p>HRW</p></td>
+<td><p>vsepc</p></td>
+<td><p>Virtual supervisor exception program counter.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x242</p></td>
+<td><p>HRW</p></td>
+<td><p>vscause</p></td>
+<td><p>Virtual supervisor trap cause.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x243</p></td>
+<td><p>HRW</p></td>
+<td><p>vstval</p></td>
+<td><p>Virtual supervisor bad address or instruction.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x244</p></td>
+<td><p>HRW</p></td>
+<td><p>vsip</p></td>
+<td><p>Virtual supervisor interrupt pending.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x280</p></td>
+<td><p>HRW</p></td>
+<td><p>bsatp</p></td>
+<td><p>Supervisor address translation and protection.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="machine-mode">
+<h4>Machine Mode<a class="headerlink" href="#machine-mode" title="Permalink to this headline">¶</a></h4>
+<p>Machine CSRs are used by any software in Machine Permission Mode (The most permissive level excluding debug)</p>
+<p>These are the CSRs that software below the OS would have access to such as bios or a system on a chip implementation.
+Software at this level can do almost anything and everything, and has access to almost any interrupts or memory the system has.</p>
+<p>In Machine Mode the following Standard CSRs are currently allocated for use:</p>
+<p>Notes:
+* All User Mode CSRs are also accessible in this mode
+* All Supervisor Mode CSRs are also accessible in this mode
+* All Hypervisor Mode CSRs are also accessible in this mode</p>
+</div>
+<div class="section" id="debug-mode">
+<h4>Debug Mode<a class="headerlink" href="#debug-mode" title="Permalink to this headline">¶</a></h4>
+<p>Debug CSRs are used by any software in Debug Permission Mode (The most permissive level)</p>
+<p>These are the CSRs that software below everything.
+Software at this level can do anything and everything, and has access to any interrupts or memory the system has.
+This mode is generally used only for testing the CPU itself (Current assumption (I might be wrong about this as I am not 100% on it.)).</p>
+<p>In Debug Mode the following Standard CSRs are currently allocated for use:</p>
+<p>Notes:
+* All User Mode CSRs are also accessible in this mode
+* All Supervisor Mode CSRs are also accessible in this mode
+* All Hypervisor Mode CSRs are also accessible in this mode
+* All Machine Mode CSRs are also accessible in this mode</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Number</p></th>
+<th class="head"><p>Privilege</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="4"><p>Debug Mode Registers</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x7B0</p></td>
+<td><p>DRW</p></td>
+<td><p>dcsr</p></td>
+<td><p>Debug control and status register.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x7B1</p></td>
+<td><p>DRW</p></td>
+<td><p>dpc</p></td>
+<td><p>Debug PC.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x7B2</p></td>
+<td><p>DRW</p></td>
+<td><p>dscratch0</p></td>
+<td><p>Debug scratch register 0.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x7B3</p></td>
+<td><p>DRW</p></td>
+<td><p>dscratch1</p></td>
+<td><p>Debug scratch register 1.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="registers-and-stack">
+<h2>Registers and Stack<a class="headerlink" href="#registers-and-stack" title="Permalink to this headline">¶</a></h2>
+<p>There are 16 Registers if you want to see them check the <a class="reference external" href="../architecture/structure.html#map-of-registers">Architecture Specification</a>, 16 64-bit “general-purpose” registers;
+the low-order 32, 16, and 8 bits of each register can be accessed independently under other names, as shown in the <a class="reference external" href="../architecture/structure.html#map-of-registers">Map of Registers</a></p>
+<p>In principle, almost any register can be used to hold any data, but some have special or restricted uses.
+Using these extra registers can have unexpected behavior.</p>
+</div>
+<div class="section" id="addressing-mode">
+<h2>Addressing Mode<a class="headerlink" href="#addressing-mode" title="Permalink to this headline">¶</a></h2>
+<p>Register <span class="math notranslate nohighlight">\(R_2 \leftarrow R_2 + R_1\)</span></p>
+<div class="highlight-kasm notranslate"><div class="highlight"><pre><span></span><span class="nf">ADD</span> <span class="nv">R1</span><span class="p">,</span> <span class="nv">R2</span>
+</pre></div>
+</div>
+<p>Direct <span class="math notranslate nohighlight">\(Mem[200] \leftarrow Mem[200] + R_1\)</span></p>
+<div class="highlight-kasm notranslate"><div class="highlight"><pre><span></span><span class="nf">ADD</span> <span class="nv">R1</span><span class="p">,</span> <span class="p">[</span><span class="mi">200</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Indirect <span class="math notranslate nohighlight">\(Mem[R_1] \leftarrow Mem[R_1] + A\)</span></p>
+<div class="highlight-kasm notranslate"><div class="highlight"><pre><span></span><span class="nf">ADD</span> <span class="nv">A</span><span class="p">,</span> <span class="p">[</span><span class="nv">R1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Immediate <span class="math notranslate nohighlight">\(R_1 \leftarrow R_1 + 69\)</span></p>
+<div class="highlight-kasm notranslate"><div class="highlight"><pre><span></span>ADI 69, R1
+</pre></div>
+</div>
+</div>
+<div class="section" id="instructions">
+<h2>Instructions<a class="headerlink" href="#instructions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="data-transfer-instructions">
+<h3>Data Transfer Instructions<a class="headerlink" href="#data-transfer-instructions" title="Permalink to this headline">¶</a></h3>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">Key</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 83%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Placeholder</p></th>
+<th class="head"><p>Denotes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>s</em></p></td>
+<td><p>immediate, register, or memory Address</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>d</em></p></td>
+<td><p>a register or memory address</p></td>
+</tr>
+<tr class="row-even"><td><p><em>m</em></p></td>
+<td><p>a memory address</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>r</em></p></td>
+<td><p>a register</p></td>
+</tr>
+<tr class="row-even"><td><p><em>imm</em></p></td>
+<td><p>immediate</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>l</em></p></td>
+<td><p>label, program line number, or memory address</p></td>
+</tr>
+</tbody>
+</table>
+<p>Most transfers use the mov instruction which works between to registers or between registers and a memory address.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Data Transfers from one memory address to another memory address is not supported.
+If you need to do this a register or the stack would need to be used instead.</p>
+</div>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Data transfer instructions</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>mov [b|w|l|q] s,d</p></td>
+<td><p>move s to d</p></td>
+</tr>
+<tr class="row-even"><td><p>movs [bw|bl|bq|wl|wq|lq] s,d</p></td>
+<td><p>move with sign extension</p></td>
+</tr>
+<tr class="row-odd"><td><p>movz [bw|bl|bq|wl|wq] s,d</p></td>
+<td><p>move with zero extension</p></td>
+</tr>
+<tr class="row-even"><td><p>movabsq imm, r</p></td>
+<td><p>move absolute quad word (64-bits)</p></td>
+</tr>
+<tr class="row-odd"><td><p>pushq s</p></td>
+<td><p>push onto the stack</p></td>
+</tr>
+<tr class="row-even"><td><p>popq s</p></td>
+<td><p>pop from the stack stack</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It may be desirable at a later point in time to make some instructions for direct memory to memory mov ops to increase preformance of memcopy commands if users are using that frequently.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Remember that the stack must stay 8 byte aligned at all times thus remember to pad your data if you need to push less then 8 byte.</p>
+</div>
+</div>
+<div class="section" id="integer-arithmetic-and-logical-operations">
+<h3>Integer Arithmetic and Logical Operations<a class="headerlink" href="#integer-arithmetic-and-logical-operations" title="Permalink to this headline">¶</a></h3>
+<table class="colwidths-given docutils align-default" id="id3">
+<caption><span class="caption-text">Arithmetic instructions</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>lea [b|wl|q] m, r</p></td>
+<td><p>load effective address of m into r</p></td>
+</tr>
+<tr class="row-even"><td><p>inc[b|w|l|q] d</p></td>
+<td><p>d = d + 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>dec[b|w|l|q] d</p></td>
+<td><p>d = d - 1</p></td>
+</tr>
+<tr class="row-even"><td><p>neg[b|w|l|q] d</p></td>
+<td><p>d = -d</p></td>
+</tr>
+<tr class="row-odd"><td><p>not[b|w|l|q] d</p></td>
+<td><p>d = ~d(bitwise complement)</p></td>
+</tr>
+<tr class="row-even"><td><p>add[b|w|l|q] s, d</p></td>
+<td><p>d = d + s</p></td>
+</tr>
+<tr class="row-odd"><td><p>sub[b|w|l|q] s, d</p></td>
+<td><p>d = d - s</p></td>
+</tr>
+<tr class="row-even"><td><p>imul[b|w|l|q] s, r</p></td>
+<td><p>r = r * s (throws away high-order half of the result)</p></td>
+</tr>
+<tr class="row-odd"><td><p>xor[b|w|l|q] s, d</p></td>
+<td><p>d = d ∧ s (bitwise)</p></td>
+</tr>
+<tr class="row-even"><td><p>or[b|w|l|q] s, d</p></td>
+<td><p>d = d | s (bitwise)</p></td>
+</tr>
+<tr class="row-odd"><td><p>and[b|w|l|q] s,d</p></td>
+<td><p>d = d &amp; s (bitwise)</p></td>
+</tr>
+<tr class="row-even"><td><p>idivl s</p></td>
+<td><p>signed division of edx by s, place quotient in eax, and remainder in edx</p></td>
+</tr>
+<tr class="row-odd"><td><p>divl s</p></td>
+<td><p>unsigned division of edx by s, place quotient in eax, and remainder in edx</p></td>
+</tr>
+<tr class="row-even"><td><p>cltd</p></td>
+<td><p>sign extend eax into edx</p></td>
+</tr>
+<tr class="row-odd"><td><p>idivq s</p></td>
+<td><p>signed devision of rdx by s, place quotient in rdx, and remainder in rdx</p></td>
+</tr>
+<tr class="row-even"><td><p>divq s</p></td>
+<td><p>unsigned devision of rdx by s, place quotient in rdx, and remainder in rdx</p></td>
+</tr>
+<tr class="row-odd"><td><p>clto</p></td>
+<td><p>sign extend rax into rdx</p></td>
+</tr>
+<tr class="row-even"><td><p>sal[b|w|l|q] imm, d</p></td>
+<td><p>d = d &lt;&lt; imm (left shift)</p></td>
+</tr>
+<tr class="row-odd"><td><p>sar[b|w|l|q] imm, d</p></td>
+<td><p>d = d &gt;&gt; imm (arithmetic right shift)</p></td>
+</tr>
+<tr class="row-even"><td><p>shr[b|w|l|q] imm, d</p></td>
+<td><p>d = d &gt;&gt; imm (logical right shift)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A very common trick is to zero a register by using xor on itself.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When data is loaded into a register it zeros out the high order bits of the register.
+If a signed operation is performed on a low order register its high order bits will be zeroed except for the sign bit.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Multiplication of two n-byte values has the potential to result in 2n-byte.
+The imul instruction simply discards the high-order half of the result, so it still fits in n bytes.
+This is common in many programming languages.</p>
+</div>
+</div>
+<div class="section" id="condition-codes">
+<h3>Condition Codes<a class="headerlink" href="#condition-codes" title="Permalink to this headline">¶</a></h3>
+<p>Almost all arithmetic instructions set processor condition codes based on their result.</p>
+<table class="colwidths-given docutils align-default" id="id4">
+<caption><span class="caption-text">The Condition Codes</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>ZF</p></td>
+<td><p>result was Zero</p></td>
+</tr>
+<tr class="row-even"><td><p>CF</p></td>
+<td><p>result caused carry out of most significant bit</p></td>
+</tr>
+<tr class="row-odd"><td><p>SF</p></td>
+<td><p>result was negative (Sign bit was set)</p></td>
+</tr>
+<tr class="row-even"><td><p>OF</p></td>
+<td><p>result caused overflow</p></td>
+</tr>
+</tbody>
+</table>
+<p>In general, compilers usually set the condition codes using one of the following instructions,
+which do not change any register:</p>
+<table class="colwidths-given docutils align-default" id="id5">
+<caption><span class="caption-text">Conditional Instructions</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>cmp[b|w|l|q] s2, s1</p></td>
+<td><p>set flags based on s1 - s2</p></td>
+</tr>
+<tr class="row-even"><td><p>test[b|w|l|q] s2, s1</p></td>
+<td><p>set flags based on s1 &amp; s2 (logical and)</p></td>
+</tr>
+</tbody>
+</table>
+<p>In the following instructions cc will stand for any of the condition codes that come after the instructions.</p>
+<table class="colwidths-given docutils align-default" id="id6">
+<caption><span class="caption-text">Condition Sensitive Instructions</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>j<em>cc</em> <em>l</em></p></td>
+<td><p>transfers control to <em>l</em> if the specified <em>cc</em> evaluates to true</p></td>
+</tr>
+<tr class="row-even"><td><p>set<em>cc</em> <em>d</em></p></td>
+<td><p>sets the single byte destination <em>d</em> to 1 or 0 according to whether the specified <em>cc</em> evaluates to true</p></td>
+</tr>
+<tr class="row-odd"><td><p>cmov<em>cc</em> s, d</p></td>
+<td><p>instructions perform mov only if the specified <em>cc</em> holds.</p></td>
+</tr>
+<tr class="row-even"><td><p>cmovs<em>cc</em> s, d</p></td>
+<td><p>instructions perform movs only if the specified <em>cc</em> holds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>cmovz<em>cc</em> s, d</p></td>
+<td><p>instructions perform movz only if the specified <em>cc</em> holds.</p></td>
+</tr>
+<tr class="row-even"><td><p>cmovabsq<em>cc</em> s, d</p></td>
+<td><p>instructions perform movabsq only if the specified <em>cc</em> holds.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="colwidths-given docutils align-default" id="id7">
+<caption><span class="caption-text">Condition Codes</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>cc</p></th>
+<th class="head"><p>condition tested</p></th>
+<th class="head"><p>meaning after cmp</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>e</p></td>
+<td><p><strong>ZF</strong></p></td>
+<td><p>equal to zero</p></td>
+</tr>
+<tr class="row-odd"><td><p>ne</p></td>
+<td><p><strong>˜ZF</strong></p></td>
+<td><p>not equal to zero</p></td>
+</tr>
+<tr class="row-even"><td><p>n</p></td>
+<td><p><strong>SF</strong></p></td>
+<td><p>negitive</p></td>
+</tr>
+<tr class="row-odd"><td><p>nn</p></td>
+<td><p><strong>˜SF</strong></p></td>
+<td><p>not negative</p></td>
+</tr>
+<tr class="row-even"><td><p>g</p></td>
+<td><p><strong>˜(SF xor OF) &amp; ˜ZF</strong></p></td>
+<td><p>greater (&gt;) (signed sensitive)</p></td>
+</tr>
+<tr class="row-odd"><td><p>ge</p></td>
+<td><p><strong>˜(SF xor OF)</strong></p></td>
+<td><p>greater or equal (&gt;=) (signed sensitive)</p></td>
+</tr>
+<tr class="row-even"><td><p>l</p></td>
+<td><p><strong>SF xor OF</strong></p></td>
+<td><p>less (&lt;) (signed sensitive)</p></td>
+</tr>
+<tr class="row-odd"><td><p>le</p></td>
+<td><p><strong>(SF xor OF) | ZF</strong></p></td>
+<td><p>less or equal (&lt;=) (signed sensitive)</p></td>
+</tr>
+<tr class="row-even"><td><p>a</p></td>
+<td><p><strong>˜CF &amp; ˜ZF</strong></p></td>
+<td><p>above (abs &gt;) (not signed sensitive)</p></td>
+</tr>
+<tr class="row-odd"><td><p>ae</p></td>
+<td><p><strong>˜CF</strong></p></td>
+<td><p>above or equal (abs &gt;=) (not signed sensitive)</p></td>
+</tr>
+<tr class="row-even"><td><p>b</p></td>
+<td><p><strong>CF</strong></p></td>
+<td><p>below (abs &lt;) (not signed sensitive)</p></td>
+</tr>
+<tr class="row-odd"><td><p>be</p></td>
+<td><p><strong>CF | ZF</strong></p></td>
+<td><p>below or equal (abs &lt;) (not signed sensitive)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="flow-control-transfers">
+<h3>Flow Control Transfers<a class="headerlink" href="#flow-control-transfers" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="floating-point-arithmetic">
+<h3>Floating Point Arithmetic<a class="headerlink" href="#floating-point-arithmetic" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, KORE Developers
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
