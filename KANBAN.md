@@ -1,12 +1,15 @@
 - [Done](#done)
   - [Done 10/18/2021](#done-10182021)
   - [Done 10/21/2021](#done-10212021)
+  - [Done 11/16/2021](#done-11162021)
   - [Done 02/25/2023](#done-02252023)
   - [Done 2023/03/08](#done-20230308)
   - [Done 2023/05/20](#done-20230520)
   - [Done 2023/05/21](#done-20230521)
   - [Done 2023/05/26](#done-20230526)
     - [Next Commit (Eforen)](#next-commit-eforen)
+  - [Done 2024/05/04](#done-20240504)
+    - [Next Commit (Eforen)](#next-commit-eforen-1)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
 - [Todos](#todos)
@@ -26,6 +29,9 @@
 
 ## Done 10/21/2021
 * [KUICK][TOKENIZER] Write Tests for every Token
+* [KUICK][TOKENIZER] Implement all failing tests
+
+## Done 11/16/2021
 * [KUICK][TOKENIZER] Implement all failing tests
 
 ## Done 02/25/2023
@@ -91,8 +97,17 @@
 * [KUICK][PARSER] Implement `LWU`
 * [KUICK][PARSER] Implement `LD`
 
+## Done 2024/05/04
+### Next Commit (Eforen)
+* [IO][External] ELF64 Parser (Headers)
+
 # Working On
 ## Working on (Eforen)
+* [IO][External] ELF64 Parser (Program Headers)
+* [IO][External] ELF64 Parser (Sections)
+* [IO][External] ELF64 Writer (Headers)
+* [IO][External] ELF64 Writer (Program Headers)
+* [IO][External] ELF64 Writer (Sections)
 * [KIUCK][PARSER] Implement Pseudo Instructions
 * [KIUCK][PARSER][TEST] Pseudo Instruction `beqz`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bnez`
@@ -108,9 +123,10 @@
 * [KUICK][ASSEMBLER] Write Tests for every Token
 
 # Todos
-* [KUICK][PARSER] Impliment `%hi(msg)`
-* [KUICK][PARSER] Impliment `%lo(msg)`
-* [KUICK][PARSER] Impliment `msg: .string "Hello World\n"`
+## Todo
+* [KUICK][PARSER] Implement `%hi(msg)`
+* [KUICK][PARSER] Implement `%lo(msg)`
+* [KUICK][PARSER] Implement `msg: .string "Hello World\n"`
 * [KUICK][ASSEMBLER] Implement all failing tests
 * Implement all RISC-V ASM directives in (RISC-V ASSEMBLY LANGUAGE Programmer Manual - Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf] (contact @ shakti[dot]iitm[@]gmail[dot]com)
 * [KUICK][PARSER] Write Test for F Type Instruction `FADD.S`
@@ -120,6 +136,5 @@
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `LD`
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `SD`
 * [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual - Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
-## Todo
 ## Planned for some time later
 ## Wishlist
