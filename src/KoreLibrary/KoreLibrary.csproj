@@ -1,70 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3B46AD76-BBB2-4293-B0BD-D61AB39A411E}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Kore</RootNamespace>
     <AssemblyName>Kore</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\Kore.RiscMeta\Kore.RiscMeta.csproj" />
+    <ProjectReference Include="..\Kore.Utility\Kore.Utility.csproj" />
+    <ProjectReference Include="..\Kore.Kuick\Kore.Kuick.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ALU.cs" />
-    <Compile Include="CPU.cs" />
-    <Compile Include="KuickParser.ParseData.cs" />
-    <Compile Include="KuickParser.ParserSyntaxException.cs" />
-    <Compile Include="KuickParser.StatementType.cs" />
-    <Compile Include="KuickParser.cs" />
-    <Compile Include="MainBus.cs" />
-    <Compile Include="MainBusComponent.cs" />
-    <Compile Include="MiscUtilities.cs" />
-    <Compile Include="KuickCompiler.cs" />
-    <Compile Include="RamController.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegisterFile.cs" />
-    <Compile Include="RiscISA.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Kore.RiscMeta\Kore.RiscMeta.csproj">
-      <Project>{134dae66-6fe1-4df1-b392-3658c48825c0}</Project>
-      <Name>Kore.RiscMeta</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kore.Utility\Kore.Utility.csproj">
-      <Project>{1bb25104-8e3a-4ef4-bde4-0674c2a70cd2}</Project>
-      <Name>Kore.Utility</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

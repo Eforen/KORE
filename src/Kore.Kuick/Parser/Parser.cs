@@ -88,7 +88,10 @@ namespace Kore.Kuick {
             return reg;
         }
         private static int ParseControlStatusRegister(Lexer lexer) {
-
+            var currentToken = ExpectToken(lexer, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            if(currentToken.token == Lexer.Token.NUMBER_INT) return int.Parse(currentToken.value);
+            if(currentToken.token == Lexer.Token.NUMBER_HEX) return Convert.ToInt32(currentToken.value, 16);
+            throw ThrowParserPanic(currentToken);
         }
 
         private static int ParseImmediate(Lexer lexer) {

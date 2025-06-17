@@ -52,22 +52,22 @@ namespace Kore.RiscMeta.ControlStateRegisters {
         /// The top two bits (csr[11:10]) indicate whether the register is read/write (00, 01, or 10) or read-only (11).
         /// </summary>
         public static readonly uint MASK_READWRITE = 0b11_00_0000_000;
-        public static readonly uint SHIFT_READWRITE = 9;
+        public static readonly int SHIFT_READWRITE = 9;
         /// <summary>
         /// The second two bits (csr[9:8]) encode the lowest privilege level that can access the CSR.
         /// </summary>
         public static readonly uint MASK_PRIVILAGE = 0b00_11_0000_000;
-        public static readonly uint SHIFT_PRIVILAGE = 7;
+        public static readonly int SHIFT_PRIVILAGE = 7;
 
         public static readonly uint MASK_REGION = 0b00_00_1111_000;
-        public static readonly uint SHIFT_REGION = 3;
+        public static readonly int SHIFT_REGION = 3;
 
         public static readonly uint MASK_REGION1 = 0b00_00_1000_000;
-        public static readonly uint SHIFT_REGION1 = 6;
+        public static readonly int SHIFT_REGION1 = 6;
         public static readonly uint MASK_REGION2 = 0b00_00_1100_000;
-        public static readonly uint SHIFT_REGION2 = 5;
+        public static readonly int SHIFT_REGION2 = 5;
         public static readonly uint MASK_REGION3 = 0b00_00_1110_000;
-        public static readonly uint SHIFT_REGION3 = 4;
+        public static readonly int SHIFT_REGION3 = 4;
 
 
 
@@ -75,14 +75,14 @@ namespace Kore.RiscMeta.ControlStateRegisters {
             RegionFlags level = getLevel(CSR);
             switch(level) {
                 case RegionFlags.UserLevel:
-                    if(CSR & MASK_READWRITE >> SHIFT_READWRITE == 10) return RegionFlags.UserLevel | RegionFlags.Writeable | RegionFlags.Custom;
-                    if(CSR & 0b11_00_1100_000 == 0b11_00_1100_000) return RegionFlags.UserLevel | RegionFlags.Custom;
+                    if((CSR & MASK_READWRITE) >> SHIFT_READWRITE == 10) return RegionFlags.UserLevel | RegionFlags.Writeable | RegionFlags.Custom;
+                    if((CSR & 0b11_00_1100_000) == 0b11_00_1100_000) return RegionFlags.UserLevel | RegionFlags.Custom;
                     return RegionFlags.UserLevel | isWriteable(CSR);
                 case RegionFlags.SupervisorLevel:
-                    if(CSR & MASK_READWRITE != 0 && (CSR * MASK_REGION2 >> SHIFT_REGION2) == 11) 
+                    if((CSR & MASK_READWRITE) != 0 && (CSR * MASK_REGION2 >> SHIFT_REGION2) == 11) 
                         return RegionFlags.SupervisorLevel | 
                                RegionFlags.Custom | 
-                               ((CSR & MASK_READWRITE >> SHIFT_READWRITE) != 11 ? RegionFlags.Standard : RegionFlags.Writeable)
+                               ((CSR & MASK_READWRITE >> SHIFT_READWRITE) != 11 ? RegionFlags.StandardReadOnly : RegionFlags.Writeable);
                     return RegionFlags.SupervisorLevel | isWriteable(CSR);
                 case RegionFlags.HypervisorLevel:
                     return RegionFlags.HypervisorLevel | isWriteable(CSR);

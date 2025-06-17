@@ -1,3 +1,7 @@
 {
-    "restructuredtext.confPath": "${workspaceFolder}\\docs\\source"
+    "restructuredtext.confPath": "${workspaceFolder}\\docs\\source",
+    "dotnet.defaultSolution": "src/KorePlatform.sln",
+    "dotnet.testExplorer.testProjectPath": "**/*.csproj",
+    "csharp.suppressHiddenDiagnostics": false,
+    "dotnet.testExplorer.enableTelemetry": false
 }

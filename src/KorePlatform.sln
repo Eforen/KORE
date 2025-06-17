@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kore.Kuick.Tests", "Kore.Ku
 		{A8B32937-161F-4139-A768-8B87D9ECA6F1} = {A8B32937-161F-4139-A768-8B87D9ECA6F1}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kore.AST.Test", "Kore.AST.Test\Kore.AST.Test.csproj", "{30278F81-732B-4584-84E4-72C608E43F7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kore.AST.Test", "Kore.AST.Test\Kore.AST.Tests.csproj", "{30278F81-732B-4584-84E4-72C608E43F7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
