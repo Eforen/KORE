@@ -9,6 +9,7 @@
   - [Done 2023/05/26](#done-20230526)
     - [Next Commit (Eforen)](#next-commit-eforen)
   - [Done 2024/05/04](#done-20240504)
+  - [Done 2025/06/16](#done-20250616)
     - [Next Commit (Eforen)](#next-commit-eforen-1)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -98,8 +99,11 @@
 * [KUICK][PARSER] Implement `LD`
 
 ## Done 2024/05/04
-### Next Commit (Eforen)
 * [IO][External] ELF64 Parser (Headers)
+
+## Done 2025/06/16
+### Next Commit (Eforen)
+* [Builds] Make build buildable on linux
 
 # Working On
 ## Working on (Eforen)
