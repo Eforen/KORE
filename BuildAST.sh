@@ -50,7 +50,7 @@ cd "$(dirname "$0")/src"
 print_status "Restoring NuGet packages..."
 dotnet restore Kore.Utility/Kore.Utility.csproj --verbosity quiet
 dotnet restore Kore.AST/Kore.AST.csproj --verbosity quiet
-dotnet restore Kore.AST.Test/Kore.AST.Test.csproj --verbosity quiet
+dotnet restore Kore.AST.Test/Kore.AST.Tests.csproj --verbosity quiet
 
 # Build dependencies first
 print_status "Building AST dependencies..."
@@ -63,9 +63,9 @@ dotnet build Kore.Utility/Kore.Utility.csproj --configuration $CONFIGURATION --n
 print_status "Building Kore.AST..."
 dotnet build Kore.AST/Kore.AST.csproj --configuration $CONFIGURATION --no-restore --verbosity minimal
 
-# Build Kore.AST.Test
-print_status "Building Kore.AST.Test..."
-dotnet build Kore.AST.Test/Kore.AST.Test.csproj --configuration $CONFIGURATION --no-restore --verbosity minimal
+# Build Kore.AST.Tests
+print_status "Building Kore.AST.Tests..."
+dotnet build Kore.AST.Test/Kore.AST.Tests.csproj --configuration $CONFIGURATION --no-restore --verbosity minimal
 
 if [ $? -eq 0 ]; then
     print_success "AST components build completed successfully!"
@@ -79,4 +79,4 @@ fi
 print_status "Build output locations:"
 echo "  - Kore.Utility/bin/$CONFIGURATION"
 echo "  - Kore.AST/bin/$CONFIGURATION"
-echo "  - Kore.AST.Test/bin/$CONFIGURATION" 
+echo "  - Kore.AST.Test/bin/$CONFIGURATION"

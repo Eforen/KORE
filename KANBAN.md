@@ -10,6 +10,7 @@
     - [Next Commit (Eforen)](#next-commit-eforen)
   - [Done 2024/05/04](#done-20240504)
   - [Done 2025/06/16](#done-20250616)
+  - [Done 2025/06/19](#done-20250619)
     - [Next Commit (Eforen)](#next-commit-eforen-1)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -102,16 +103,19 @@
 * [IO][External] ELF64 Parser (Headers)
 
 ## Done 2025/06/16
-### Next Commit (Eforen)
 * [Builds] Make build buildable on linux
 
-# Working On
-## Working on (Eforen)
+## Done 2025/06/19
+### Next Commit (Eforen)
+* [IO][External] ELF64 Testing Suite
 * [IO][External] ELF64 Parser (Program Headers)
 * [IO][External] ELF64 Parser (Sections)
 * [IO][External] ELF64 Writer (Headers)
 * [IO][External] ELF64 Writer (Program Headers)
 * [IO][External] ELF64 Writer (Sections)
+
+# Working On
+## Working on (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
 * [KIUCK][PARSER][TEST] Pseudo Instruction `beqz`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bnez`
@@ -140,5 +144,6 @@
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `LD`
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `SD`
 * [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual - Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
+
 ## Planned for some time later
 ## Wishlist

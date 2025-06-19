@@ -1,0 +1,1 @@
+riscv64-unknown-elf-gcc -march=rv64gc -mabi=lp64d -nostdlib -T link.ld -o hello.elf hello.c

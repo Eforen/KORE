@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# KORE RISC-V Compiler - AST Test Script
-# This script builds and runs tests for the AST components
+# KORE RISC-V Compiler - Utility Test Script
+# This script builds and runs tests for the Utility components
 
 set -e  # Exit on any error
 
@@ -41,31 +41,27 @@ print_status "Using .NET SDK version: $(dotnet --version)"
 
 # Configuration (default to Debug, can be overridden)
 CONFIGURATION=${1:-Debug}
-print_status "Testing AST components in $CONFIGURATION configuration"
+print_status "Testing Utility components in $CONFIGURATION configuration"
 
 # Navigate to source directory
 cd "$(dirname "$0")/src"
 
 # Build dependencies first
-print_status "Building AST dependencies..."
+print_status "Building Utility dependencies..."
 
-# Build Kore.Utility (if AST depends on it)
+# Build Kore.Utility
 print_status "Building Kore.Utility..."
 dotnet build Kore.Utility/Kore.Utility.csproj --configuration $CONFIGURATION --verbosity minimal
 
-# Build Kore.AST
-print_status "Building Kore.AST..."
-dotnet build Kore.AST/Kore.AST.csproj --configuration $CONFIGURATION --verbosity minimal
-
-# Build and run Kore.AST.Tests
-print_status "Building and running Kore.AST.Tests..."
-dotnet test Kore.AST.Test/Kore.AST.Tests.csproj --configuration $CONFIGURATION --verbosity normal
+# Build and run Kore.Utility.Tests
+print_status "Building and running Kore.Utility.Tests..."
+dotnet test Kore.Utility.Tests/Kore.Utility.Tests.csproj --configuration $CONFIGURATION --verbosity normal
 
 if [ $? -eq 0 ]; then
-    print_success "AST tests completed successfully!"
+    print_success "Utility tests completed successfully!"
 else
-    print_error "AST tests failed!"
+    print_error "Utility tests failed!"
     exit 1
 fi
 
-print_status "AST test artifacts location: Kore.AST.Test/bin/$CONFIGURATION"
+print_status "Utility test artifacts location: Kore.Utility.Tests/bin/$CONFIGURATION" 
