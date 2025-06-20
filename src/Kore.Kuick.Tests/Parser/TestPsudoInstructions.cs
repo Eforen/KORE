@@ -129,8 +129,8 @@ namespace Kore.Kuick.Tests.Parser {
         [TestCase("csrci cycle, 0x3",    "csrrci x0, cycle, 0x3",    "Clear cycle count CSR (immediate)")]
         [TestCase("csrci time, 0x4",     "csrrci x0, time, 0x4",     "Clear time CSR (immediate)")]
         ///////////////////////////////////////////////////////////////////////////////
-        [TestCase("frcsr x1", "csrrs x1, fflags, x0", "Read floating point flags CSR")]
-        [TestCase("fscsr x2", "csrrs x0, fflags, x2", "Set floating point flags CSR")]
+        [TestCase("frcsr x1", "csrrs x1, fcsr, x0", "Read floating point control/status register")]
+        [TestCase("fscsr x2", "csrrs x0, fcsr, x2", "Set floating point control/status register")]
         ///////////////////////////////////////////////////////////////////////////////
         [TestCase("frrm x3",  "csrrs x3, frm, x0",    "Read floating point rounding mode CSR")]
         [TestCase("fsrm x4",  "csrrs x0, frm, x4",    "Set floating point rounding mode CSR")]

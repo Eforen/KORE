@@ -88,9 +88,17 @@ namespace Kore.Kuick {
             return reg;
         }
         private static int ParseControlStatusRegister(Lexer lexer) {
-            var currentToken = ExpectToken(lexer, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            var currentToken = ExpectToken(lexer, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX, Lexer.Token.IDENTIFIER, Lexer.Token.CSR);
             if(currentToken.token == Lexer.Token.NUMBER_INT) return int.Parse(currentToken.value);
             if(currentToken.token == Lexer.Token.NUMBER_HEX) return Convert.ToInt32(currentToken.value, 16);
+            if(currentToken.token == Lexer.Token.IDENTIFIER || currentToken.token == Lexer.Token.CSR) {
+                // Convert CSR names to their numeric values using the CSR enum
+                if(Enum.TryParse(currentToken.value, true, out Kore.RiscMeta.ControlStateRegisters.CSR csr)) {
+                    return (int)csr;
+                } else {
+                    throw ThrowUnexpected(currentToken, $"Known CSR name. '{currentToken.value}' is not a recognized CSR name.");
+                }
+            }
             throw ThrowParserPanic(currentToken);
         }
 
@@ -349,6 +357,8 @@ namespace Kore.Kuick {
                     return ParseSInstruction(currentToken, lexer);
                 case Lexer.Token.OP_U:
                     return ParseUInstruction(currentToken, lexer);
+                case Lexer.Token.OP_PSEUDO:
+                    return ParsePseudoInstruction(currentToken, lexer);
                 default:
                     throw ThrowUnimplemented(currentToken);
             }
@@ -425,11 +435,48 @@ namespace Kore.Kuick {
                     return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeS.fsd, lexer);
                 ////////////////////////////////////////////////////////////////////////
                 case "CSRR":
-                    return ParsePseudoInstructionTypeI_Z_IMM_REGISTER(currentToken, RiscMeta.Instructions.TypeI.csrrs, lexer);
+                    return ParsePseudoInstructionCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, lexer);
+                case "CSRW":
+                    return ParsePseudoInstructionCSR(currentToken, RiscMeta.Instructions.TypeI.csrrw, lexer);
+                case "CSRS":
+                    return ParsePseudoInstructionCSR(currentToken, RiscMeta.Instructions.TypeI.csrrs, lexer);
                 case "CSRC":
-                    return ParsePseudoInstructionTypeI_Z_IMM_REGISTER(currentToken, RiscMeta.Instructions.TypeI.csrrc, lexer);
+                    return ParsePseudoInstructionCSR(currentToken, RiscMeta.Instructions.TypeI.csrrc, lexer);
                 case "CSRCI":
-                    return ParsePseudoInstructionTypeI_Z_IMM_REGISTER(currentToken, RiscMeta.Instructions.TypeI.csrrci, lexer);
+                    return ParsePseudoInstructionCSRImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrci, lexer);
+                case "CSRWI":
+                    return ParsePseudoInstructionCSRImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrwi, lexer);
+                case "CSRSI":
+                    return ParsePseudoInstructionCSRImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrsi, lexer);
+                case "RDCYCLE": // Pseduo instruction: RDCYCLE rd -> CSRRS rd, cycle, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "cycle", lexer);
+                case "RDCYCLEH": // Pseduo instruction: RDCYCLEH rd -> CSRRS rd, cycleh, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "cycleh", lexer);
+                case "RDTIME": // Pseduo instruction: RDTIME rd -> CSRRS rd, time, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "time", lexer);
+                case "RDTIMEH": // Pseduo instruction: RDTIMEH rd -> CSRRS rd, timeh, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "timeh", lexer);
+                case "RDINSTRET": // Pseduo instruction: RDINSTRET rd -> CSRRS rd, instret, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "instret", lexer);
+                case "RDINSTRETH": // Pseduo instruction: RDINSTRETH rd -> CSRRS rd, instreth, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "instreth", lexer);
+                ////////////////////////////////////////////////////////////////////////
+                case "FRCSR": // Pseudo instruction: FRCSR rd -> CSRRS rd, fcsr, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "fcsr", lexer);
+                case "FSCSR": // Pseudo instruction: FSCSR rd -> CSRRS x0, fcsr, rd [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRWrite(currentToken, RiscMeta.Instructions.TypeI.csrrs, "fcsr", lexer);
+                case "FRRM": // Pseudo instruction: FRRM rd -> CSRRS rd, frm, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "frm", lexer);
+                case "FSRM": // Pseudo instruction: FSRM rd -> CSRRS x0, frm, rd [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRWrite(currentToken, RiscMeta.Instructions.TypeI.csrrs, "frm", lexer);
+                case "FRFLAGS": // Pseudo instruction: FRFLAGS rd -> CSRRS rd, fflags, x0 [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "fflags", lexer);
+                case "FSFLAGS": // Pseudo instruction: FSFLAGS rd -> CSRRS x0, fflags, rd [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRWrite(currentToken, RiscMeta.Instructions.TypeI.csrrs, "fflags", lexer);
+                case "FSRMI": // Pseudo instruction: FSRMI imm -> CSRRWI x0, frm, imm [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRWriteImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrwi, "frm", lexer);
+                case "FSFLAGSI": // Pseudo instruction: FSFLAGSI imm -> CSRRWI x0, fflags, imm [TYPE I]
+                    return ParsePseudoInstructionSpecificCSRWriteImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrwi, "fflags", lexer);
                 default:
                     throw ThrowUnimplemented(currentToken);
             }
@@ -477,35 +524,80 @@ namespace Kore.Kuick {
         }
 
         /// <summary>
-        /// Psudo SYMBOL/IMM REGISTER -> OP rd, symbol/imm, rt
+        /// Pseudo CSR read instruction parser that handles "csrr rd, csr" format
+        /// Format: csrr rd, csr -> csrrs rd, csr, x0
         /// </summary>
         /// <param name="startToken"></param>
         /// <param name="op"></param>
         /// <param name="lexer"></param>
         /// <returns></returns>
-        private static AstNode[] ParsePseudoInstructionTypeI_Z_IMM_REGISTER(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+        private static AstNode[] ParsePseudoInstructionCSRRead(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+            // Parse the destination register first
+            var rd = ParseRegister(lexer); // Get the destination register (rd)
+            
+            // Parse the CSR using the existing method that handles CSR name to number conversion
+            int csrValue = ParseControlStatusRegister(lexer);
+            
+            // Create the instruction: csrrs rd, csr, x0
+            return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(
+                op,
+                rd,
+                Register.x0,
+                csrValue
+            ), lexer));
+        }
 
-            // Format Example: OP rd, symbol, rt
-            // Skip the first register because its hardcoded to x0
-            var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
-            int imm = 0;
-            switch(token.token) {
+        /// <summary>
+        /// Pseudo CSR instruction parser that handles both CSR tokens and numerical CSR addresses
+        /// Format: csrs <csr>, <register> -> csrrs x0, <csr>, <register>
+        /// </summary>
+        /// <param name="startToken"></param>
+        /// <param name="op"></param>
+        /// <param name="lexer"></param>
+        /// <returns></returns>
+        private static AstNode[] ParsePseudoInstructionCSR(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+            // Parse the CSR (can be either a CSR token like "cycle" or a number like 0x7C0)
+            var csrToken = ExpectToken(lexer, Lexer.Token.CSR, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            int csrValue = 0;
+            
+            switch(csrToken.token) {
                 case Lexer.Token.NUMBER_INT:
-                case Lexer.Token.NUMBER_HEX:
-                    imm = ParseImmediate(lexer);
+                    csrValue = Convert.ToInt32(csrToken.value, 10);
                     break;
+                case Lexer.Token.NUMBER_HEX:
+                    csrValue = Convert.ToInt32(csrToken.value, 16);
+                    break;
+                case Lexer.Token.CSR:
                 case Lexer.Token.IDENTIFIER:
-                    throw ThrowUnimplemented(token);
+                    // For CSR tokens, we need to get the numeric value
+                    // For now, we'll create a fake instruction and let the normal CSR instruction parser handle it
+                    var register = ParseRegister(lexer); // Get the source register
+                    
+                    // Create fake tokens to simulate "csrrs x0, <csr>, <register>"
+                    // We'll create a new lexer with the transformed instruction
+                    var transformedInstruction = $"csrrs x0, {csrToken.value}, {register}";
+                    var fakeLexer = new Lexer();
+                    fakeLexer.Load(".text\n" + transformedInstruction);
+                    
+                    // Skip the .text directive
+                    fakeLexer.ReadToken(); // .text
+                    fakeLexer.ReadToken(); // EOL
+                    
+                    // Parse as a normal I-type instruction
+                    var fakeToken = fakeLexer.ReadToken(); // csrrs
+                    return ParseIInstruction(fakeToken, fakeLexer);
                 default:
-                    throw ThrowUnexpected(token, "Label Identifier or Offset Number");
+                    throw ThrowUnexpected(csrToken, "CSR name or CSR address");
             }
-            var rt = ParseRegister(lexer); // Get the destination register (rd)
-
+            
+            // Handle numeric CSR case
+            var rt = ParseRegister(lexer); // Get the source register
+            
             return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(
                 op,
                 Register.x0,
                 rt,
-                imm
+                csrValue
             ), lexer));
         }
 
@@ -685,6 +777,106 @@ namespace Kore.Kuick {
             } else {
 
                 return ComposeInstructionArray(expectReturnEOL(new DirectiveNode { Name = name }, lexer));
+            }
+        }
+
+        /// <summary>
+        /// Pseudo CSR immediate instruction parser that handles both CSR tokens and numerical CSR addresses
+        /// Format: csrwi/csrsi/csrci <csr>, <zimm> -> csrrwi/csrrsi/csrrci x0, <csr>, <zimm>
+        /// </summary>
+        /// <param name="startToken"></param>
+        /// <param name="op"></param>
+        /// <param name="lexer"></param>
+        /// <returns></returns>
+        private static AstNode[] ParsePseudoInstructionCSRImmediate(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+            // Parse the CSR (can be either a CSR token like "cycle" or a number like 0x7C0)
+            var csrToken = ExpectToken(lexer, Lexer.Token.CSR, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            
+            // Parse the immediate value (zimm)
+            var zimm = ParseImmediate(lexer);
+            
+            // Create fake tokens to simulate "csrrwi/csrrsi/csrrci x0, <csr>, <zimm>"
+            var opName = startToken.value.ToLower();
+            string fullOpName;
+            if (opName == "csrwi") fullOpName = "csrrwi";
+            else if (opName == "csrsi") fullOpName = "csrrsi"; 
+            else if (opName == "csrci") fullOpName = "csrrci";
+            else throw new SyntaxException($"Unknown CSR immediate instruction: {opName}");
+            
+            var transformedInstruction = $"{fullOpName} x0, {csrToken.value}, {zimm}";
+            var fakeLexer = new Lexer();
+            fakeLexer.Load(".text\n" + transformedInstruction);
+            
+            // Skip the .text directive
+            fakeLexer.ReadToken(); // .text
+            fakeLexer.ReadToken(); // EOL
+            
+            // Parse as a normal I-type instruction
+            var fakeToken = fakeLexer.ReadToken(); // csrrwi/csrrsi/csrrci
+            return ParseIInstruction(fakeToken, fakeLexer);
+        }
+
+        private static AstNode[] ParsePseudoInstructionSpecificCSRRead(Lexer.TokenData currentToken, RiscMeta.Instructions.TypeI op, string csrName, Lexer lexer) {
+            // Parse the destination register first
+            var rd = ParseRegister(lexer); // Get the destination register (rd)
+            
+            // Convert the hardcoded CSR name to its numeric value using the CSR enum
+            if(Enum.TryParse(csrName, true, out Kore.RiscMeta.ControlStateRegisters.CSR csr)) {
+                int csrValue = (int)csr;
+                
+                // Create the instruction: csrrs rd, csr, x0
+                return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(
+                    op,
+                    rd,
+                    Register.x0,
+                    csrValue
+                ), lexer));
+            } else {
+                throw new SyntaxException($"Unknown CSR name: {csrName}");
+            }
+        }
+
+        private static AstNode[] ParsePseudoInstructionSpecificCSRWrite(Lexer.TokenData currentToken, RiscMeta.Instructions.TypeI op, string csrName, Lexer lexer) {
+            // Parse the source register 
+            var rs = ParseRegister(lexer); // Get the source register (rs)
+            
+            // Convert the hardcoded CSR name to its numeric value using the CSR enum
+            if(Enum.TryParse(csrName, true, out Kore.RiscMeta.ControlStateRegisters.CSR csr)) {
+                int csrValue = (int)csr;
+                
+                // Create the instruction: csrrs x0, csr, rs
+                return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(
+                    op,
+                    Register.x0,  // destination = x0
+                    rs,           // source register 
+                    csrValue      // CSR value
+                ), lexer));
+            } else {
+                throw new SyntaxException($"Unknown CSR name: {csrName}");
+            }
+        }
+
+        private static AstNode[] ParsePseudoInstructionSpecificCSRWriteImmediate(Lexer.TokenData currentToken, RiscMeta.Instructions.TypeI op, string csrName, Lexer lexer) {
+            // Parse the immediate value (zimm)
+            var zimm = ParseImmediate(lexer);
+            
+            // Convert the hardcoded CSR name to its numeric value using the CSR enum
+            if(Enum.TryParse(csrName, true, out Kore.RiscMeta.ControlStateRegisters.CSR csr)) {
+                int csrValue = (int)csr;
+                
+                // For CSR immediate instructions, the CSR address goes in bits [31:20] and immediate in [19:15]
+                // We encode them in the immediate field: (csr << 20) | (zimm & 0x1F)
+                int encodedImmediate = (csrValue << 20) | (zimm & 0x1F);
+                
+                // Create the instruction: csrrwi x0, csr, zimm
+                return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(
+                    op,
+                    Register.x0,      // destination = x0
+                    Register.x0,      // source register (unused for immediate instructions)
+                    encodedImmediate  // CSR and immediate encoded together
+                ), lexer));
+            } else {
+                throw new SyntaxException($"Unknown CSR name: {csrName}");
             }
         }
 

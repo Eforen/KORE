@@ -111,7 +111,30 @@ namespace Kore.RiscMeta.ControlStateRegisters {
         }
     }
     public enum CSR {
+        // User Floating-Point CSRs (0x001-0x003)
+        fflags = 0x001,     // Floating-Point Accrued Exceptions
+        frm = 0x002,        // Floating-Point Dynamic Rounding Mode  
+        fcsr = 0x003,       // Floating-Point Control and Status Register
 
+        // User Counter/Timers (0xC00-0xC82)
+        cycle = 0xC00,      // Cycle counter for RDCYCLE instruction
+        time = 0xC01,       // Timer for RDTIME instruction
+        instret = 0xC02,    // Instructions-retired counter for RDINSTRET instruction
+        
+        // Upper 32 bits of counters (RV32 only) (0xC80-0xC82)
+        cycleh = 0xC80,     // Upper 32 bits of cycle, RV32 only
+        timeh = 0xC81,      // Upper 32 bits of time, RV32 only
+        instreth = 0xC82,   // Upper 32 bits of instret, RV32 only
+
+        // Machine Status CSRs (0x300-0x306)
+        ustatus = 0x000,    // User status register
+        uie = 0x004,        // User interrupt-enable register
+        utvec = 0x005,      // User trap handler base address
+        uscratch = 0x040,   // User scratch register
+        uepc = 0x041,       // User exception program counter
+        ucause = 0x042,     // User trap cause
+        utval = 0x043,      // User bad address or instruction
+        uip = 0x044,        // User interrupt pending
     }
     namespace User {
         // |       CSR Address       | Hex Range | Description |

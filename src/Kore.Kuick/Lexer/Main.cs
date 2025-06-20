@@ -116,7 +116,7 @@ namespace Kore.Kuick
             new Replacement("t3", "x28"), 
             new Replacement("t4", "x29"), 
             new Replacement("t5", "x30"), 
-            new Replacement("t6", "x31"), 
+            new Replacement("t6", "x31"),
             new Replacement("s01", "x9"), 
             new Replacement("a00", "x10"), 
             new Replacement("a01", "x11"), 
@@ -137,16 +137,115 @@ namespace Kore.Kuick
             new Replacement("t03", "x28"), 
             new Replacement("t04", "x29"), 
             new Replacement("t05", "x30"), 
-            new Replacement("t06", "x31") };
+            new Replacement("t06", "x31"),
+            // Floating-point registers
+            new Replacement("f0", "f0"), 
+            new Replacement("f1", "f1"), 
+            new Replacement("f2", "f2"), 
+            new Replacement("f3", "f3"), 
+            new Replacement("f4", "f4"), 
+            new Replacement("f5", "f5"), 
+            new Replacement("f6", "f6"), 
+            new Replacement("f7", "f7"), 
+            new Replacement("f8", "f8"), 
+            new Replacement("f9", "f9"), 
+            new Replacement("f10", "f10"), 
+            new Replacement("f11", "f11"), 
+            new Replacement("f12", "f12"), 
+            new Replacement("f13", "f13"), 
+            new Replacement("f14", "f14"), 
+            new Replacement("f15", "f15"), 
+            new Replacement("f16", "f16"), 
+            new Replacement("f17", "f17"), 
+            new Replacement("f18", "f18"), 
+            new Replacement("f19", "f19"), 
+            new Replacement("f20", "f20"), 
+            new Replacement("f21", "f21"), 
+            new Replacement("f22", "f22"), 
+            new Replacement("f23", "f23"), 
+            new Replacement("f24", "f24"), 
+            new Replacement("f25", "f25"), 
+            new Replacement("f26", "f26"), 
+            new Replacement("f27", "f27"), 
+            new Replacement("f28", "f28"), 
+            new Replacement("f29", "f29"), 
+            new Replacement("f30", "f30"), 
+            new Replacement("f31", "f31"),
+            // Floating-point register aliases
+            new Replacement("ft0", "f0"), 
+            new Replacement("ft1", "f1"), 
+            new Replacement("ft2", "f2"), 
+            new Replacement("ft3", "f3"), 
+            new Replacement("ft4", "f4"), 
+            new Replacement("ft5", "f5"), 
+            new Replacement("ft6", "f6"), 
+            new Replacement("ft7", "f7"), 
+            new Replacement("fs0", "f8"), 
+            new Replacement("fs1", "f9"), 
+            new Replacement("fa0", "f10"), 
+            new Replacement("fa1", "f11"), 
+            new Replacement("fa2", "f12"), 
+            new Replacement("fa3", "f13"), 
+            new Replacement("fa4", "f14"), 
+            new Replacement("fa5", "f15"), 
+            new Replacement("fa6", "f16"), 
+            new Replacement("fa7", "f17"), 
+            new Replacement("fs2", "f18"), 
+            new Replacement("fs3", "f19"), 
+            new Replacement("fs4", "f20"), 
+            new Replacement("fs5", "f21"), 
+            new Replacement("fs6", "f22"), 
+            new Replacement("fs7", "f23"), 
+            new Replacement("fs8", "f24"), 
+            new Replacement("fs9", "f25"), 
+            new Replacement("fs10", "f26"), 
+            new Replacement("fs11", "f27"), 
+            new Replacement("ft8", "f28"), 
+            new Replacement("ft9", "f29"), 
+            new Replacement("ft10", "f30"), 
+            new Replacement("ft11", "f31") };
         Dictionary<Token, string[]> OP_TYPES = new Dictionary<Token, string[]>()
         {
-            [Token.OP_R] = new string[] { "SLL", "SRL", "SRA", "SLLW", "SRLW", "SRAW", "ADD", "SUB", "ADDW", "SUBW", "XOR", "OR", "AND", "SLT", "SLTU", "MRET", "SRET", "WFI", "SFENCE.VMA", "MUL", "MULH", "MULHSU", "MULHU", "DIV", "DIVU", "REM", "REMU", "MULW", "DIVW", "REMW", "REMUW", "LR.W", "LR.D", "SC.W", "SC.D", "AMOSWAP.W", "AMOSWAP.D", "AMOADD.W", "AMOADD.D", "AMOXOR.W", "AMOAND.W", "AMOOR.W", "AMOXOR.D", "AMOAND.D", "AMOOR.D", "AMOMIN.W", "AMOMAX.W", "AMOMINU.W", "AMOMAXU.W", "AMOMIN.D", "AMOMAX.D", "AMOMINU.D", "AMOMAXU.D", "FMV.W.X", "FMV.X.W", "FMV.D.X", "FMV.X.D", "FCVT.S.W", "FCVT.D.W", "FCVT.S.WU", "FCVT.D.WU", "FCVT.W.S", "FCVT.W.D", "FCVT.WU.S", "FCVT.WU.D", "FCVT.S.L", "FCVT.D.L", "FCVT.S.LU", "FCVT.D.LU", "FCVT.L.S", "FCVT.L.D", "FCVT.LU.S", "FCVT.LU.D", "FADD.S", "FADD.D", "FSUB.S", "FSUB.D", "FMUL.S", "FMUL.D", "FDIV.S", "FDIV.D", "FSQRT.S", "FSQRT.D", "FMADD.S", "FMADD.D", "FMSUB.S", "FMSUB.D", "FNMADD.S", "FNMADD.D", "FNMSUB.S", "FNMSUB.D", "FSGNJ.S", "FSGNJ.D", "FSGNJN.S", "FSGNJN.D", "FSGNJX.S", "FSGNJX.D", "FMIN.S", "FMIN.D", "FMAX.S", "FMAX.D", "FEQ.S", "FEQ.D", "FLT.S", "FLT.D", "FLE.S", "FLE.D", "FCLASS.S", "FCLASS.D", "FRCSR", "FRRM", "FRFLAGS", "FSCSR", "FSRM", "FSFLAGS", "FSRMI", "FSFLAGSI", "SETVL", "VMULH", "VREM", "VSLL", "VSRL", "VSRA", "VLDS", "VLDX", "VSTS", "VSTX", "AMOSWAP", "AMOADD", "AMOXOR", "AMOAND", "AMOOR", "AMOMIN", "AMOMAX", "VPEQ", "VPNE", "VPLT", "VPGE", "VPAND", "VPANDN", "VPOR", "VPXOR", "VPNOT", "VPSWAP", "VMOV", "VCVT", "VADD", "VSUB", "VMUL", "VDIV", "VSQRET", "VFMADD", "VFMSUB", "VFNMADD", "VFNMSUB", "VSGNJ", "VSGNJN", "VSGNJX", "VMIN", "VMAX", "VXOR", "VOR", "VAND", "VCLASS", "VSETDCFG", "VEXTRACT", "VMERGE", "VSELECT" },
-            [Token.OP_I] = new string[] { "SLLI", "SRLI", "SRAI", "SLLIW", "SRLIW", "SRAIW", "ADDI", "ADDIW", "XORI", "ORI", "ANDI", "SLTI", "SLTIU", "JALR", "FENCE", "FENCE.I", "ECALL", "EBREAK", "CSRRW", "CSRRS", "CSRRC", "CSRRWI", "CSRRSI", "CSRRCI", "LB", "LH", "LBU", "LHU", "LW", "LWU", "LD", "FLW", "FLD", "VLD" },
+            [Token.OP_R] = new string[] { 
+                "SLL", "SRL", "SRA", "SLLW", "SRLW", "SRAW", "ADD", "SUB", 
+                "ADDW", "SUBW", "XOR", "OR", "AND", "SLT", "SLTU", "MRET", 
+                "SRET", "WFI", "SFENCE.VMA", "MUL", "MULH", "MULHSU", "MULHU", 
+                "DIV", "DIVU", "REM", "REMU", "MULW", "DIVW", "REMW", "REMUW", 
+                "LR.W", "LR.D", "SC.W", "SC.D", 
+                "AMOSWAP.W", "AMOSWAP.D", "AMOADD.W", "AMOADD.D", "AMOXOR.W", 
+                "AMOAND.W", "AMOOR.W", "AMOXOR.D", "AMOAND.D", "AMOOR.D", "AMOMIN.W", 
+                "AMOMAX.W", "AMOMINU.W", "AMOMAXU.W", "AMOMIN.D", "AMOMAX.D", "AMOMINU.D", 
+                "AMOMAXU.D", "FMV.W.X", "FMV.X.W", "FMV.D.X", "FMV.X.D", "FCVT.S.W", "FCVT.D.W", 
+                "FCVT.S.WU", "FCVT.D.WU", "FCVT.W.S", "FCVT.W.D", "FCVT.WU.S", "FCVT.WU.D", 
+                "FCVT.S.L", "FCVT.D.L", "FCVT.S.LU", "FCVT.D.LU", "FCVT.L.S", "FCVT.L.D", 
+                "FCVT.LU.S", "FCVT.LU.D", "FADD.S", "FADD.D", "FSUB.S", "FSUB.D", "FMUL.S", 
+                "FMUL.D", "FDIV.S", "FDIV.D", "FSQRT.S", "FSQRT.D", "FMADD.S", "FMADD.D", 
+                "FMSUB.S", "FMSUB.D", "FNMADD.S", "FNMADD.D", "FNMSUB.S", "FNMSUB.D", "FSGNJ.S", 
+                "FSGNJ.D", "FSGNJN.S", "FSGNJN.D", "FSGNJX.S", "FSGNJX.D", "FMIN.S", "FMIN.D", 
+                "FMAX.S", "FMAX.D", "FEQ.S", "FEQ.D", "FLT.S", "FLT.D", "FLE.S", "FLE.D", 
+                "FCLASS.S", "FCLASS.D", "SETVL", "VMULH", "VREM", "VSLL", "VSRL", "VSRA", "VLDS", 
+                "VLDX", "VSTS", "VSTX", "AMOSWAP", "AMOADD", "AMOXOR", "AMOAND", "AMOOR", "AMOMIN", 
+                "AMOMAX", "VPEQ", "VPNE", "VPLT", "VPGE", "VPAND", "VPANDN", "VPOR", "VPXOR", "VPNOT", 
+                "VPSWAP", "VMOV", "VCVT", "VADD", "VSUB", "VMUL", "VDIV", "VSQRET", "VFMADD", "VFMSUB", 
+                "VFNMADD", "VFNMSUB", "VSGNJ", "VSGNJN", "VSGNJX", "VMIN", "VMAX", "VXOR", "VOR", "VAND", 
+                "VCLASS", "VSETDCFG", "VEXTRACT", "VMERGE", "VSELECT"
+            },
+            [Token.OP_I] = new string[] { 
+                "SLLI", "SRLI", "SRAI", "SLLIW", "SRLIW", "SRAIW", "ADDI", "ADDIW", "XORI", "ORI", "ANDI", "SLTI", "SLTIU", "JALR", 
+                "FENCE", "FENCE.I", "ECALL", "EBREAK", "CSRRW", "CSRRS", "CSRRC", "CSRRWI", "CSRRSI", "CSRRCI", "LB", "LH", "LBU", 
+                "LHU", "LW", "LWU", "LD", "FLW", "FLD", "VLD"
+            },
             [Token.OP_U] = new string[] { "LUI", "AUIPC" },
             [Token.OP_B] = new string[] { "BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU" },
             [Token.OP_J] = new string[] { "JAL" },
             [Token.OP_S] = new string[] { "SB", "SH", "SW", "SD", "FSW", "FSD", "VST" },
-            [Token.OP_PSEUDO] = new string[] { "NOP", "NEG", "NEGW", "SNEZ", "SLTZ", "SGTZ", "BEQZ", "BNEZ", "BLEZ", "BGEZ", "BLTZ", "BGTZ", "J", "JR", "RET", "TAIL", "RDINSTRET[H]", "RDCYCLE[H]", "RDTIME[H]", "CSRR", "CSRW", "CSRS", "CSRC", "CSRWI", "CSRSI", "CSRCI", "FRCSR", "FSCSR", "FRRM", "FSRM", "FRFLAGS", "FSFLAGS", "LLA", "LA", "LB", "LH", "LW", "LD", "SB", "SH", "SW", "SD", "FLW", "FLD", "FSW", "FSD", "LI", "MV", "NOT", "SEXT.W", "SEQZ", "FMV.S", "FABS.S", "FNEG.S", "FMV.D", "FABS.D", "FNEG.D", "BGT", "BLE", "BGTU", "BLEU", "JAL", "JALR", "CALL", "FENCE", "FSCSR", "FSRM", "FSFLAGS" },
+            [Token.OP_PSEUDO] = new string[] { 
+                "NOP", "NEG", "NEGW", "SNEZ", "SLTZ", "SGTZ", "BEQZ", "BNEZ", "BLEZ", "BGEZ", "BLTZ", "BGTZ", "J", "JR", "RET", "TAIL", 
+                "RDINSTRET", "RDINSTRETH", "RDCYCLE", "RDCYCLEH", "RDTIME", "RDTIMEH", "CSRR", "CSRW", "CSRS", "CSRC", "CSRWI", "CSRSI", 
+                "CSRCI", "FRCSR", "FSCSR", "FRRM", "FSRM", "FRFLAGS", "FSFLAGS", "FSRMI", "FSFLAGSI", "LLA", "LA", "LB", "LH", "LW", "LD", "SB", "SH", "SW", "SD", 
+                "FLW", "FLD", "FSW", "FSD", "LI", "MV", "NOT", "SEXT.W", "SEQZ", "FMV.S", "FABS.S", "FNEG.S", "FMV.D", "FABS.D", "FNEG.D", 
+                "BGT", "BLE", "BGTU", "BLEU", "JAL", "JALR", "CALL", "FENCE"
+            },
             [Token.OP_CR] = new string[] { "C.ADD", "C.SUB", "C.AND", "C.OR", "C.XOR", "C.MV", "C.JR", "C.JALR", "C.ADDW", "C.SUBW" },
             [Token.OP_CI] = new string[] { "C.LWSP", "C.FLWSP", "C.FLDSP", "C.ADDI", "C.ADDI16SP", "C.ANDI", "C.LI", "C.LUI", "C.SLLI", "C.SRAI", "C.SRLI", "C.EBRAKE", "C.ADDIW", "C.LDSP" },
             [Token.OP_CSS] = new string[] { "C.SWSP", "C.FSWSP", "C.FSDSP", "C.SDSP" },
@@ -155,6 +254,28 @@ namespace Kore.Kuick
             [Token.OP_CS] = new string[] { "C.SW", "C.FSW", "C.FSD", "C.SD" },
             [Token.OP_CB] = new string[] { "C.BEQZ", "C.BNEZ" },
             [Token.OP_CJ] = new string[] { "C.J", "C.JAL" }
+        };
+
+        /// <summary>
+        /// CSR (Control and Status Register) names that should be recognized as CSR tokens
+        /// </summary>
+        string[] CSR_NAMES = new string[] {
+            "ustatus", "uie", "utvec", "uscratch", "uepc", "ucause", "utval", "uip",
+            "fflags", "frm", "fcsr",
+            "cycle", "time", "instret", "hpmcounter3", "hpmcounter4", "hpmcounter31",
+            "cycleh", "timeh", "instreth", "hpmcounter3h", "hpmcounter4h", "hpmcounter31h",
+            "sstatus", "sedeleg", "sideleg", "sie", "stvec", "scounteren", "sscratch",
+            "sepc", "scause", "stval", "sip", "satp", "scontext",
+            "hstatus", "hedeleg", "hideleg", "hie", "hcounteren", "htegie", "htval",
+            "hip", "hvip", "htinst", "hgeip", "hgatp", "hcontext", "htimedelta", "htimedeltah",
+            "vsstatus", "vsie", "vstvec", "vsscratch", "vsepc", "vscause", "vstval", "vsip", "bsatp",
+            "mvendorid", "marchid", "mimpid", "mhartid", "mstatus", "misa", "medeleg", "mideleg",
+            "mie", "mtvec", "mcounteren", "mstatush", "mscratch", "mepc", "hcause", "htval2",
+            "pmpcfg0", "pmpcfg1", "pmpcfg2", "pmpcfg3", "pmpcfg14", "pmpcfg15",
+            "pmpaddr0", "pmpaddr1", "pmpaddr63",
+            "mcountinhibit", "mhpmevent3", "mhpmevent4", "mhpmevent31",
+            "tselect", "tdata1", "tdata2", "tdata3", "mcontext",
+            "dcsr", "dpc", "dscratch0", "dscratch1"
         };
 
         /// <summary>
@@ -337,6 +458,9 @@ namespace Kore.Kuick
                             return new TokenData(Token.REGISTER, replacement.target, y, x);
                         }
                     }
+
+                    // Check if this identifier is a CSR name
+                    if (Array.IndexOf(CSR_NAMES, valueLow) >= 0) return new TokenData(Token.CSR, valueLow, y, x);
 
                     //TODO: check if in op arrays (One for each type) and thus actually an OP and return Correct OP type instead
                     // foreach(var tokenSet in OP_TYPES){
