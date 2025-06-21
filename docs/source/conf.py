@@ -40,6 +40,7 @@ extensions = [
     'sphinx_tabs.tabs',
     'sphinx_rtd_theme',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.glossary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

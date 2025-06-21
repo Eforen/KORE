@@ -122,6 +122,7 @@
 
 # Working On
 ## Working on (Eforen)
+* [KUICK][AST] Maintain Program Node Maintains a Symbols Tables (Multi Scope (Local, Global))
 * [KIUCK][PARSER] Implement Pseudo Instructions
 * [KANBAN][KIUCK][PARSER] Add Tasks for remaining Pseudo Instruction implementations
 * Confirm that all the tests for the previous Pseudo Instruction implementations exist (Rushed atm)
@@ -132,7 +133,8 @@
 
 # Todos
 ## Todo
-* [KUICK][AST] Maintain Program Node Maintains a Symbols Tables (Multi Scope (Local, Global))
+* [KUICK][PARSER] Pseudo Instruction `j label` is effectively `jal x0, label`
+* [KUICK][PARSER] Pseudo Instruction `jr rs` is effectively `jalr x0, rs, 0`
 * [KUICK] Impliment Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL)
 * [KUICK] Impliment Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL)
 

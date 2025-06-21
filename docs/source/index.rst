@@ -79,3 +79,15 @@ Indices and tables
 
     architecture/design
     architecture/structure
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Reference
+
+    glossary
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Development
+
+    contributing
