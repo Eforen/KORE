@@ -106,23 +106,23 @@
 * [Builds] Make build buildable on linux
 
 ## Done 2025/06/19
-### Next Commit (Eforen)
 * [IO][External] ELF64 Testing Suite
 * [IO][External] ELF64 Parser (Program Headers)
 * [IO][External] ELF64 Parser (Sections)
 * [IO][External] ELF64 Writer (Headers)
 * [IO][External] ELF64 Writer (Program Headers)
 * [IO][External] ELF64 Writer (Sections)
-
-# Working On
-## Working on (Eforen)
-* [KIUCK][PARSER] Implement Pseudo Instructions
+### Next Commit (Eforen)
 * [KIUCK][PARSER][TEST] Pseudo Instruction `beqz`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bnez`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `blez`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bgez`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bltz`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bgtz`
+
+# Working On
+## Working on (Eforen)
+* [KIUCK][PARSER] Implement Pseudo Instructions
 * [KANBAN][KIUCK][PARSER] Add Tasks for remaining Pseudo Instruction implementations
 * Confirm that all the tests for the previous Pseudo Instruction implementations exist (Rushed atm)
 
@@ -132,6 +132,56 @@
 
 # Todos
 ## Todo
+* [KUICK][AST] Maintain Program Node Maintains a Symbols Tables (Multi Scope (Local, Global))
+* [KUICK] Impliment Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL)
+* [KUICK] Impliment Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL)
+
+* [KUICK] Impliment Directive `.section` `([{.text,.data,.rodata,.bss}])` should emit section (if not present, default .text) and make current
+* [KUICK] Impliment Directive `.text` `(emit .text section (if not present) and make current)` should 
+* [KUICK] Impliment Directive `.data` `(emit .data section (if not present) and make current)` should 
+* [KUICK] Impliment Directive `.rodata` `(emit .rodata section (if not present) and make current)` should 
+* [KUICK] Impliment Directive `.bss` `(emit .bss section (if not present) and make current)` should 
+* [KUICK] Impliment Directive ` .insn <value>` emit a raw instruction with the given value
+* [KUICK] Impliment Directive `.insn <insn_length>, <value>` the same, but also verify that the instruction length has the given value in bytes
+* [KUICK] Impliment Directive `.insn <type> <fields>` see: https://github.com/riscv-non-isa/riscv-asm-manual/blob/main/src/asm-manual.adoc#.insn and https://sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html
+
+* [KUICK][PARSER] Impliment Text Labels `loop: name` used like `j loop` https://github.com/riscv-non-isa/riscv-asm-manual/blob/main/src/asm-manual.adoc#labels
+* [KUICK][PARSER] Impliment Numeric Labels `1:` used like `j 1b` or `j 1f` based on if forward or backward refs
+
+* [KUICK] Impliment Directive `.align` `(integer)` should align to power of 2 (alias for .p2align which is preferred - see .align
+* [KUICK] Impliment Directive `.p2align` `(p2,[pad_val=0],max)` should align to power of 2
+* [KUICK] Impliment Directive `.balign` `(b,[pad_val=0])` should byte align
+* [KUICK] Impliment Directive `.file` `("filename")` should emit filename FILE LOCAL symbol table
+* [KUICK] Impliment Directive `.comm` `(symbol_name,size,align)` should emit common object to .bss section
+* [KUICK] Impliment Directive `.common` `(symbol_name,size,align)` should emit common object to .bss section
+* [KUICK] Impliment Directive `.ident` `("string")` should accepted for source compatibility
+* [KUICK] Impliment Directive `.size` `(symbol, symbol)` should accepted for source compatibility
+* [KUICK] Impliment Directive `.string` `("string")` should emit string
+* [KUICK] Impliment Directive `.asciz` `("string")` should emit string (alias for .string)
+* [KUICK] Impliment Directive `.equ` `(name, value)` should constant definition
+* [KUICK] Impliment Directive `.type` `(symbol, @function)` should accepted for source compatibility
+* [KUICK] Impliment Directive `.option` `({arch,rvc,norvc,pic,nopic,relax,norelax,push,pop})` should RISC-V options. Refer to .option for a more detailed description.
+* [KUICK] Impliment Directive `.byte` `(expression [, expression]*)` should 8-bit comma separated words
+* [KUICK] Impliment Directive `.2byte` `(expression [, expression]*)` should 16-bit comma separated words
+* [KUICK] Impliment Directive `.half` `(expression [, expression]*)` should 16-bit comma separated words
+* [KUICK] Impliment Directive `.short` `(expression [, expression]*)` should 16-bit comma separated words
+* [KUICK] Impliment Directive `.4byte` `(expression [, expression]*)` should 32-bit comma separated words
+* [KUICK] Impliment Directive `.word` `(expression [, expression]*)` should 32-bit comma separated words
+* [KUICK] Impliment Directive `.long` `(expression [, expression]*)` should 32-bit comma separated words
+* [KUICK] Impliment Directive `.8byte` `(expression [, expression]*)` should 64-bit comma separated words
+* [KUICK] Impliment Directive `.dword` `(expression [, expression]*)` should 64-bit comma separated words
+* [KUICK] Impliment Directive `.quad` `(expression [, expression]*)` should 64-bit comma separated words
+* [KUICK] Impliment Directive `.float` `(expression [, expression]*)` should 32-bit floating point values, see Floating-point literals for the value format.
+* [KUICK] Impliment Directive `.double` `(expression [, expression]*)` should 64-bit floating point values, see Floating-point literals for the value format.
+* [KUICK] Impliment Directive `.quad` `(expression [, expression]*)` should 128-bit floating point values, see Floating-point literals for the value format.
+* [KUICK] Impliment Directive `.dtprelword` `(expression [, expression]*)` should 32-bit thread local word
+* [KUICK] Impliment Directive `.dtpreldword` `(expression [, expression]*)` should 64-bit thread local word
+* [KUICK] Impliment Directive `.sleb128` `(expression)` should signed little endian base 128, DWARF
+* [KUICK] Impliment Directive `.uleb128` `(expression)` should unsigned little endian base 128, DWARF
+* [KUICK] Impliment Directive `.zero` `(integer)` should zero bytes
+* [KUICK] Impliment Directive `.variant_cc` `(symbol_name)` should annotate the symbol with variant calling convention
+* [KUICK] Impliment Directive `.attribute` `(name, value)` should RISC-V object attributes, more detailed description see .attribute.
+* [KUICK] Impliment Directive `.insn` `(see description)` should emit a custom instruction encoding, see .insn
 * [KUICK][PARSER] Implement `%hi(msg)`
 * [KUICK][PARSER] Implement `%lo(msg)`
 * [KUICK][PARSER] Implement `msg: .string "Hello World\n"`
@@ -143,6 +193,8 @@
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `ADDIW`
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `LD`
 * [KUICK][PARSER] Write Test for RV64I/E Instruction Set Instruction `SD`
+* [KUICK] Impliment Directive `.macro` `(name arg1 [, argn])` should begin macro definition \argname to substitute
+* [KUICK] Impliment Directive `.endm` `(end macro definition)` should 
 * [Cite] Email SHAKTI Development Team requesting to include their PDF in this repository (RISC-V ASSEMBLY LANGUAGE Programmer Manual - Part 1)[https://shakti.org.in/docs/risc-v-asm-manual.pdf]
 
 ## Planned for some time later

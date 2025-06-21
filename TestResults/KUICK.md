@@ -923,6 +923,6 @@
 | ✅ | N/A | `tokenPositions(".option push\n.option nopic",[DIRECTIVE, WHITESPACE, IDENTIFIER, EOL, DIRECTIVE, ...],[0, 0, 0, 0, 1, ...],[0, 7, 8, 12, 0, ...],[".option", " ", "push", "\n", ".option", ...])` |
 
 ---
-*Generated on Fri Jun 20 01:09:41 AM CDT 2025*
+*Generated on Fri Jun 20 01:17:38 AM CDT 2025*
 
 📁 **Full results**: [Kuick.xml](./Kuick.xml)

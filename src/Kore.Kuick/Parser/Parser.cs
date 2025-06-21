@@ -668,8 +668,8 @@ namespace Kore.Kuick {
                         op, 
                         firstRegister == true ? rs1 : Register.x0, 
                         firstRegister == false ? rs1 : Register.x0, 
-                        ParseImmediate(lexer
-                    )), lexer);
+                        ParseImmediate(lexer)
+                    ), lexer);
                 case Lexer.Token.IDENTIFIER:
                     return expectReturnEOL(new InstructionNodeTypeBLabel(
                         op, 

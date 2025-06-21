@@ -56,6 +56,7 @@ Indices and tables
     assembly/spec
     assembly/structure
     assembly/catalog
+    assembly/references
 
 .. toctree::
     :maxdepth: 2
