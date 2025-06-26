@@ -33,15 +33,36 @@ author = 'KORE Developers'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'KerboscriptLexer',
-    'KASMLexer',
-    'KVMLexer',
-    'KPPLexer',
     'sphinx_tabs.tabs',
     'sphinx_rtd_theme',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.glossary',
+    # Note: sphinx.ext.glossary doesn't exist - glossary support is built-in
 ]
+
+# Try to load custom lexers if available
+try:
+    import KerboscriptLexer
+    extensions.append('KerboscriptLexer')
+except ImportError:
+    pass
+
+try:
+    import KASMLexer
+    extensions.append('KASMLexer')
+except ImportError:
+    pass
+
+try:
+    import KVMLexer
+    extensions.append('KVMLexer')
+except ImportError:
+    pass
+
+try:
+    import KPPLexer
+    extensions.append('KPPLexer')
+except ImportError:
+    pass
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

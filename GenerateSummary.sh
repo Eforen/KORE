@@ -5,12 +5,16 @@
 # Input: TestResults/Kuick.trx or TestResults/Kuick.trx.backup
 # Output: TestResults/KUICK.md
 
+# if a name is provided, use it to paths
+FILE_NAME=$1
+FILE_NAME_UPPER=$(echo "$FILE_NAME" | tr '[:lower:]' '[:upper:]')
+
 set -e
 
-TRX_FILE="TestResults/Kuick.trx"
-BACKUP_TRX_FILE="TestResults/Kuick.trx.backup"
-XML_FILE="TestResults/Kuick.xml"
-OUTPUT_FILE="TestResults/KUICK.md"
+TRX_FILE="TestResults/$FILE_NAME.trx"
+BACKUP_TRX_FILE="TestResults/$FILE_NAME.trx.backup"
+XML_FILE="TestResults/$FILE_NAME.xml"
+OUTPUT_FILE="TestResults/$FILE_NAME_UPPER.md"
 
 # Check for TRX file, fall back to backup, then XML if neither TRX exists
 if [ -f "$TRX_FILE" ]; then
@@ -21,7 +25,7 @@ elif [ -f "$XML_FILE" ]; then
     SOURCE_FILE="$XML_FILE"
 else
     echo "Error: No test results file found at $TRX_FILE, $BACKUP_TRX_FILE, or $XML_FILE"
-    echo "Please run ./GenerateKuick-trx.sh first"
+    echo "Please run ./Generate$FILE_NAME_UPPER-trx.sh first"
     exit 1
 fi
 
@@ -32,7 +36,7 @@ mkdir -p TestResults
 
 # Parse TRX file and generate markdown
 cat > "$OUTPUT_FILE" << 'EOF'
-# Kuick Test Results Summary
+# Test Results Summary
 
 ## Overall Statistics
 
@@ -135,6 +139,6 @@ echo "" >> "$OUTPUT_FILE"
 echo "---" >> "$OUTPUT_FILE"
 echo "*Generated on $(date)*" >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
-echo "📁 **Full results**: [Kuick.xml](./Kuick.xml)" >> "$OUTPUT_FILE"
+echo "📁 **Full results**: [$FILE_NAME.xml]($FILE_NAME.xml)" >> "$OUTPUT_FILE"
 
 echo "✅ Markdown summary generated at $OUTPUT_FILE" 

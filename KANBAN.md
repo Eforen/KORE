@@ -11,6 +11,8 @@
   - [Done 2024/05/04](#done-20240504)
   - [Done 2025/06/16](#done-20250616)
   - [Done 2025/06/19](#done-20250619)
+  - [Done 2025/06/20](#done-20250620)
+  - [Done 2025/06/21](#done-20250621)
     - [Next Commit (Eforen)](#next-commit-eforen-1)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -112,7 +114,8 @@
 * [IO][External] ELF64 Writer (Headers)
 * [IO][External] ELF64 Writer (Program Headers)
 * [IO][External] ELF64 Writer (Sections)
-### Next Commit (Eforen)
+
+## Done 2025/06/20
 * [KIUCK][PARSER][TEST] Pseudo Instruction `beqz`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bnez`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `blez`
@@ -120,9 +123,18 @@
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bltz`
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bgtz`
 
+## Done 2025/06/21
+### Next Commit (Eforen)
+* [KUICK][AST] Maintain Program Node Maintains a Symbols Tables (Multi Scope (Local, Global))
+* [KUICK][AST] Symbol Table with Address Assignment in CodeGenerator
+* [KUICK][AST] Symbol-based AST Nodes (SymbolReferenceNode, InstructionNodeTypeBSymbol, etc.)
+* [KUICK][AST] Symbol Directive Nodes (.global, .local)
+* [KUICK][AST] Comprehensive Symbol Table Test Suite (16 tests passing)
+* [KUICK][CODEGEN] Symbol Address Assignment and Resolution
+* [KUICK][CODEGEN] Multi-pass Assembly with Symbol Cache Miss Handling
+
 # Working On
 ## Working on (Eforen)
-* [KUICK][AST] Maintain Program Node Maintains a Symbols Tables (Multi Scope (Local, Global))
 * [KIUCK][PARSER] Implement Pseudo Instructions
 * [KANBAN][KIUCK][PARSER] Add Tasks for remaining Pseudo Instruction implementations
 * Confirm that all the tests for the previous Pseudo Instruction implementations exist (Rushed atm)
@@ -133,10 +145,14 @@
 
 # Todos
 ## Todo
-* [KUICK][PARSER] Pseudo Instruction `j label` is effectively `jal x0, label`
-* [KUICK][PARSER] Pseudo Instruction `jr rs` is effectively `jalr x0, rs, 0`
-* [KUICK] Impliment Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL)
-* [KUICK] Impliment Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL)
+* [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
+* [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED
+
+* [KUICK][PARSER] Pseudo Instruction `j label` is effectively `jal x0, label` [Symbol Table Foundation Complete]
+* [KUICK][PARSER] Pseudo Instruction `jr rs` is effectively `jalr x0, rs, 0` [Symbol Table Foundation Complete]
+
+* [KUICK][PARSER] Implement Text Labels `loop: name` used like `j loop` https://github.com/riscv-non-isa/riscv-asm-manual/blob/main/src/asm-manual.adoc#labels [Symbol Table Foundation Complete]
+* [KUICK][PARSER] Implement Numeric Labels `1:` used like `j 1b` or `j 1f` based on if forward or backward refs [Symbol Table Foundation Complete]
 
 * [KUICK] Impliment Directive `.section` `([{.text,.data,.rodata,.bss}])` should emit section (if not present, default .text) and make current
 * [KUICK] Impliment Directive `.text` `(emit .text section (if not present) and make current)` should 
@@ -146,9 +162,6 @@
 * [KUICK] Impliment Directive ` .insn <value>` emit a raw instruction with the given value
 * [KUICK] Impliment Directive `.insn <insn_length>, <value>` the same, but also verify that the instruction length has the given value in bytes
 * [KUICK] Impliment Directive `.insn <type> <fields>` see: https://github.com/riscv-non-isa/riscv-asm-manual/blob/main/src/asm-manual.adoc#.insn and https://sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html
-
-* [KUICK][PARSER] Impliment Text Labels `loop: name` used like `j loop` https://github.com/riscv-non-isa/riscv-asm-manual/blob/main/src/asm-manual.adoc#labels
-* [KUICK][PARSER] Impliment Numeric Labels `1:` used like `j 1b` or `j 1f` based on if forward or backward refs
 
 * [KUICK] Impliment Directive `.align` `(integer)` should align to power of 2 (alias for .p2align which is preferred - see .align
 * [KUICK] Impliment Directive `.p2align` `(p2,[pad_val=0],max)` should align to power of 2

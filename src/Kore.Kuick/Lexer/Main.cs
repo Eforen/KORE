@@ -33,7 +33,7 @@ namespace Kore.Kuick
             new TokenFinder(@"^""[^""]*""", Token.STRING), // " String //TODO: Make this allow escapes
             new TokenFinder(@"^'[^']*'", Token.STRING), // ' String //TODO: Make this allow escapes
             new TokenFinder(@"^\.[a-zA-Z]*", Token.DIRECTIVE), // Directive
-            new TokenFinder(@"^[a-zA-Z]*:", Token.LABEL), // Label
+            new TokenFinder(@"^[a-zA-Z_][a-zA-Z0-9_]*:", Token.LABEL), // Label - updated to include underscores and digits
             new TokenFinder(@"^[\w\[\]\._]+", Token.IDENTIFIER), // Identifier
             new TokenFinder(@"^\(", Token.PARREN_OPEN), // Open Parren (
             new TokenFinder(@"^\)", Token.PARREN_CLOSE), // Close Parren )

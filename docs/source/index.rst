@@ -79,6 +79,7 @@ Indices and tables
 
     architecture/design
     architecture/structure
+    architecture/symbol_table
 
 .. toctree::
     :maxdepth: 1
@@ -89,5 +90,7 @@ Indices and tables
 .. toctree::
     :maxdepth: 2
     :caption: Development
+    :numbered:
 
-    contributing
+    development/contributing
+    development/index

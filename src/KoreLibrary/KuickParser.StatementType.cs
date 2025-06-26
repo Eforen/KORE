@@ -16,6 +16,7 @@ namespace Kore
             DIRECTIVE_ALIGN,
             DIRECTIVE_BALIGN,
             DIRECTIVE_GLOBAL,
+            DIRECTIVE_LOCAL,
             DIRECTIVE_STRING,
             DIRECTIVE_BYTE,
             DIRECTIVE_HALF,

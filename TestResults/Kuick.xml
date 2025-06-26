@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" name="@">
-  <Times creation="2025-06-20T01:17:16.8814099-05:00" queuing="2025-06-20T01:17:16.8814100-05:00" start="2025-06-20T01:17:15.0068296-05:00" finish="2025-06-20T01:17:24.1197715-05:00"/>
+  <Times creation="2025-06-26T08:41:08.9959785-05:00" queuing="2025-06-26T08:41:08.9959786-05:00" start="2025-06-26T08:41:07.1576335-05:00" finish="2025-06-26T08:41:16.0841707-05:00"/>
   <TestSettings name="default">
     <Deployment runDeploymentRoot="testrun"/>
   </TestSettings>
   <Results>
+    <UnitTestResult testName="DebugDataTokenization" outcome="Passed"/>
     <UnitTestResult testName="InlineDirectives(&quot;hi&quot;,HI,&quot;lo&quot;,LO,&quot;myVar&quot;)" outcome="Passed"/>
     <UnitTestResult testName="InlineDirectives(&quot;pcrel_hi&quot;,PCREL_HI,&quot;pcrel_lo&quot;,PCREL_LO,&quot;myVar&quot;)" outcome="Passed"/>
     <UnitTestResult testName="MachineCode(&quot;.text\n    li      a5,0      # should result in 0x00000793u\n    lui     a0,10     # should result in 0x00010537u\n    ret               # should result in 0x00008067u\n    auipc   gp,0x2    # should result in 0x00002197u\n    sub     a2,a2,a0  # should result in 0x40a60633u\n    li      a1,0      # should result in 0x00000593u\n    auipc   a0,0      # should result in 0x00000517u\n    lw      a0,0(sp)  # should result in 0x00012503u\n    addi    a1,sp,8   # should result in 0x00810593u\n    li      a2,0      # should result in 0x00000613u\n    addi    sp,sp,-16 # should result in 0xff010113u\n    sd      s0,0(sp)  # should result in 0x00813023u\n&quot;,[1939, 66871, 32871, 8599, 1084622387, ...])" outcome="Failed">
@@ -12,10 +13,10 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 4. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 759
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 763
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 916
    at Kore.Kuick.Tests.Assembler.CodeGeneratorTests.MachineCode(String asm, UInt32[] data) in src/Kore.Kuick.Tests/Assembler/CodeGeneratorTests.cs:line 40
    at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
    at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)</StackTrace>
@@ -43,7 +44,7 @@
     <UnitTestResult testName="PseudoInstructions(&quot;csrc cycle, x3&quot;,&quot;csrrc x0, cycle, x3&quot;,&quot;Clear cycle count CSR&quot;)" outcome="Failed">
       <Output>
         <ErrorInfo>
-          <Message>  String lengths are both 117. Strings differ at index 72.
+          <Message>  String lengths are both 129. Strings differ at index 84.
   Expected: "...      TypeI csrrs RD:zero RS:x3 IMM:3072\n          }\n      }\n"
   But was:  "...      TypeI csrrc RD:zero RS:x3 IMM:3072\n          }\n      }\n"
   ------------------------------^
@@ -57,7 +58,7 @@
     <UnitTestResult testName="PseudoInstructions(&quot;csrc instret, x2&quot;,&quot;csrrc x0, instret, x2&quot;,&quot;Clear instruction count CSR&quot;)" outcome="Failed">
       <Output>
         <ErrorInfo>
-          <Message>  String lengths are both 117. Strings differ at index 72.
+          <Message>  String lengths are both 129. Strings differ at index 84.
   Expected: "...      TypeI csrrs RD:zero RS:x2 IMM:3074\n          }\n      }\n"
   But was:  "...      TypeI csrrc RD:zero RS:x2 IMM:3074\n          }\n      }\n"
   ------------------------------^
@@ -71,7 +72,7 @@
     <UnitTestResult testName="PseudoInstructions(&quot;csrc time, x4&quot;,&quot;csrrc x0, time, x4&quot;,&quot;Clear time CSR&quot;)" outcome="Failed">
       <Output>
         <ErrorInfo>
-          <Message>  String lengths are both 117. Strings differ at index 72.
+          <Message>  String lengths are both 129. Strings differ at index 84.
   Expected: "...      TypeI csrrs RD:zero RS:tp IMM:3073\n          }\n      }\n"
   But was:  "...      TypeI csrrc RD:zero RS:tp IMM:3073\n          }\n      }\n"
   ------------------------------^
@@ -106,7 +107,7 @@
     <UnitTestResult testName="PseudoInstructions(&quot;csrw cycle, x3&quot;,&quot;csrrw x0, cycle, x3&quot;,&quot;Write cycle count CSR&quot;)" outcome="Failed">
       <Output>
         <ErrorInfo>
-          <Message>  String lengths are both 117. Strings differ at index 72.
+          <Message>  String lengths are both 129. Strings differ at index 84.
   Expected: "...      TypeI csrrs RD:zero RS:x3 IMM:3072\n          }\n      }\n"
   But was:  "...      TypeI csrrw RD:zero RS:x3 IMM:3072\n          }\n      }\n"
   ------------------------------^
@@ -120,7 +121,7 @@
     <UnitTestResult testName="PseudoInstructions(&quot;csrw instret, x2&quot;,&quot;csrrw x0, instret, x2&quot;,&quot;Write instruction count CSR&quot;)" outcome="Failed">
       <Output>
         <ErrorInfo>
-          <Message>  String lengths are both 117. Strings differ at index 72.
+          <Message>  String lengths are both 129. Strings differ at index 84.
   Expected: "...      TypeI csrrs RD:zero RS:x2 IMM:3074\n          }\n      }\n"
   But was:  "...      TypeI csrrw RD:zero RS:x2 IMM:3074\n          }\n      }\n"
   ------------------------------^
@@ -134,7 +135,7 @@
     <UnitTestResult testName="PseudoInstructions(&quot;csrw time, x4&quot;,&quot;csrrw x0, time, x4&quot;,&quot;Write time CSR&quot;)" outcome="Failed">
       <Output>
         <ErrorInfo>
-          <Message>  String lengths are both 117. Strings differ at index 72.
+          <Message>  String lengths are both 129. Strings differ at index 84.
   Expected: "...      TypeI csrrs RD:zero RS:tp IMM:3073\n          }\n      }\n"
   But was:  "...      TypeI csrrw RD:zero RS:tp IMM:3073\n          }\n      }\n"
   ------------------------------^
@@ -154,9 +155,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 175
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 173
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -168,9 +169,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 175
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 173
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -182,9 +183,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 175
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 173
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -196,9 +197,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 175
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 173
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -210,9 +211,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 175
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 173
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -224,9 +225,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 175
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 173
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -243,9 +244,9 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 86
-   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 235
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 233
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -258,9 +259,9 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 86
-   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 235
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 233
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -273,9 +274,9 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 86
-   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 235
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 233
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -290,9 +291,9 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 86
-   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 235
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 233
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -305,9 +306,9 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 86
-   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 235
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 233
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -320,9 +321,9 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token REGISTER at line 1, column 4. Expected Register.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnexpected(TokenData currentToken, String expectation) in src/Kore.Kuick/Parser/Parser.cs:line 16
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 86
-   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 235
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseSInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 233
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -332,7 +333,7 @@
     <UnitTestResult testName="PseudoInstructions(&quot;j 0x16&quot;,&quot;jal x0, 0x8&quot;,&quot;Jump 16 bytes&quot;)" outcome="Failed">
       <Output>
         <ErrorInfo>
-          <Message>  Expected string length 106 but was 105. Strings differ at index 84.
+          <Message>  Expected string length 118 but was 117. Strings differ at index 96.
   Expected: "...]{\n              TypeJ jal RD:zero IMM:22          }\n      }\n"
   But was:  "...]{\n              TypeJ jal RD:zero IMM:8          }\n      }\n"
   ------------------------------------------------------^
@@ -350,11 +351,11 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token NUMBER_INT(0) at line 1, column 9. Expected REGISTER.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ExpectToken(Lexer lexer, Token expectation, Boolean ignoreWhitespace) in src/Kore.Kuick/Parser/Parser.cs:line 36
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 84
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 221
-   at Kore.Kuick.Parser.ParseInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 351
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 759
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 219
+   at Kore.Kuick.Parser.ParseInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 349
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 763
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 916
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -367,11 +368,11 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token NUMBER_INT(0) at line 1, column 9. Expected REGISTER.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ExpectToken(Lexer lexer, Token expectation, Boolean ignoreWhitespace) in src/Kore.Kuick/Parser/Parser.cs:line 36
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 84
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 221
-   at Kore.Kuick.Parser.ParseInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 351
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 759
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 219
+   at Kore.Kuick.Parser.ParseInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 349
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 763
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 916
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -383,9 +384,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -397,9 +398,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -411,9 +412,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -434,9 +435,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -448,9 +449,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -462,9 +463,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -476,9 +477,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -490,9 +491,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -504,9 +505,9 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 915
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -544,11 +545,11 @@
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token NUMBER_INT(0) at line 1, column 9. Expected REGISTER.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ExpectToken(Lexer lexer, Token expectation, Boolean ignoreWhitespace) in src/Kore.Kuick/Parser/Parser.cs:line 36
    at Kore.Kuick.Parser.ParseRegister(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 84
-   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 221
-   at Kore.Kuick.Parser.ParseInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 351
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 722
-   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 759
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParseIInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 219
+   at Kore.Kuick.Parser.ParseInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 349
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 726
+   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 763
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 916
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -581,10 +582,10 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 759
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 763
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 916
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -596,10 +597,10 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 759
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 763
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 916
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
@@ -611,16 +612,22 @@
         <ErrorInfo>
           <Message>Kore.Kuick.Parser+SyntaxException : Unexpected token OP_PSEUDO at line 1, column 0. Operation Not implimented.</Message>
           <StackTrace>   at Kore.Kuick.Parser.ThrowUnimplemented(TokenData currentToken) in src/Kore.Kuick/Parser/Parser.cs:line 19
-   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 481
-   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 725
-   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 759
-   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 896
+   at Kore.Kuick.Parser.ParsePseudoInstruction(TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 479
+   at Kore.Kuick.Parser.ParseNodeSection(SectionNode section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 729
+   at Kore.Kuick.Parser.CreateSectionNode(String section, TokenData currentToken, Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 763
+   at Kore.Kuick.Parser.Parse(Lexer lexer) in src/Kore.Kuick/Parser/Parser.cs:line 916
    at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
    at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
    at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
+    <UnitTestResult testName="TestBranchWithLabels" outcome="Passed"/>
+    <UnitTestResult testName="TestForwardReferenceNoDefinition" outcome="Passed"/>
+    <UnitTestResult testName="TestForwardReferenceThenDefinition" outcome="Passed"/>
+    <UnitTestResult testName="TestLabelParsing" outcome="Passed"/>
+    <UnitTestResult testName="TestMixedDirectivesAndLabels" outcome="Passed"/>
+    <UnitTestResult testName="TestMultipleSections" outcome="Passed"/>
     <UnitTestResult testName="TestParseAddAndSubInstructions" outcome="Passed"/>
     <UnitTestResult testName="TestParseAddInstruction" outcome="Passed"/>
     <UnitTestResult testName="TestParseAddiInstruction(addi,&quot;.text\naddi x1, x0, 0&quot;,x1,zero,0)" outcome="Passed"/>
@@ -692,6 +699,12 @@
     <UnitTestResult testName="TestParseUTypeInstruction(auipc,&quot;.text\nauipc x1, 0x52345&quot;,x1,336709)" outcome="Passed"/>
     <UnitTestResult testName="TestParseUTypeInstruction(lui,&quot;.text\nlui x1, 0&quot;,x1,0)" outcome="Passed"/>
     <UnitTestResult testName="TestParseUTypeInstruction(lui,&quot;.text\nlui x1, 0x12345&quot;,x1,74565)" outcome="Passed"/>
+    <UnitTestResult testName="TestSymbolDirectiveParsing(&quot;.global _start&quot;,Global,&quot;_start&quot;)" outcome="Passed"/>
+    <UnitTestResult testName="TestSymbolDirectiveParsing(&quot;.global main&quot;,Global,&quot;main&quot;)" outcome="Passed"/>
+    <UnitTestResult testName="TestSymbolDirectiveParsing(&quot;.local _private_func&quot;,Local,&quot;_private_func&quot;)" outcome="Passed"/>
+    <UnitTestResult testName="TestSymbolDirectiveParsing(&quot;.local helper_function&quot;,Local,&quot;helper_function&quot;)" outcome="Passed"/>
+    <UnitTestResult testName="TestTrulyUndefinedReference" outcome="Passed"/>
+    <UnitTestResult testName="TestUndefinedReferences" outcome="Passed"/>
     <UnitTestResult testName="fullReadToken(&quot;     .text&quot;,[WHITESPACE, DIRECTIVE, EOF, EOF, EOF],[&quot;     &quot;, &quot;.text&quot;, null, null, null])" outcome="Passed"/>
     <UnitTestResult testName="fullReadToken(&quot;.byte 0xFF, 0xf2, 0x02, 0x85, 0x05&quot;,[DIRECTIVE, WHITESPACE, NUMBER_HEX, WHITESPACE, NUMBER_HEX, ...],[&quot;.byte&quot;, &quot; &quot;, &quot;0xFF&quot;, &quot;, &quot;, &quot;0xf2&quot;, ...])" outcome="Passed"/>
     <UnitTestResult testName="fullReadToken(&quot;.byte 0xFF, 0xf2, 0x02, 0x85, 0x05&quot;,[DIRECTIVE, WHITESPACE, NUMBER_HEX, WHITESPACE, NUMBER_HEX, ...],[&quot;.byte&quot;, &quot; &quot;, &quot;0xFF&quot;, &quot;, &quot;, &quot;0xf2&quot;, ...])" outcome="Passed"/>
@@ -1844,6 +1857,10 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestRTypeInstructions" name="TestParseRInstruction(add,x1,x2,x3)"/>
     </UnitTest>
+    <UnitTest name="TestLabelParsing" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestLabelParsing"/>
+    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;BLEZ&quot;,OP_PSEUDO)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;BLEZ&quot;,OP_PSEUDO)"/>
@@ -1895,6 +1912,10 @@
     <UnitTest name="readToken(&quot;0x85, 0x05&quot;,NUMBER_HEX,&quot;0x85&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="readToken(&quot;0x85, 0x05&quot;,NUMBER_HEX,&quot;0x85&quot;)"/>
+    </UnitTest>
+    <UnitTest name="TestSymbolDirectiveParsing(&quot;.local _private_func&quot;,Local,&quot;_private_func&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestSymbolDirectiveParsing(&quot;.local _private_func&quot;,Local,&quot;_private_func&quot;)"/>
     </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;ADDIW&quot;,OP_I)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
@@ -3016,6 +3037,10 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;AMOMAXU.W&quot;,OP_R)"/>
     </UnitTest>
+    <UnitTest name="TestForwardReferenceThenDefinition" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestForwardReferenceThenDefinition"/>
+    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;C.SRLI&quot;,OP_CI)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;C.SRLI&quot;,OP_CI)"/>
@@ -3135,6 +3160,10 @@
     <UnitTest name="sanityCheckOps(&quot;dcsr&quot;,CSR)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;dcsr&quot;,CSR)"/>
+    </UnitTest>
+    <UnitTest name="TestMixedDirectivesAndLabels" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestMixedDirectivesAndLabels"/>
     </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;FCVT.WU.S&quot;,OP_R)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
@@ -3324,6 +3353,10 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="readToken(&quot;0b1000&quot;,NUMBER_BIN,&quot;0b1000&quot;)"/>
     </UnitTest>
+    <UnitTest name="DebugDataTokenization" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="DebugDataTokenization"/>
+    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;FADD.S&quot;,OP_R)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;FADD.S&quot;,OP_R)"/>
@@ -3335,6 +3368,10 @@
     <UnitTest name="PseudoInstructions(&quot;sgtz x3, x3&quot;,&quot;slt x3, x0, x3&quot;,&quot;Set if greater than zero&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestPsudoInstructions" name="PseudoInstructions(&quot;sgtz x3, x3&quot;,&quot;slt x3, x0, x3&quot;,&quot;Set if greater than zero&quot;)"/>
+    </UnitTest>
+    <UnitTest name="TestUndefinedReferences" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestUndefinedReferences"/>
     </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;pmpcfg0&quot;,CSR)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
@@ -3532,6 +3569,10 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;FMAX.S&quot;,OP_R)"/>
     </UnitTest>
+    <UnitTest name="TestTrulyUndefinedReference" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestTrulyUndefinedReference"/>
+    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;C.EBRAKE&quot;,OP_CI)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;C.EBRAKE&quot;,OP_CI)"/>
@@ -3603,6 +3644,10 @@
     <UnitTest name="sanityCheckOps(&quot;MULW&quot;,OP_R)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;MULW&quot;,OP_R)"/>
+    </UnitTest>
+    <UnitTest name="TestForwardReferenceNoDefinition" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestForwardReferenceNoDefinition"/>
     </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;FLE.S&quot;,OP_R)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
@@ -3888,6 +3933,10 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestPsudoInstructions" name="PseudoInstructions(&quot;fld f2, myVar1&quot;,&quot;auipc x2, %pcrel_hi(myVar1)\n  fld f2, %pcrel_lo(myVar1)(x2)&quot;,&quot;Load doubleword&quot;)"/>
     </UnitTest>
+    <UnitTest name="TestBranchWithLabels" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestBranchWithLabels"/>
+    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;hstatus&quot;,CSR)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;hstatus&quot;,CSR)"/>
@@ -4144,6 +4193,10 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestPsudoInstructions" name="PseudoInstructions(&quot;csrc time, x4&quot;,&quot;csrrc x0, time, x4&quot;,&quot;Clear time CSR&quot;)"/>
     </UnitTest>
+    <UnitTest name="TestSymbolDirectiveParsing(&quot;.global main&quot;,Global,&quot;main&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestSymbolDirectiveParsing(&quot;.global main&quot;,Global,&quot;main&quot;)"/>
+    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;FSUB.D&quot;,OP_R)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;FSUB.D&quot;,OP_R)"/>
@@ -4280,6 +4333,10 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;RDINSTRET[H]&quot;,OP_PSEUDO)"/>
     </UnitTest>
+    <UnitTest name="TestMultipleSections" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestMultipleSections"/>
+    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;AMOADD.W&quot;,OP_R)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;AMOADD.W&quot;,OP_R)"/>
@@ -4331,6 +4388,10 @@
     <UnitTest name="PseudoInstructions(&quot;csrr x2, instret&quot;,&quot;csrrs x2, instret, x0&quot;,&quot;Read instruction count CSR&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestPsudoInstructions" name="PseudoInstructions(&quot;csrr x2, instret&quot;,&quot;csrrs x2, instret, x0&quot;,&quot;Read instruction count CSR&quot;)"/>
+    </UnitTest>
+    <UnitTest name="TestSymbolDirectiveParsing(&quot;.global _start&quot;,Global,&quot;_start&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestSymbolDirectiveParsing(&quot;.global _start&quot;,Global,&quot;_start&quot;)"/>
     </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;CSRRWI&quot;,OP_I)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
@@ -4899,6 +4960,10 @@
     <UnitTest name="sanityCheckOps(&quot;hcounteren&quot;,CSR)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;hcounteren&quot;,CSR)"/>
+    </UnitTest>
+    <UnitTest name="TestSymbolDirectiveParsing(&quot;.local helper_function&quot;,Local,&quot;helper_function&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestDirectivesAndLabels" name="TestSymbolDirectiveParsing(&quot;.local helper_function&quot;,Local,&quot;helper_function&quot;)"/>
     </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;LH&quot;,OP_I)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
@@ -5977,17 +6042,30 @@
     <TestEntry/>
     <TestEntry/>
     <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
+    <TestEntry/>
   </TestEntries>
   <TestLists>
     <TestList name="Results Not in a List"/>
     <TestList name="All Loaded Results"/>
   </TestLists>
   <ResultSummary outcome="Failed">
-    <Counters total="879" executed="855" passed="809" failed="46" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0"/>
+    <Counters total="892" executed="868" passed="822" failed="46" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0"/>
     <Output>
       <StdOut>NUnit Adapter 3.16.1.0: Test execution started
 Running all tests in src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll
-   NUnit3TestExecutor converted 879 of 879 NUnit test cases
+   NUnit3TestExecutor converted 892 of 892 NUnit test cases
 Test 'sanityCheckOps("FRCSR",OP_PSEUDO)' was skipped in the test run.
 Test 'sanityCheckOps("FSCSR",OP_PSEUDO)' was skipped in the test run.
 Test 'sanityCheckOps("FRRM",OP_PSEUDO)' was skipped in the test run.

@@ -369,6 +369,8 @@ namespace Kore
                     return DirectiveBAlign();
                 case "global":
                     return DirectiveGlobal();
+                case "local":
+                    return DirectiveLocal();
                 case "string":
                     return DirectiveString();
                 case "byte":
@@ -461,6 +463,22 @@ namespace Kore
             // return an options directive
             return new ParseData { type = StatementType.DIRECTIVE_GLOBAL, value = sym.value};
         }
+
+        /**
+         * DirectiveLocal
+         *   : .local sym
+         *   ;
+         */
+        ParseData DirectiveLocal()
+        {
+            // Consume the Directive Call
+            var token = _consume(KuickTokenizer.Token.DIRECTIVE);
+            // Consume the Symbol Identifier
+            var sym = Identifier();
+            // return a local directive
+            return new ParseData { type = StatementType.DIRECTIVE_LOCAL, value = sym.value};
+        }
+
         ParseData DirectiveString()
         {
             throw new NotImplementedException("String Directive not supported yet");

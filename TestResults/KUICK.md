@@ -1,12 +1,12 @@
-# Kuick Test Results Summary
+# Test Results Summary
 
 ## Overall Statistics
 
 | Metric | Count | Status |
 |--------|-------|--------|
-| Total Tests | 879 | ℹ️ |
-| Executed | 855 | ▶️ |
-| Passed | 809 | ✅ |
+| Total Tests | 892 | ℹ️ |
+| Executed | 868 | ▶️ |
+| Passed | 822 | ✅ |
 | Failed | 46 | ❌ |
 
 ## Test Method Breakdown
@@ -18,7 +18,14 @@
 | ✅ | 14 passed | `TestParseBLabelInstruction` |
 | ✅ | 174 passed | `readToken` |
 | ✅ | 19 passed | `fullReadToken` |
+| ✅ | 1 passed | `DebugDataTokenization` |
 | ❌ | 1 failed | `MachineCode` |
+| ✅ | 1 passed | `TestBranchWithLabels` |
+| ✅ | 1 passed | `TestForwardReferenceNoDefinition` |
+| ✅ | 1 passed | `TestForwardReferenceThenDefinition` |
+| ✅ | 1 passed | `TestLabelParsing` |
+| ✅ | 1 passed | `TestMixedDirectivesAndLabels` |
+| ✅ | 1 passed | `TestMultipleSections` |
 | ✅ | 1 passed | `TestParseAddAndSubInstructions` |
 | ✅ | 1 passed | `TestParseAddiMultiInstruction` |
 | ✅ | 1 passed | `TestParseAddInstruction` |
@@ -26,6 +33,8 @@
 | ✅ | 1 passed | `TestParseShInstruction` |
 | ✅ | 1 passed | `TestParseSubInstruction` |
 | ✅ | 1 passed | `TestParseSwInstruction` |
+| ✅ | 1 passed | `TestTrulyUndefinedReference` |
+| ✅ | 1 passed | `TestUndefinedReferences` |
 | ✅ | 1 passed | `tokenPositions` |
 | ❌ | 24 failed | `sanityCheckOps` |
 | ✅ | 2 passed | `InlineDirectives` |
@@ -38,10 +47,12 @@
 | ✅ | 4 passed | `TestParseJTypeImmInstruction` |
 | ✅ | 4 passed | `TestParseRInstruction` |
 | ✅ | 4 passed | `TestParseUTypeInstruction` |
+| ✅ | 4 passed | `TestSymbolDirectiveParsing` |
 ## Detailed Test Results
 
 | Status | Error Details | Test Name |
 |--------|---------------|-----------|
+| ✅ | N/A | `DebugDataTokenization` |
 | ✅ | N/A | `fullReadToken(".byte 0xFF, 0xf2, 0x02, 0x85, 0x05",[DIRECTIVE, WHITESPACE, NUMBER_HEX, WHITESPACE, NUMBER_HEX, ...],[".byte", " ", "0xFF", ", ", "0xf2", ...])` |
 | ✅ | N/A | `fullReadToken(".byte 0xFF, 0xf2, 0x02, 0x85, 0x05",[DIRECTIVE, WHITESPACE, NUMBER_HEX, WHITESPACE, NUMBER_HEX, ...],[".byte", " ", "0xFF", ", ", "0xf2", ...])` |
 | ✅ | N/A | `fullReadToken(".double 0.1d, 4.5d, 2.4d, 2414.125125d",[DIRECTIVE, WHITESPACE, NUMBER_DOUBLE, WHITESPACE, NUMBER_DOUBLE, ...],[".double", " ", "0.1d", ", ", "4.5d", ...])` |
@@ -848,6 +859,12 @@
 | ✅ | N/A | `sanityCheckOps("XOR",OP_R)` |
 | ✅ | N/A | `],["SH", "x2", "0x10", "(", "x1", ...])` |
 | ✅ | N/A | `],["SH", "x2", "0", "(", "x1", ...])` |
+| ✅ | N/A | `TestBranchWithLabels` |
+| ✅ | N/A | `TestForwardReferenceNoDefinition` |
+| ✅ | N/A | `TestForwardReferenceThenDefinition` |
+| ✅ | N/A | `TestLabelParsing` |
+| ✅ | N/A | `TestMixedDirectivesAndLabels` |
+| ✅ | N/A | `TestMultipleSections` |
 | ✅ | N/A | `TestParseAddAndSubInstructions` |
 | ✅ | N/A | `TestParseAddiInstruction(addi,".text\naddi x1, x0, 0",x1,zero,0)` |
 | ✅ | N/A | `TestParseAddiInstruction(addi,".text\naddi x1, x0, 1",x1,zero,1)` |
@@ -915,6 +932,12 @@
 | ✅ | N/A | `TestParseUTypeInstruction(auipc,".text\nauipc x1, 0x52345",x1,336709)` |
 | ✅ | N/A | `TestParseUTypeInstruction(lui,".text\nlui x1, 0",x1,0)` |
 | ✅ | N/A | `TestParseUTypeInstruction(lui,".text\nlui x1, 0x12345",x1,74565)` |
+| ✅ | N/A | `TestSymbolDirectiveParsing(".global main",Global,"main")` |
+| ✅ | N/A | `TestSymbolDirectiveParsing(".global _start",Global,"_start")` |
+| ✅ | N/A | `TestSymbolDirectiveParsing(".local helper_function",Local,"helper_function")` |
+| ✅ | N/A | `TestSymbolDirectiveParsing(".local _private_func",Local,"_private_func")` |
+| ✅ | N/A | `TestTrulyUndefinedReference` |
+| ✅ | N/A | `TestUndefinedReferences` |
 | ✅ | N/A | `text\nld x1, 0(x0)",x1,zero,0)` |
 | ✅ | N/A | `text\nld x1, 0x7ff(x0)",x1,zero,2047)` |
 | ✅ | N/A | `text\nld x1, 0x7f(x0)",x1,zero,127)` |
@@ -923,6 +946,6 @@
 | ✅ | N/A | `tokenPositions(".option push\n.option nopic",[DIRECTIVE, WHITESPACE, IDENTIFIER, EOL, DIRECTIVE, ...],[0, 0, 0, 0, 1, ...],[0, 7, 8, 12, 0, ...],[".option", " ", "push", "\n", ".option", ...])` |
 
 ---
-*Generated on Fri Jun 20 01:17:38 AM CDT 2025*
+*Generated on Thu Jun 26 08:41:29 AM CDT 2025*
 
-📁 **Full results**: [Kuick.xml](./Kuick.xml)
+📁 **Full results**: [Kuick.xml](Kuick.xml)

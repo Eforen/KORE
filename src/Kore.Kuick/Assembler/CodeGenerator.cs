@@ -26,6 +26,29 @@ namespace Kore.Kuick.Assembler {
             labelCacheMiss = true;
             return -1;
         }
+
+        // Symbol address assignment methods
+        private void assignSymbolAddress(string symbolName, int address) {
+            if (currentSymbolTable != null) {
+                var symbol = currentSymbolTable.GetSymbol(symbolName);
+                if (symbol != null) {
+                    symbol.Address = address;
+                    symbol.IsDefined = true;
+                }
+            }
+        }
+
+        private int getSymbolAddress(string symbolName) {
+            if (currentSymbolTable != null) {
+                var symbol = currentSymbolTable.GetSymbol(symbolName);
+                if (symbol != null && symbol.IsDefined) {
+                    return (int)symbol.Address;
+                }
+            }
+            symbolCacheMiss = true;
+            return -1;
+        }
+
         public enum GeneratorPass : byte {
             /// <summary> Convert PsudoCode and Directives to AST Nodes </summary>
             PsudoCode = 0,
@@ -41,20 +64,24 @@ namespace Kore.Kuick.Assembler {
         public List<byte> machineCode = new List<byte>();
         public Dictionary<string, LabelNode> labels = new Dictionary<string, LabelNode>();
         public bool labelCacheMiss = false;
+        public bool symbolCacheMiss = false;
         public int nextLineNumber = 0;
+        private SymbolTable currentSymbolTable = null;
 
         public byte[] Generate(ProgramNode node) {
             machineCode.Clear();
             labels.Clear();
             labelCacheMiss = false;
+            symbolCacheMiss = false;
             nextLineNumber = 0;
+            currentSymbolTable = node.SymbolTable;
 
             // TODO: Implement code generation based on the given AST node.
             phase = GeneratorPass.PsudoCode;
             node.CallProcessor(this);
             phase = GeneratorPass.LineNumber;
             node.CallProcessor(this);
-            if(labelCacheMiss) {
+            if(labelCacheMiss || symbolCacheMiss) {
                 phase = GeneratorPass.LineNumberCleanup;
                 node.CallProcessor(this);
             }
@@ -65,6 +92,9 @@ namespace Kore.Kuick.Assembler {
         }
 
         public AstNode ProcessASTNode(ProgramNode node) {
+            // Set the current symbol table for this program
+            currentSymbolTable = node.SymbolTable;
+            
             foreach(SectionNode n in node.Sections) {
                 n.CallProcessor(this);
             }
@@ -260,6 +290,80 @@ namespace Kore.Kuick.Assembler {
         }
 
         public AstNode ProcessASTNode(CommentNode node) {
+            return null;
+        }
+
+        // New symbol-based node processing methods
+        public AstNode ProcessASTNode(SymbolDirectiveNode node) {
+            // For now, just pass through - symbol directives are handled at parse time
+            // In the future, this could be used for additional processing or validation
+            return null;
+        }
+
+        public AstNode ProcessASTNode(InstructionNodeTypeBSymbol node) {
+            // Process symbol-based B-type instruction similar to InstructionNodeTypeBLabel
+            switch(phase) {
+                case GeneratorPass.PsudoCode:
+                    return null;
+                case GeneratorPass.LineNumber:
+                    // Get this instructions Line number
+                    node.lineNumber = assignLineNumber();
+                    // Fall Through
+                    break;
+                case GeneratorPass.LineNumberCleanup:
+                    // Fall Through
+                    break;
+                case GeneratorPass.GenerateCode:
+                    return null;
+                default:
+                    return null;
+            }
+
+            // Get address of symbol if its been assigned
+            int symbolAddr = getSymbolAddress(node.SymbolReference.SymbolName);
+            // Drop out if < 0 because this means its a cache miss
+            if(symbolAddr < 0) return null;
+            // Must have symbol address, make new immediate instruction
+            var inst = new InstructionNodeTypeBImmediate(node.op, node.rs1, node.rs2, symbolAddr);
+            inst.lineNumber = node.lineNumber;
+            return inst;
+        }
+
+        public AstNode ProcessASTNode(InstructionNodeTypeJSymbol node) {
+            // Process symbol-based J-type instruction similar to InstructionNodeTypeJLabel
+            switch(phase) {
+                case GeneratorPass.PsudoCode:
+                    return null;
+                case GeneratorPass.LineNumber:
+                    // Get this instructions Line number
+                    node.lineNumber = assignLineNumber();
+                    // Fall Through
+                    break;
+                case GeneratorPass.LineNumberCleanup:
+                    // Fall Through
+                    break;
+                case GeneratorPass.GenerateCode:
+                    return null;
+                default:
+                    return null;
+            }
+
+            // Get address of symbol if its been assigned
+            int symbolAddr = getSymbolAddress(node.SymbolReference.SymbolName);
+            // Drop out if < 0 because this means its a cache miss
+            if(symbolAddr < 0) return null;
+            // Must have symbol address, make new immediate instruction
+            var inst = new InstructionNodeTypeJImmediate(node.op, node.rd, symbolAddr);
+            inst.lineNumber = node.lineNumber;
+            return inst;
+        }
+
+        public AstNode ProcessASTNode(SymbolReferenceNode node) {
+            // When we encounter a symbol reference that defines a symbol (like a label),
+            // assign it the current line number as its address
+            if (phase == GeneratorPass.LineNumber) {
+                assignSymbolAddress(node.SymbolName, nextLineNumber);
+            }
             return null;
         }
     }

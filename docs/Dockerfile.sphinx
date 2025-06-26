@@ -1,0 +1,18 @@
+FROM docker.io/sphinxdoc/sphinx:latest
+
+# Install required Python packages
+RUN pip install --no-cache-dir \
+    sphinx-rtd-theme \
+    sphinx-tabs
+
+# Set working directory
+WORKDIR /docs
+
+# Copy the custom lexer files
+COPY *.py /docs/
+
+# Copy the source directory to install custom lexers
+COPY source/ /docs/source/
+
+# Set the default command
+CMD ["sphinx-build", "-b", "html", "source", "build/html"] 

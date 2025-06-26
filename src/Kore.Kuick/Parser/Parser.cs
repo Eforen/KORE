@@ -118,8 +118,6 @@ namespace Kore.Kuick {
         }
 
         private static AstNode[] ParseNodeLabel(Lexer.TokenData currentToken, Lexer lexer) {
-            //TODO: Get rid of this signature, it was needed when the lexer had no peak function. 
-            // (We should also get rid of all the other signatures that take a Lexer.TokenData currentToken)
             if(currentToken.token != Lexer.Token.LABEL) throw ThrowUnexpected(currentToken, "LABEL");
             // Make the node
             var labelNode = new LabelNode(currentToken.value);
@@ -129,7 +127,7 @@ namespace Kore.Kuick {
 
             // If not the end of file or line
             // Check EOL first because its more likely
-            if(currentToken.token != Lexer.Token.EOL || currentToken.token != Lexer.Token.EOF) {
+            if(currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
                 throw ThrowUnexpected(currentToken, "EOL || EOF");
             }
             return ComposeInstructionArray(labelNode);
@@ -145,7 +143,7 @@ namespace Kore.Kuick {
 
             // If not the end of file or line
             // Check EOL first because its more likely
-            if(currentToken.token != Lexer.Token.EOL || currentToken.token != Lexer.Token.EOF) {
+            if(currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
                 throw ThrowUnexpected(currentToken, "EOL || EOF");
             }
             return ComposeInstructionArray(labelNode);
@@ -688,13 +686,19 @@ namespace Kore.Kuick {
             ExpectToken(lexer, Lexer.Token.EOL);
 
             while(true) {
-                // Get the next token
+                // Check if the next token is a section directive without consuming it
+                var peekToken = lexer.PeakToken(true);
+                if(peekToken.token == Lexer.Token.EOF) {
+                    return section;
+                }
+                
+                // If the next token is a section directive, don't consume it - let the main parser handle it
+                if(peekToken.token == Lexer.Token.DIRECTIVE && getSectionFromDirectiveToken(peekToken) != default(string)) {
+                    return section;
+                }
+                
+                // Now actually consume the token since we know it's not a section directive
                 currentToken = lexer.ReadToken(true);
-
-                if(
-                    currentToken.token == Lexer.Token.EOF ||
-                    (currentToken.token == Lexer.Token.DIRECTIVE && getSectionFromDirectiveToken(currentToken) != default(string))
-                    ) return section;
 
                 AstNode[] newNodes = null;
                 //TODO: Refactor to a switch statement
@@ -764,7 +768,21 @@ namespace Kore.Kuick {
 
         private static AstNode[] ParseNodeDirective(Lexer.TokenData currentToken, Lexer lexer) {
             var name = currentToken.value;
-            currentToken = lexer.ReadToken();
+            currentToken = lexer.ReadToken(true); // Skip whitespace when reading the next token
+
+            // Handle symbol directives (.global and .local)
+            if (name == ".global" || name == ".local") {
+                if (currentToken.token == Lexer.Token.IDENTIFIER) {
+                    var symbolName = currentToken.value;
+                    var directiveType = name == ".global" ? 
+                        SymbolDirectiveNode.DirectiveType.Global : 
+                        SymbolDirectiveNode.DirectiveType.Local;
+                    
+                    return ComposeInstructionArray(expectReturnEOL(new SymbolDirectiveNode(directiveType, symbolName), lexer));
+                } else {
+                    throw new SyntaxException($"Expected symbol name after {name} directive");
+                }
+            }
 
             if(currentToken.token == Lexer.Token.STRING || currentToken.token == Lexer.Token.IDENTIFIER) {
                 return ComposeInstructionArray(expectReturnEOL(new StringDirectiveNode { Name = name, Value = currentToken.value }, lexer));
@@ -882,6 +900,7 @@ namespace Kore.Kuick {
 
         public static ProgramNode Parse(Lexer lexer) {
             var programNode = new ProgramNode();
+            var currentSection = ".text"; // Default section
 
             Lexer.TokenData currentToken = default(Lexer.TokenData);
             while(currentToken.token != Lexer.Token.EOF) {
@@ -893,14 +912,53 @@ namespace Kore.Kuick {
                 // Get section
                 var directiveValue = getSectionFromDirectiveToken(currentToken);
                 if(directiveValue != default(string)) {
-                    programNode.Sections.Add(CreateSectionNode(directiveValue, currentToken, lexer));
+                    currentSection = directiveValue; // Update current section
+                    var sectionNode = CreateSectionNode(directiveValue, currentToken, lexer);
+                    programNode.Sections.Add(sectionNode);
                     continue;
                 }
 
                 throw ThrowUnexpected(currentToken, "Section");
             }
 
+            // Post-process to integrate symbol directives with symbol table
+            ProcessSymbolDirectives(programNode, currentSection);
+
             return programNode;
+        }
+
+        /// <summary>
+        /// Post-processes the AST to integrate SymbolDirectiveNode instances with the program's symbol table
+        /// and to define labels in the symbol table
+        /// </summary>
+        private static void ProcessSymbolDirectives(ProgramNode program, string defaultSection) {
+            foreach (var section in program.Sections) {
+                foreach (var node in section.Contents) {
+                    if (node is SymbolDirectiveNode symbolDirective) {
+                        // Process the symbol directive using the ParserExtensions
+                        if (symbolDirective.Type == SymbolDirectiveNode.DirectiveType.Global) {
+                            var processedDirective = program.ProcessGlobalDirective(symbolDirective.SymbolName);
+                            symbolDirective.Symbol = processedDirective.Symbol;
+                        }
+                        else if (symbolDirective.Type == SymbolDirectiveNode.DirectiveType.Local) {
+                            var processedDirective = program.ProcessLocalDirective(symbolDirective.SymbolName);
+                            symbolDirective.Symbol = processedDirective.Symbol;
+                        }
+                    }
+                    else if (node is LabelNode labelNode) {
+                        // Define the label in the symbol table
+                        program.DefineLabel(labelNode.Name, labelNode.lineNumber, section.Name);
+                    }
+                    else if (node is InstructionNodeTypeJLabel jLabelInstruction) {
+                        // J-type instruction with label reference - add to symbol table if not already present
+                        program.SymbolTable.GetOrCreateSymbol(jLabelInstruction.label, SymbolScope.Unknown, SymbolType.Label);
+                    }
+                    else if (node is InstructionNodeTypeBLabel bLabelInstruction) {
+                        // B-type instruction with label reference - add to symbol table if not already present
+                        program.SymbolTable.GetOrCreateSymbol(bLabelInstruction.label, SymbolScope.Unknown, SymbolType.Label);
+                    }
+                }
+            }
         }
     }
 }
