@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" name="@">
-  <Times creation="2025-06-26T08:41:08.9959785-05:00" queuing="2025-06-26T08:41:08.9959786-05:00" start="2025-06-26T08:41:07.1576335-05:00" finish="2025-06-26T08:41:16.0841707-05:00"/>
+  <Times creation="2025-06-26T19:09:51.5563423-05:00" queuing="2025-06-26T19:09:51.5563423-05:00" start="2025-06-26T19:09:49.6916028-05:00" finish="2025-06-26T19:09:58.9077805-05:00"/>
   <TestSettings name="default">
     <Deployment runDeploymentRoot="testrun"/>
   </TestSettings>
@@ -330,20 +330,7 @@
         </ErrorInfo>
       </Output>
     </UnitTestResult>
-    <UnitTestResult testName="PseudoInstructions(&quot;j 0x16&quot;,&quot;jal x0, 0x8&quot;,&quot;Jump 16 bytes&quot;)" outcome="Failed">
-      <Output>
-        <ErrorInfo>
-          <Message>  Expected string length 118 but was 117. Strings differ at index 96.
-  Expected: "...]{\n              TypeJ jal RD:zero IMM:22          }\n      }\n"
-  But was:  "...]{\n              TypeJ jal RD:zero IMM:8          }\n      }\n"
-  ------------------------------------------------------^
-</Message>
-          <StackTrace>   at Kore.Kuick.Tests.Parser.TestPsudoInstructions.PseudoInstructions(String pseudoInstruction, String trueInstruction, String description) in src/Kore.Kuick.Tests/Parser/TestPsudoInstructions.cs:line 206
-   at InvokeStub_TestPsudoInstructions.PseudoInstructions(Object, Span`1)
-</StackTrace>
-        </ErrorInfo>
-      </Output>
-    </UnitTestResult>
+    <UnitTestResult testName="PseudoInstructions(&quot;j 0x16&quot;,&quot;jal x0, 0x16&quot;,&quot;Jump 16 bytes&quot;)" outcome="Passed"/>
     <UnitTestResult testName="PseudoInstructions(&quot;j 0x8&quot;,&quot;jal x0, 0x8&quot;,&quot;Jump 8 bytes&quot;)" outcome="Passed"/>
     <UnitTestResult testName="PseudoInstructions(&quot;jr x1&quot;,&quot;jalr x0, 0(x1)&quot;,&quot;Jump register&quot;)" outcome="Failed">
       <Output>
@@ -4365,10 +4352,6 @@
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestRTypeInstructions" name="TestParseSubInstruction"/>
     </UnitTest>
-    <UnitTest name="PseudoInstructions(&quot;j 0x16&quot;,&quot;jal x0, 0x8&quot;,&quot;Jump 16 bytes&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
-      <Execution/>
-      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestPsudoInstructions" name="PseudoInstructions(&quot;j 0x16&quot;,&quot;jal x0, 0x8&quot;,&quot;Jump 16 bytes&quot;)"/>
-    </UnitTest>
     <UnitTest name="sanityCheckOps(&quot;FCVT.D.WU&quot;,OP_R)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;FCVT.D.WU&quot;,OP_R)"/>
@@ -5056,6 +5039,10 @@
     <UnitTest name="sanityCheckOps(&quot;li&quot;,OP_PSEUDO)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
       <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.LexerTests.LexerTests" name="sanityCheckOps(&quot;li&quot;,OP_PSEUDO)"/>
+    </UnitTest>
+    <UnitTest name="PseudoInstructions(&quot;j 0x16&quot;,&quot;jal x0, 0x16&quot;,&quot;Jump 16 bytes&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
+      <Execution/>
+      <TestMethod codeBase="src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="Kore.Kuick.Tests.Parser.TestPsudoInstructions" name="PseudoInstructions(&quot;j 0x16&quot;,&quot;jal x0, 0x16&quot;,&quot;Jump 16 bytes&quot;)"/>
     </UnitTest>
     <UnitTest name="PseudoInstructions(&quot;rdtimeh x3&quot;,&quot;csrrs x3, timeh, x0&quot;,&quot;Read time&quot;)" storage="src/kore.kuick.tests/bin/release/net8.0/kore.kuick.tests.dll">
       <Execution/>
@@ -6061,7 +6048,7 @@
     <TestList name="All Loaded Results"/>
   </TestLists>
   <ResultSummary outcome="Failed">
-    <Counters total="892" executed="868" passed="822" failed="46" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0"/>
+    <Counters total="892" executed="868" passed="823" failed="45" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0"/>
     <Output>
       <StdOut>NUnit Adapter 3.16.1.0: Test execution started
 Running all tests in src/Kore.Kuick.Tests/bin/Release/net8.0/Kore.Kuick.Tests.dll

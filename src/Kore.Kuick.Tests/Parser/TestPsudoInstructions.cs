@@ -67,7 +67,7 @@ namespace Kore.Kuick.Tests.Parser {
         [TestCase("bgtz x2, 0x00000002", "blt x0, x2, 0x00000002", "Branch if greater than zero")]
         ///////////////////////////////////////////////////////////////////////////////
         [TestCase("j 0x8", "jal x0, 0x8", "Jump 8 bytes")]
-        [TestCase("j 0x16", "jal x0, 0x8", "Jump 16 bytes")]
+        [TestCase("j 0x16", "jal x0, 0x16", "Jump 16 bytes")]
         [TestCase("jr x1", "jalr x0, 0(x1)", "Jump register")]
         [TestCase("jr x7", "jalr x0, 0(x7)", "Jump register")]
         [TestCase("ret", "jalr x0, 0(x1)", "Return from subroutine")]

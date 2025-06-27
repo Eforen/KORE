@@ -48,12 +48,17 @@ EXECUTED_TESTS=$(grep -o 'executed="[0-9]*"' "$SOURCE_FILE" | head -1 | sed 's/e
 PASSED_TESTS=$(grep -o 'passed="[0-9]*"' "$SOURCE_FILE" | head -1 | sed 's/passed="//;s/"//')
 FAILED_TESTS=$(grep -o 'failed="[0-9]*"' "$SOURCE_FILE" | head -1 | sed 's/failed="//;s/"//')
 
+# Calculate ignored/skipped tests (NotExecuted)
+IGNORED_COUNT=$(grep 'outcome="NotExecuted"' "$SOURCE_FILE" 2>/dev/null | wc -l)
+IGNORED_TESTS=${IGNORED_COUNT:-0}
+
 echo "| Metric | Count | Status |" >> "$OUTPUT_FILE"
 echo "|--------|-------|--------|" >> "$OUTPUT_FILE"
 echo "| Total Tests | $TOTAL_TESTS | ℹ️ |" >> "$OUTPUT_FILE"
 echo "| Executed | $EXECUTED_TESTS | ▶️ |" >> "$OUTPUT_FILE"
 echo "| Passed | $PASSED_TESTS | ✅ |" >> "$OUTPUT_FILE"
 echo "| Failed | $FAILED_TESTS | ❌ |" >> "$OUTPUT_FILE"
+echo "| Ignored | $IGNORED_TESTS | ⭕ |" >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
 
 # Add test class breakdown
@@ -88,6 +93,9 @@ while read count class_outcome; do
     if [ "$OUTCOME" = "Passed" ]; then
         EMOJI="✅"
         STATUS="$count passed"
+    elif [ "$OUTCOME" = "NotExecuted" ]; then
+        EMOJI="⭕"
+        STATUS="$count ignored"
     else
         EMOJI="❌" 
         STATUS="$count failed"
@@ -119,9 +127,12 @@ grep -o '<UnitTestResult.*testName="[^"]*".*outcome="[^"]*"' "$SOURCE_FILE" | wh
     if [ "$OUTCOME" = "Passed" ]; then
         EMOJI="✅"
         ERROR_DETAILS="N/A"
+    elif [ "$OUTCOME" = "NotExecuted" ]; then
+        EMOJI="⭕"
+        ERROR_DETAILS="Test ignored - see full XML for details"
     else
         EMOJI="❌"
-        ERROR_DETAILS="Test failed - see full TRX for details"
+        ERROR_DETAILS="Test failed - see full XML for details"
     fi
     
     echo "$CLEAN_NAME|$EMOJI|$ERROR_DETAILS"

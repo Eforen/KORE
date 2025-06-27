@@ -13,6 +13,8 @@
   - [Done 2025/06/19](#done-20250619)
   - [Done 2025/06/20](#done-20250620)
   - [Done 2025/06/21](#done-20250621)
+  - [Done 2025/06/21](#done-20250621-1)
+  - [Done 2025/06/26](#done-20250626)
     - [Next Commit (Eforen)](#next-commit-eforen-1)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -124,15 +126,21 @@
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bgtz`
 
 ## Done 2025/06/21
-### Next Commit (Eforen)
 * [KUICK][AST] Maintain Program Node Maintains a Symbols Tables (Multi Scope (Local, Global))
 * [KUICK][AST] Symbol Table with Address Assignment in CodeGenerator
 * [KUICK][AST] Symbol-based AST Nodes (SymbolReferenceNode, InstructionNodeTypeBSymbol, etc.)
 * [KUICK][AST] Symbol Directive Nodes (.global, .local)
 * [KUICK][AST] Comprehensive Symbol Table Test Suite (16 tests passing)
+
+## Done 2025/06/21
 * [KUICK][CODEGEN] Symbol Address Assignment and Resolution
 * [KUICK][CODEGEN] Multi-pass Assembly with Symbol Cache Miss Handling
+* [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete]
+* [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 
+## Done 2025/06/26
+
+### Next Commit (Eforen)
 # Working On
 ## Working on (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
@@ -143,10 +151,9 @@
 * [KUICK][ASSEMBLER] Rewrite tests to take in AST and output binary
 * [KUICK][ASSEMBLER] Write Tests for every Token
 
+
 # Todos
 ## Todo
-* [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
-* [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED
 
 * [KUICK][PARSER] Pseudo Instruction `j label` is effectively `jal x0, label` [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Pseudo Instruction `jr rs` is effectively `jalr x0, rs, 0` [Symbol Table Foundation Complete]

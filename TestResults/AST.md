@@ -8,6 +8,7 @@
 | Executed | 18 | ▶️ |
 | Passed | 18 | ✅ |
 | Failed | 0 | ❌ |
+| Ignored | 0 | ⭕ |
 
 ## Test Method Breakdown
 
@@ -55,6 +56,6 @@
 | ✅ | N/A | `TestUndefinedSymbols` |
 
 ---
-*Generated on Thu Jun 26 08:41:04 AM CDT 2025*
+*Generated on Thu Jun 26 07:09:45 PM CDT 2025*
 
 📁 **Full results**: [Ast.xml](Ast.xml)

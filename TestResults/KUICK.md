@@ -6,14 +6,15 @@
 |--------|-------|--------|
 | Total Tests | 892 | ℹ️ |
 | Executed | 868 | ▶️ |
-| Passed | 822 | ✅ |
-| Failed | 46 | ❌ |
+| Passed | 823 | ✅ |
+| Failed | 45 | ❌ |
+| Ignored | 24 | ⭕ |
 
 ## Test Method Breakdown
 
 | Status | Details | Test Method |
 |--------|---------|-------------|
-| ✅ | 105 passed | `PseudoInstructions` |
+| ✅ | 106 passed | `PseudoInstructions` |
 | ❌ | 11 failed | `sanityCheckOps` |
 | ✅ | 14 passed | `TestParseBLabelInstruction` |
 | ✅ | 174 passed | `readToken` |
@@ -36,11 +37,11 @@
 | ✅ | 1 passed | `TestTrulyUndefinedReference` |
 | ✅ | 1 passed | `TestUndefinedReferences` |
 | ✅ | 1 passed | `tokenPositions` |
-| ❌ | 24 failed | `sanityCheckOps` |
+| ⭕ | 24 ignored | `sanityCheckOps` |
 | ✅ | 2 passed | `InlineDirectives` |
 | ✅ | 2 passed | `noWhiteSpaceReadTokens` |
 | ✅ | 32 passed | `TestParseAddiInstruction` |
-| ❌ | 34 failed | `PseudoInstructions` |
+| ❌ | 33 failed | `PseudoInstructions` |
 | ✅ | 3 passed | `TestParseBImmInstruction` |
 | ✅ | 3 passed | `TestParseJTypeLabelInstruction` |
 | ✅ | 435 passed | `sanityCheckOps` |
@@ -92,13 +93,13 @@
 | ✅ | N/A | `PseudoInstructions("bnez x2, 0x00000002","bne x2, x0, 0x00000002","Branch if not equal zero")` |
 | ✅ | N/A | `PseudoInstructions("bnez x3, 0x00000001","bne x3, x0, 0x00000001","Branch if not equal zero")` |
 | ✅ | N/A | `PseudoInstructions("csrc 0x7C0, x1","csrrc x0, 0x7C0, x1","Clear custom CSR")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("csrc cycle, x3","csrrc x0, cycle, x3","Clear cycle count CSR")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("csrc cycle, x3","csrrc x0, cycle, x3","Clear cycle count CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrci 0x7C0, 0x1","csrrci x0, 0x7C0, 0x1","Clear custom CSR (immediate)")` |
 | ✅ | N/A | `PseudoInstructions("csrci cycle, 0x3","csrrci x0, cycle, 0x3","Clear cycle count CSR (immediate)")` |
 | ✅ | N/A | `PseudoInstructions("csrci instret, 0x2","csrrci x0, instret, 0x2","Clear instruction count CSR (immediate)")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("csrc instret, x2","csrrc x0, instret, x2","Clear instruction count CSR")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("csrc instret, x2","csrrc x0, instret, x2","Clear instruction count CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrci time, 0x4","csrrci x0, time, 0x4","Clear time CSR (immediate)")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("csrc time, x4","csrrc x0, time, x4","Clear time CSR")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("csrc time, x4","csrrc x0, time, x4","Clear time CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrr x1, 0x7C0","csrrs x1, 0x7C0, x0","Read custom CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrr x2, instret","csrrs x2, instret, x0","Read instruction count CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrr x3, cycle","csrrs x3, cycle, x0","Read cycle count CSR")` |
@@ -116,38 +117,38 @@
 | ✅ | N/A | `PseudoInstructions("csrsi time, 0x8","csrrsi x0, time, 0x8","Set time CSR (immediate)")` |
 | ✅ | N/A | `PseudoInstructions("csrs time, x8","csrrs x0, time, x8","Set time CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrw 0x7C0, x1","csrrw x0, 0x7C0, x1","Write custom CSR")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("csrw cycle, x3","csrrw x0, cycle, x3","Write cycle count CSR")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("csrw cycle, x3","csrrw x0, cycle, x3","Write cycle count CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrwi 0x7C0, 0x1","csrrwi x0, 0x7C0, 0x1","Write custom CSR (immediate)")` |
 | ✅ | N/A | `PseudoInstructions("csrwi cycle, 0x3","csrrwi x0, cycle, 0x3","Write cycle count CSR (immediate)")` |
 | ✅ | N/A | `PseudoInstructions("csrwi instret, 0x2","csrrwi x0, instret, 0x2","Write instruction count CSR (immediate)")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("csrw instret, x2","csrrw x0, instret, x2","Write instruction count CSR")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("csrw instret, x2","csrrw x0, instret, x2","Write instruction count CSR")` |
 | ✅ | N/A | `PseudoInstructions("csrwi time, 0x4","csrrwi x0, time, 0x4","Write time CSR (immediate)")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("csrw time, x4","csrrw x0, time, x4","Write time CSR")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fld f1, myVar","auipc x1, %pcrel_hi(myVar)\n   fld f1, %pcrel_lo(myVar)(x1)","Load doubleword")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fld f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  fld f2, %pcrel_lo(myVar1)(x2)","Load doubleword")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fld f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nfld f3, %pcrel_lo(myVar152)(x3)","Load doubleword")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("flw f1, myVar","auipc x1, %pcrel_hi(myVar)\n   flw f1, %pcrel_lo(myVar)(x1)","Load word")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("flw f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  flw f2, %pcrel_lo(myVar1)(x2)","Load word")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("flw f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nflw f3, %pcrel_lo(myVar152)(x3)","Load word")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("csrw time, x4","csrrw x0, time, x4","Write time CSR")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fld f1, myVar","auipc x1, %pcrel_hi(myVar)\n   fld f1, %pcrel_lo(myVar)(x1)","Load doubleword")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fld f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  fld f2, %pcrel_lo(myVar1)(x2)","Load doubleword")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fld f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nfld f3, %pcrel_lo(myVar152)(x3)","Load doubleword")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("flw f1, myVar","auipc x1, %pcrel_hi(myVar)\n   flw f1, %pcrel_lo(myVar)(x1)","Load word")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("flw f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  flw f2, %pcrel_lo(myVar1)(x2)","Load word")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("flw f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nflw f3, %pcrel_lo(myVar152)(x3)","Load word")` |
 | ✅ | N/A | `PseudoInstructions("frcsr x1","csrrs x1, fcsr, x0","Read floating point control/status register")` |
 | ✅ | N/A | `PseudoInstructions("frflags x5","csrrs x5, fflags, x0","Read floating point flags CSR")` |
 | ✅ | N/A | `PseudoInstructions("frrm x3","csrrs x3, frm, x0","Read floating point rounding mode CSR")` |
 | ✅ | N/A | `PseudoInstructions("fscsr x2","csrrs x0, fcsr, x2","Set floating point control/status register")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fsd f1, myVar","auipc x1, %pcrel_hi(myVar)\n   fsd f1, %pcrel_lo(myVar)(x1)","Store doubleword")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fsd f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  fsd f2, %pcrel_lo(myVar1)(x2)","Store doubleword")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fsd f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nfsd f3, %pcrel_lo(myVar152)(x3)","Store doubleword")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fsd f1, myVar","auipc x1, %pcrel_hi(myVar)\n   fsd f1, %pcrel_lo(myVar)(x1)","Store doubleword")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fsd f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  fsd f2, %pcrel_lo(myVar1)(x2)","Store doubleword")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fsd f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nfsd f3, %pcrel_lo(myVar152)(x3)","Store doubleword")` |
 | ✅ | N/A | `PseudoInstructions("fsflags x6","csrrs x0, fflags, x6","Set floating point flags CSR")` |
 | ✅ | N/A | `PseudoInstructions("fsrm x4","csrrs x0, frm, x4","Set floating point rounding mode CSR")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fsw f1, myVar","auipc x1, %pcrel_hi(myVar)\n   fsw f1, %pcrel_lo(myVar)(x1)","Store word")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fsw f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  fsw f2, %pcrel_lo(myVar1)(x2)","Store word")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("fsw f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nfsw f3, %pcrel_lo(myVar152)(x3)","Store word")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("j 0x16","jal x0, 0x8","Jump 16 bytes")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fsw f1, myVar","auipc x1, %pcrel_hi(myVar)\n   fsw f1, %pcrel_lo(myVar)(x1)","Store word")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fsw f2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  fsw f2, %pcrel_lo(myVar1)(x2)","Store word")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("fsw f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nfsw f3, %pcrel_lo(myVar152)(x3)","Store word")` |
+| ✅ | N/A | `PseudoInstructions("j 0x16","jal x0, 0x16","Jump 16 bytes")` |
 | ✅ | N/A | `PseudoInstructions("j 0x8","jal x0, 0x8","Jump 8 bytes")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("jr x1","jalr x0, 0(x1)","Jump register")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("jr x7","jalr x0, 0(x7)","Jump register")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("la x1, myVar","auipc x1, %pcrel_hi(myVar)\n   addi x1, x1, %pcrel_lo(myVar)","Load address into x1")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("la x2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  addi x2, x2, %pcrel_lo(myVar1)","Load address into x2")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("la x3, myVar152","auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)","Load address into x3")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("jr x1","jalr x0, 0(x1)","Jump register")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("jr x7","jalr x0, 0(x7)","Jump register")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("la x1, myVar","auipc x1, %pcrel_hi(myVar)\n   addi x1, x1, %pcrel_lo(myVar)","Load address into x1")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("la x2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  addi x2, x2, %pcrel_lo(myVar1)","Load address into x2")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("la x3, myVar152","auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)","Load address into x3")` |
 | ✅ | N/A | `PseudoInstructions("lb x1, myVar","auipc x1, %pcrel_hi(myVar)\n   lb x1, %pcrel_lo(myVar)(x1)","Load byte")` |
 | ✅ | N/A | `PseudoInstructions("lb x2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  lb x2, %pcrel_lo(myVar1)(x2)","Load byte")` |
 | ✅ | N/A | `PseudoInstructions("lb x3, myVar152","auipc x3, %pcrel_hi(myVar152)\nlb x3, %pcrel_lo(myVar152)(x3)","Load byte")` |
@@ -157,12 +158,12 @@
 | ✅ | N/A | `PseudoInstructions("lh x1, myVar","auipc x1, %pcrel_hi(myVar)\n   lh x1, %pcrel_lo(myVar)(x1)","Load halfword")` |
 | ✅ | N/A | `PseudoInstructions("lh x2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  lh x2, %pcrel_lo(myVar1)(x2)","Load halfword")` |
 | ✅ | N/A | `PseudoInstructions("lh x3, myVar152","auipc x3, %pcrel_hi(myVar152)\nlh x3, %pcrel_lo(myVar152)(x3)","Load halfword")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("li x1, 0","addi x1, x0, 0","Load immediate")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("li x2, 5","addi x2, x0, 5","Load immediate")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("li x3, 2047","addi x3, x0, 2047","Load immediate")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("lla x1, myVar","auipc x1, %pcrel_hi(myVar)\naddi x1, x1, %pcrel_lo(myVar)","Load address into x1")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("lla x2, myVar1","auipc x2, %pcrel_hi(myVar1)\naddi x2, x2, %pcrel_lo(myVar1)","Load address into x2")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("lla x3, myVar152","auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)","Load address into x3")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("li x1, 0","addi x1, x0, 0","Load immediate")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("li x2, 5","addi x2, x0, 5","Load immediate")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("li x3, 2047","addi x3, x0, 2047","Load immediate")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("lla x1, myVar","auipc x1, %pcrel_hi(myVar)\naddi x1, x1, %pcrel_lo(myVar)","Load address into x1")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("lla x2, myVar1","auipc x2, %pcrel_hi(myVar1)\naddi x2, x2, %pcrel_lo(myVar1)","Load address into x2")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("lla x3, myVar152","auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)","Load address into x3")` |
 | ✅ | N/A | `PseudoInstructions("lw x1, myVar","auipc x1, %pcrel_hi(myVar)\n   lw x1, %pcrel_lo(myVar)(x1)","Load word")` |
 | ✅ | N/A | `PseudoInstructions("lw x2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  lw x2, %pcrel_lo(myVar1)(x2)","Load word")` |
 | ✅ | N/A | `PseudoInstructions("lw x3, myVar152","auipc x3, %pcrel_hi(myVar152)\nlw x3, %pcrel_lo(myVar152)(x3)","Load word")` |
@@ -188,7 +189,7 @@
 | ✅ | N/A | `PseudoInstructions("rdtime x1","csrrs x1, time, x0","Read time")` |
 | ✅ | N/A | `PseudoInstructions("rdtime x2","csrrs x2, time, x0","Read time")` |
 | ✅ | N/A | `PseudoInstructions("rdtime x3","csrrs x3, time, x0","Read time")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("ret","jalr x0, 0(x1)","Return from subroutine")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("ret","jalr x0, 0(x1)","Return from subroutine")` |
 | ✅ | N/A | `PseudoInstructions("sb x1, myVar, t1","auipc t1, %pcrel_hi(myVar)\n   sb x1, %pcrel_lo(myVar)(t1)","Store byte")` |
 | ✅ | N/A | `PseudoInstructions("sb x2, myVar1, t2","auipc t2, %pcrel_hi(myVar1)\n  sb x2, %pcrel_lo(myVar1)(t2)","Store byte")` |
 | ✅ | N/A | `PseudoInstructions("sb x3, myVar152, t3","auipc t3, %pcrel_hi(myVar152)\nsb x3, %pcrel_lo(myVar152)(t3)","Store byte")` |
@@ -210,9 +211,9 @@
 | ✅ | N/A | `PseudoInstructions("sw x1, myVar, t1","auipc t1, %pcrel_hi(myVar)\n   sw x1, %pcrel_lo(myVar)(t1)","Store word")` |
 | ✅ | N/A | `PseudoInstructions("sw x2, myVar1, t2","auipc t2, %pcrel_hi(myVar1)\n  sw x2, %pcrel_lo(myVar1)(t2)","Store word")` |
 | ✅ | N/A | `PseudoInstructions("sw x3, myVar152, t3","auipc t3, %pcrel_hi(myVar152)\nsw x3, %pcrel_lo(myVar152)(t3)","Store word")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("tail 0x4262fb3f","auipc x6, 0x4262f000\n    jal x0, 0xb3f","Tail call arr-away subroutine")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("tail 0x74543765","auipc x6, 0x74543000\n    jal x0, 0x765","Tail call arr-away subroutine")` |
-| ❌ | Test failed - see full TRX for details | `PseudoInstructions("tail 0x81C45C2C","auipc x6, 0x81C45000\n    jal x0, 0xC2C","Tail call arr-away subroutine")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("tail 0x4262fb3f","auipc x6, 0x4262f000\n    jal x0, 0xb3f","Tail call arr-away subroutine")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("tail 0x74543765","auipc x6, 0x74543000\n    jal x0, 0x765","Tail call arr-away subroutine")` |
+| ❌ | Test failed - see full XML for details | `PseudoInstructions("tail 0x81C45C2C","auipc x6, 0x81C45000\n    jal x0, 0xC2C","Tail call arr-away subroutine")` |
 | ✅ | N/A | `readToken("0.0f",NUMBER_FLOAT,"0.0f")` |
 | ✅ | N/A | `readToken("0.1d, 4.5d, 2.4d, 2414.125125d",NUMBER_DOUBLE,"0.1d")` |
 | ✅ | N/A | `readToken("0.1f, 42.2f, 151326.52562f",NUMBER_FLOAT,"0.1f")` |
@@ -531,18 +532,18 @@
 | ✅ | N/A | `sanityCheckOps("FDIV.S",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FENCE.I",OP_I)` |
 | ✅ | N/A | `sanityCheckOps("FENCE",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("fence",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("fence",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("FEQ.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FEQ.S",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("fflags",CSR)` |
 | ✅ | N/A | `sanityCheckOps("FLD",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("fld",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("fld",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("FLE.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FLE.S",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FLT.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FLT.S",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FLW",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("flw",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("flw",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("FMADD.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FMADD.S",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FMAX.D",OP_R)` |
@@ -565,22 +566,22 @@
 | ✅ | N/A | `sanityCheckOps("FNMADD.S",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FNMSUB.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FNMSUB.S",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FRCSR",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FRCSR",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FRFLAGS",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FRFLAGS",OP_R)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("FRCSR",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FRCSR",OP_R)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("FRFLAGS",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FRFLAGS",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("frm",CSR)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FRRM",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FRRM",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("fscsr",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSCSR",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSCSR",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("fsd",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("FRRM",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FRRM",OP_R)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("fscsr",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("FSCSR",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FSCSR",OP_R)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("fsd",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("FSD",OP_S)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSFLAGSI",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("fsflags",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSFLAGS",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSFLAGS",OP_R)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FSFLAGSI",OP_R)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("fsflags",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("FSFLAGS",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FSFLAGS",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FSGNJ.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FSGNJN.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FSGNJN.S",OP_R)` |
@@ -589,13 +590,13 @@
 | ✅ | N/A | `sanityCheckOps("FSGNJX.S",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FSQRT.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FSQRT.S",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSRMI",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("fsrm",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSRM",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("FSRM",OP_R)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FSRMI",OP_R)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("fsrm",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("FSRM",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("FSRM",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FSUB.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("FSUB.S",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("fsw",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("fsw",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("FSW",OP_S)` |
 | ✅ | N/A | `sanityCheckOps("hcause",CSR)` |
 | ✅ | N/A | `sanityCheckOps("hcontext",CSR)` |
@@ -634,19 +635,19 @@
 | ✅ | N/A | `sanityCheckOps("instreth",CSR)` |
 | ✅ | N/A | `sanityCheckOps("instreth",CSR)` |
 | ✅ | N/A | `sanityCheckOps("JAL",OP_J)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("jal",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("jal",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("JALR",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("jalr",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("jalr",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("J",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("JR",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("LA",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("LB",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("LB",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("LB",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("LBU",OP_I)` |
 | ✅ | N/A | `sanityCheckOps("LD",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("LD",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("LD",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("LH",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("LH",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("LH",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("LHU",OP_I)` |
 | ✅ | N/A | `sanityCheckOps("li",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("LLA",OP_PSEUDO)` |
@@ -654,7 +655,7 @@
 | ✅ | N/A | `sanityCheckOps("LR.W",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("LUI",OP_U)` |
 | ✅ | N/A | `sanityCheckOps("LW",OP_I)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("LW",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("LW",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("LWU",OP_I)` |
 | ✅ | N/A | `sanityCheckOps("marchid",CSR)` |
 | ✅ | N/A | `sanityCheckOps("mcontext",CSR)` |
@@ -697,23 +698,23 @@
 | ✅ | N/A | `sanityCheckOps("pmpcfg1",CSR)` |
 | ✅ | N/A | `sanityCheckOps("pmpcfg2",CSR)` |
 | ✅ | N/A | `sanityCheckOps("pmpcfg3",CSR)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("RDCYCLE[H]",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("RDINSTRET[H]",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("RDTIME[H]",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("RDCYCLE[H]",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("RDINSTRET[H]",OP_PSEUDO)` |
+| ❌ | Test failed - see full XML for details | `sanityCheckOps("RDTIME[H]",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("REM",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("REMU",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("REMUW",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("REMW",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("RET",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("satp",CSR)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("SB",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("SB",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("SB",OP_S)` |
 | ✅ | N/A | `sanityCheckOps("scause",CSR)` |
 | ✅ | N/A | `sanityCheckOps("SC.D",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("scontext",CSR)` |
 | ✅ | N/A | `sanityCheckOps("scounteren",CSR)` |
 | ✅ | N/A | `sanityCheckOps("SC.W",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("SD",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("SD",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("SD",OP_S)` |
 | ✅ | N/A | `sanityCheckOps("sedeleg",CSR)` |
 | ✅ | N/A | `sanityCheckOps("sepc",CSR)` |
@@ -722,7 +723,7 @@
 | ✅ | N/A | `sanityCheckOps("sext.w",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("SFENCE.VMA",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("SGTZ",OP_PSEUDO)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("SH",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("SH",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("SH",OP_S)` |
 | ✅ | N/A | `sanityCheckOps("sideleg",CSR)` |
 | ✅ | N/A | `sanityCheckOps("sie",CSR)` |
@@ -752,7 +753,7 @@
 | ✅ | N/A | `sanityCheckOps("stvec",CSR)` |
 | ✅ | N/A | `sanityCheckOps("SUB",OP_R)` |
 | ✅ | N/A | `sanityCheckOps("SUBW",OP_R)` |
-| ❌ | Test failed - see full TRX for details | `sanityCheckOps("SW",OP_PSEUDO)` |
+| ⭕ | Test ignored - see full XML for details | `sanityCheckOps("SW",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("SW",OP_S)` |
 | ✅ | N/A | `sanityCheckOps("TAIL",OP_PSEUDO)` |
 | ✅ | N/A | `sanityCheckOps("tdata1",CSR)` |
@@ -942,10 +943,10 @@
 | ✅ | N/A | `text\nld x1, 0x7ff(x0)",x1,zero,2047)` |
 | ✅ | N/A | `text\nld x1, 0x7f(x0)",x1,zero,127)` |
 | ✅ | N/A | `text\nld x1, 0x80(x0)",x1,zero,128)` |
-| ❌ | Test failed - see full TRX for details | `text\n    li      a5,0      # should result in 0x00000793u\n    lui     a0,10     # should result in 0x00010537u\n    ret               # should result in 0x00008067u\n    auipc   gp,0x2    # should result in 0x00002197u\n    sub     a2,a2,a0  # should result in 0x40a60633u\n    li      a1,0      # should result in 0x00000593u\n    auipc   a0,0      # should result in 0x00000517u\n    lw      a0,0(sp)  # should result in 0x00012503u\n    addi    a1,sp,8   # should result in 0x00810593u\n    li      a2,0      # should result in 0x00000613u\n    addi    sp,sp,-16 # should result in 0xff010113u\n    sd      s0,0(sp)  # should result in 0x00813023u\n",[1939, 66871, 32871, 8599, 1084622387, ...])` |
+| ❌ | Test failed - see full XML for details | `text\n    li      a5,0      # should result in 0x00000793u\n    lui     a0,10     # should result in 0x00010537u\n    ret               # should result in 0x00008067u\n    auipc   gp,0x2    # should result in 0x00002197u\n    sub     a2,a2,a0  # should result in 0x40a60633u\n    li      a1,0      # should result in 0x00000593u\n    auipc   a0,0      # should result in 0x00000517u\n    lw      a0,0(sp)  # should result in 0x00012503u\n    addi    a1,sp,8   # should result in 0x00810593u\n    li      a2,0      # should result in 0x00000613u\n    addi    sp,sp,-16 # should result in 0xff010113u\n    sd      s0,0(sp)  # should result in 0x00813023u\n",[1939, 66871, 32871, 8599, 1084622387, ...])` |
 | ✅ | N/A | `tokenPositions(".option push\n.option nopic",[DIRECTIVE, WHITESPACE, IDENTIFIER, EOL, DIRECTIVE, ...],[0, 0, 0, 0, 1, ...],[0, 7, 8, 12, 0, ...],[".option", " ", "push", "\n", ".option", ...])` |
 
 ---
-*Generated on Thu Jun 26 08:41:29 AM CDT 2025*
+*Generated on Thu Jun 26 07:10:12 PM CDT 2025*
 
 📁 **Full results**: [Kuick.xml](Kuick.xml)
