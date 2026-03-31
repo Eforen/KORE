@@ -1,7 +1,7 @@
 # KORE RISC-V Compiler - Makefile
 # Provides convenient targets for building, testing, and cleaning
 
-.PHONY: all build build-solution test clean setup help debug release \
+.PHONY: all build build-solution build-docs test clean setup help debug release \
 	build-tools build-tools-binutils build-tools-binutils-readelf \
 	version-inc-readelf-major version-inc-readelf-minor version-inc-readelf-patch
 
@@ -11,6 +11,11 @@ VERBOSITY ?= minimal
 
 # Default target
 all: build
+
+# Sphinx HTML documentation — same as `cd docs && make local` (Dockerfile.sphinx / kore-sphinx image)
+build-docs:
+	@$(MAKE) -C docs local SPHINXOPTS="$(SPHINXOPTS)"
+	@echo "Documentation built: docs/build/html/index.html"
 
 # Full solution build (entire KorePlatform.sln)
 build-solution:
@@ -130,6 +135,7 @@ help:
 	@echo ""
 	@echo "  make build              - Run all build-* component targets (utility, AST, Kuick, tools)"
 	@echo "  make build-solution     - Build entire KorePlatform.sln"
+	@echo "  make build-docs         - Build Sphinx HTML via Docker/Podman (docs/Makefile local)"
 	@echo "  make debug         - Build in Debug configuration"
 	@echo "  make release       - Build in Release configuration"
 	@echo "  make build-utility - Build Utility components only"

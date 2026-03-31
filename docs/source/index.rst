@@ -50,6 +50,12 @@ Indices and tables
 
 .. toctree::
     :maxdepth: 2
+    :caption: CLI tools (host)
+
+    cli/index
+
+.. toctree::
+    :maxdepth: 2
     :numbered:
     :caption: Assembly Documentation
 

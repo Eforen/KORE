@@ -2,7 +2,7 @@ using Kuick.Tools.Commands;
 using Kuick.Tools.Commands.Options;
 using Kuick.Tools.Versioning;
 
-if (args.Length == 0 || args[0] is "-h" or "--help")
+if (args.Length == 0 || args[0] is "--help")
 {
     PrintHelp();
     return 0;
@@ -38,9 +38,10 @@ static void PrintHelp()
 {
     Console.WriteLine("Kuick.Tools");
     Console.WriteLine("Usage:");
-    Console.WriteLine("  kuick-readelf readelf <input-path> [--header] [--include-empty] [--verbose]");
-    Console.WriteLine("  kuick-readelf <input-path> [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf readelf <input-path> [options]");
     Console.WriteLine("  kuick-readelf --version");
+    Console.WriteLine("  kuick-readelf --help");
 }
 
 static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelfOptions(string[] args)
@@ -51,7 +52,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     }
 
     string? inputPath = null;
-    var headerOnly = false;
+    var fileHeaderOnly = false;
     var includeEmpty = false;
     var verbose = false;
 
@@ -59,8 +60,10 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     {
         switch (arg)
         {
+            case "-h":
+            case "--file-header":
             case "--header":
-                headerOnly = true;
+                fileHeaderOnly = true;
                 break;
             case "--include-empty":
                 includeEmpty = true;
@@ -92,7 +95,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     return (true, new ReadelfOptions
     {
         InputPath = inputPath,
-        HeaderOnly = headerOnly,
+        FileHeaderOnly = fileHeaderOnly,
         IncludeEmpty = includeEmpty,
         Verbose = verbose
     }, string.Empty);

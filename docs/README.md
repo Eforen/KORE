@@ -1,15 +1,47 @@
 # KORE Documentation Build System
 
-This directory contains the Sphinx documentation for the KORE project, along with a containerized build system that eliminates the need for local Sphinx installation.
+This directory contains the Sphinx documentation for the KORE project, along with a **containerized** build (`Dockerfile.sphinx`, image `kore-sphinx:latest`) so you get a consistent environment without installing Sphinx on the host.
 
 ## Quick Start
 
-To build the documentation using containers:
+From the **repository root** (requires **Docker** or **Podman**):
+
+```bash
+make build-docs
+```
+
+This is equivalent to:
+
+```bash
+cd docs && make local
+```
+
+Output is written to `docs/build/html/`. Open `docs/build/html/index.html` in a browser to preview.
+
+Pass options through to Sphinx (for example warnings as errors):
+
+```bash
+make build-docs SPHINXOPTS=-W
+```
+
+### CI vs local preview
+
+- **GitHub Actions** (`.github/workflows/gh-pages.yml`) uses [`sphinx-action`](https://github.com/ammaraskar/sphinx-action) to run `sphinx-build` in a container on the runner. It does **not** use `Dockerfile.sphinx` directly, but the result is standard Sphinx HTML from `docs/source/`.
+- **Local preview** via `make build-docs` / `make local` uses this repo’s **`Dockerfile.sphinx`**, which extends `sphinxdoc/sphinx` and installs `sphinx-rtd-theme` and `sphinx-tabs` — matching how this tree is set up for reproducible local builds.
+
+### Without Docker
+
+If you cannot run containers, install dependencies from `requirements.txt` into a virtualenv and run Sphinx manually, for example:
 
 ```bash
 cd docs
-make local
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+sphinx-build -b html source build/html
 ```
+
+(Older pins in `requirements.txt` may require an older Python; see package notes.)
 
 To build and serve the documentation locally for preview:
 
@@ -26,6 +58,7 @@ This will automatically detect whether you have Docker or Podman installed and u
 
 | Target | Description |
 |--------|-------------|
+| `make build-docs` (from repo root) | Same as `cd docs && make local` — build HTML via Docker/Podman + `Dockerfile.sphinx` |
 | `make local` | Build docs using Docker or Podman (auto-detect) |
 | `make local-docker` | Build docs using Docker specifically |
 | `make local-podman` | Build docs using Podman specifically |
@@ -48,143 +81,124 @@ This will automatically detect whether you have Docker or Podman installed and u
 | `make local-clean-all` | Clean build directory and remove container image |
 | `make local-help` | Show help for container-based targets |
 
-## Requirements
-
-You need either Docker or Podman installed:
-
-- **Docker**: https://docs.docker.com/get-docker/
-- **Podman**: https://podman.io/getting-started/installation
-
-For serving without containers, you also need:
-- **Python 3**: For the built-in HTTP server
-
-### On Fedora/RHEL Systems
-
-Install Podman (recommended):
-```bash
-sudo dnf install podman
-```
-
-## Serving Documentation Locally
-
-### Option 1: Python HTTP Server (Recommended)
-
-```bash
-# Build and serve in one command
-make local-serve
-
-# Or serve existing build
-make serve
-```
-
-This uses Python's built-in HTTP server and is the simplest option. The documentation will be available at `http://localhost:8000`.
-
-### Option 2: Containerized Nginx Server
-
-```bash
-# Build and serve using containers
-make local-serve-container
-
-# Or serve existing build with containers
-make serve-container
-```
-
-This uses a containerized Nginx server, which provides a production-like environment.
-
-### Custom Port
-
-You can specify a custom port using the `SERVE_PORT` environment variable:
-
-```bash
-# Serve on port 9000 instead of default 8000
-SERVE_PORT=9000 make serve
-```
-
-## Container Build System
-
 The documentation build uses a custom Docker image based on `sphinxdoc/sphinx:latest` with additional dependencies:
 
 - `sphinx-rtd-theme` - Read the Docs theme
 - `sphinx-tabs` - Tabbed content support
-- Custom lexers for KORE-specific syntax highlighting
 
-### Custom Image Details
+## Container Build System
 
-The build system:
+The containerized build system provides several advantages:
+
 1. Builds a custom image (`kore-sphinx:latest`) with all required dependencies
-2. Copies custom lexer files and source documentation
-3. Runs Sphinx build inside the container
-4. Outputs HTML documentation to `build/html/`
+2. Eliminates the need for local Python environment management
+3. Ensures consistent builds across different development environments
+4. Works on Linux, macOS, and Windows (with Docker Desktop)
 
-### SELinux Support
+### Prerequisites
 
-On SELinux-enabled systems (Fedora/RHEL), the volume mounts automatically include the `:Z` flag for proper container access to host files.
+- Docker or Podman installed and running
+- Git (for cloning the repository)
 
-## Output
-
-After a successful build:
-- HTML documentation is available in `build/html/`
-- Open `build/html/index.html` in your browser to view the documentation
-- Or use one of the serve targets to host it locally
-
-## Traditional Build (Alternative)
-
-If you prefer to install Sphinx locally:
+### Quick Commands
 
 ```bash
-# Install dependencies (Python/pip required)
-pip install sphinx sphinx-rtd-theme sphinx-tabs
+# Build documentation using auto-detected container runtime
+make local
 
-# Build documentation
-make html
+# Build using Docker specifically
+make local-docker
 
-# Serve using Python (from build/html directory)
-cd build/html && python3 -m http.server 8000
+# Build using Podman specifically
+make local-podman
+
+# Build only the container image
+make build-image
 ```
+
+### Manual Container Build
+
+If you prefer to build manually:
+
+```bash
+# Build the image
+docker build -f Dockerfile.sphinx -t kore-sphinx:latest .
+
+# Run the build
+docker run --rm -v "$(pwd)":/docs -w /docs kore-sphinx:latest sphinx-build -b html source build/html
+```
+
+### Alternative: Local Sphinx Installation
+
+If you prefer not to use containers:
+
+```bash
+pip install sphinx sphinx-rtd-theme sphinx-tabs
+cd docs
+sphinx-build -b html source build/html
+```
+
+## Development Workflow
+
+1. Edit documentation in `source/`
+2. Build using `make local` (or `make build-docs` from repo root)
+3. Preview in `build/html/index.html`
+4. Commit changes
 
 ## Troubleshooting
 
-### Permission Errors
-If you encounter permission errors, ensure your container runtime has proper access:
-- **Docker**: Add your user to the `docker` group or run with `sudo`
-- **Podman**: Usually works without additional permissions
+### Container Runtime Issues
 
-### Missing Container Runtime
-If neither Docker nor Podman is found:
-```
-Error: Neither Docker nor Podman found. Please install one of them:
-  - Docker: https://docs.docker.com/get-docker/
-  - Podman: https://podman.io/getting-started/installation
-```
+If you get permission errors with Podman on Linux:
 
-Install either Docker or Podman following the provided links.
-
-### Port Already in Use
-If you get a "port already in use" error:
 ```bash
-# Use a different port
-SERVE_PORT=9000 make serve
+# Add your user to the docker group (Docker)
+sudo usermod -aG docker $USER
+
+# Or configure Podman for rootless operation
 ```
 
-Or find and stop the process using the port:
+### SELinux (Fedora/RHEL)
+
+Volume mounts use the `:Z` flag for SELinux compatibility. If you still have issues:
+
 ```bash
-# Find process using port 8000
-lsof -i :8000
+# Check SELinux status
+getenforce
 
-# Kill the process (replace PID with actual process ID)
-kill <PID>
+# Temporarily set to permissive for testing
+sudo setenforce 0
 ```
 
-### Build Warnings
-Some warnings during build are normal and don't prevent successful documentation generation. The warnings typically relate to:
-- RST formatting issues
-- Missing files in toctrees
-- Title underline lengths
+### Build Failures
 
-## Development Notes
+1. Check that all files in `source/` are valid RST
+2. Verify `conf.py` configuration
+3. Check container logs for detailed error messages
 
-- The `Dockerfile.sphinx` contains the custom image definition
-- Custom lexers (`.py` files) are automatically copied into the container
-- The `conf.py` handles missing custom lexers gracefully with try/except blocks
-- Extensions are loaded conditionally to avoid errors if custom lexers are unavailable
-- Serving targets automatically build documentation if it doesn't exist 
+## File Structure
+
+```
+docs/
+├── Dockerfile.sphinx    # Custom Sphinx container definition
+├── Makefile            # Build automation
+├── requirements.txt    # Python dependencies (non-container / legacy)
+├── source/             # Documentation source files
+│   ├── conf.py        # Sphinx configuration
+│   └── index.rst      # Main documentation index
+└── build/              # Generated output (gitignored)
+    └── html/          # HTML output
+```
+
+## Contributing to Documentation
+
+1. Follow RST formatting guidelines
+2. Test builds locally using `make local`
+3. Ensure all links work
+4. Update `index.rst` when adding new pages
+
+## Additional Resources
+
+- [Sphinx Documentation](https://www.sphinx-doc.org/)
+- [reStructuredText Primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html)
+- [Read the Docs Theme](https://sphinx-rtd-theme.readthedocs.io/)

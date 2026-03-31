@@ -12,14 +12,14 @@ public sealed class ReadelfOutputWriter
     private readonly RelocationFormatter _relocationFormatter = new();
     private readonly StringTableFormatter _stringTableFormatter = new();
 
-    public string Format(ElfObject elfObject, bool headerOnly, FormatterOptions options)
+    public string Format(ElfObject elfObject, bool fileHeaderOnly, FormatterOptions options)
     {
         var sections = new List<string>
         {
             _headerFormatter.Format(elfObject, options)
         };
 
-        if (!headerOnly)
+        if (!fileHeaderOnly)
         {
             sections.Add(_sectionFormatter.Format(elfObject, options));
             sections.Add(_symbolFormatter.Format(elfObject, options));

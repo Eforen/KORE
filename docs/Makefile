@@ -36,10 +36,10 @@ local: build-image
 	@echo "Building Sphinx documentation using containers..."
 	@echo "Using container runtime: $(CONTAINER_CMD)"
 	$(CONTAINER_CMD) run --rm \
-		-v "$(shell pwd)":/docs:Z \
+		-v "$(CURDIR)":/docs:Z \
 		-w /docs \
 		kore-sphinx:latest \
-		sphinx-build -b html source build/html
+		sphinx-build -b html source build/html $(SPHINXOPTS)
 	@echo "Documentation built successfully!"
 	@echo "Open build/html/index.html in your browser to view the documentation."
 
@@ -50,10 +50,10 @@ local-docker:
 	docker build -f Dockerfile.sphinx -t kore-sphinx:latest .
 	@echo "Building Sphinx documentation using Docker..."
 	docker run --rm \
-		-v "$(shell pwd)":/docs:Z \
+		-v "$(CURDIR)":/docs:Z \
 		-w /docs \
 		kore-sphinx:latest \
-		sphinx-build -b html source build/html
+		sphinx-build -b html source build/html $(SPHINXOPTS)
 	@echo "Documentation built successfully!"
 	@echo "Open build/html/index.html in your browser to view the documentation."
 
@@ -64,10 +64,10 @@ local-podman:
 	podman build -f Dockerfile.sphinx -t kore-sphinx:latest .
 	@echo "Building Sphinx documentation using Podman..."
 	podman run --rm \
-		-v "$(shell pwd)":/docs:Z \
+		-v "$(CURDIR)":/docs:Z \
 		-w /docs \
 		kore-sphinx:latest \
-		sphinx-build -b html source build/html
+		sphinx-build -b html source build/html $(SPHINXOPTS)
 	@echo "Documentation built successfully!"
 	@echo "Open build/html/index.html in your browser to view the documentation."
 
@@ -101,7 +101,7 @@ endif
 	@echo "Press Ctrl+C to stop the server"
 	$(CONTAINER_CMD) run --rm -it \
 		-p $(SERVE_PORT):8000 \
-		-v "$(shell pwd)/build/html":/usr/share/nginx/html:Z,ro \
+		-v "$(CURDIR)/build/html":/usr/share/nginx/html:Z,ro \
 		docker.io/nginx:alpine
 
 # Build and serve in one command
@@ -149,6 +149,7 @@ local-help:
 	@echo ""
 	@echo "Environment Variables:"
 	@echo "  SERVE_PORT=8000       - Port for serving documentation (default: 8000)"
+	@echo "  SPHINXOPTS=...        - Extra args for sphinx-build (e.g. make local SPHINXOPTS=-W)"
 	@echo ""
 	@echo "Requirements:"
 	@echo "  - Docker: https://docs.docker.com/get-docker/"

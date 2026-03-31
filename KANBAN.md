@@ -135,12 +135,19 @@
 ## Done 2026/03/31
 * [LIB][ELF] new elf reading writing library
 * [CLI][READELF] riscv32-kuick-elf-readelf Scaffolding (Basic Command Line Interface)
-### Next Commit (Eforen)
 * [CLI][READELF] Add Versioning system that shows in `--version`
+### Next Commit (Eforen)
+* [CLI][READELF] `-h` / `--file-header` Display the ELF file header info similar to `riscv32-unknown-elf-readelf -h`
+* [DOCS][CLI] Create a CLI Documentation Section for CLI Tools used outside of the emulator
+* [DOCS][CLI] Create a CLI Documentation Page for binutils with link to the readelf page and placeholders for the other binutils tools
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-h`
+* [BUILD] `make build-docs` runs `docs` container build (`make local` / `Dockerfile.sphinx`) for local preview (`docs/build/html/index.html`)
 
 # Working On
 ## Working on (Eforen)
 * [CLI][READELF] Add Help system that shows in `-h` / `--help`
+* [DOCS][ARCHITECTURE][ELF] Create a ELF Architecture Page that explains the RISCV ELF format and how it works
+* [DOCS][Development] Create a libraries page that talks about how to use the elf library
 
 ## Set aside (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
@@ -153,21 +160,31 @@
 
 # Todos
 ## Todo
-* [CLI][READELF] `-h` / `--file-header` Display the ELF file header info similar to `riscv32-unknown-elf-readelf -h`
 * [CLI][READELF] `-l` / `--program-headers` Display the ELF program headers info similar to `riscv32-unknown-elf-readelf -l`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-l`
 * [CLI][READELF] `-S` / `--section-headers` Display the ELF section headers info similar to `riscv32-unknown-elf-readelf -S`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-S`
 * [CLI][READELF] `--sections` Simple Alias for `--section-headers`
 * [CLI][READELF] `-s` / `--symbols` Display the ELF symbol table info similar to `riscv32-unknown-elf-readelf -s`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-s`
 * [CLI][READELF] `--syms` Simple Alias for `--symbols`
 * [CLI][READELF] `-r` / `--relocations` Display the ELF relocation table info similar to `riscv32-unknown-elf-readelf -r`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-r`
 * [CLI][READELF] `--relocs` Simple Alias for `--relocations`
 * [CLI][READELF] `-d` / `--dynamic-section` Display the ELF dynamic section info similar to `riscv32-unknown-elf-readelf -d`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-d`
 * [CLI][READELF] `--dynamic` Simple Alias for `--dynamic-section`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--dynamic`
 * [CLI][READELF] `-V` / `--version-info` Display the ELF version info similar to `riscv32-unknown-elf-readelf -V`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-V`
 * [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-A`
 * [CLI][READELF] `-I` / `--histogram` Display the ELF histogram of bucket list lengths similar to `riscv32-unknown-elf-readelf -I`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-I`
 * [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--got-contents`
 * [CLI][READELF] `-a` / `-all` Equivalent to: -h -l -S -s -r -d -V -A -I --got-contents
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-a`
 * [KUICKER] Write simple new 2 pass assembler
 * [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED
