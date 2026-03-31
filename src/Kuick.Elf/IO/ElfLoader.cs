@@ -1,3 +1,4 @@
+using System.Text;
 using Kuick.Elf.Models;
 
 namespace Kuick.Elf.IO;
@@ -77,7 +78,158 @@ public sealed class ElfLoader
         };
 
         LoadProgramHeaders(stream, reader, elfObject, elfClass);
+        LoadSectionHeaders(stream, reader, elfObject, elfClass);
         return elfObject;
+    }
+
+    private readonly struct RawSectionHeader
+    {
+        public required uint NameIndex { get; init; }
+        public required uint Type { get; init; }
+        public required ulong Flags { get; init; }
+        public required ulong Address { get; init; }
+        public required ulong Offset { get; init; }
+        public required ulong Size { get; init; }
+        public required uint Link { get; init; }
+        public required uint Info { get; init; }
+        public required ulong Addralign { get; init; }
+        public required ulong Entsize { get; init; }
+    }
+
+    private static void LoadSectionHeaders(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)
+    {
+        var h = obj.Header;
+        if (h.SectionHeaderCount == 0 || h.SectionHeaderOffset == 0)
+        {
+            return;
+        }
+
+        var expected = elfClass == ElfClass64 ? 64u : 40u;
+        if (h.SectionHeaderEntrySize < expected)
+        {
+            throw new InvalidDataException(
+                $"Invalid section header entry size {h.SectionHeaderEntrySize}; expected at least {expected} for ELF{elfClass * 32}.");
+        }
+
+        stream.Seek((long)h.SectionHeaderOffset, SeekOrigin.Begin);
+        var extra = h.SectionHeaderEntrySize - expected;
+        var raw = new RawSectionHeader[h.SectionHeaderCount];
+        for (var i = 0; i < h.SectionHeaderCount; i++)
+        {
+            raw[i] = elfClass == ElfClass64 ? ReadSectionHeader64(reader) : ReadSectionHeader32(reader);
+            if (extra > 0)
+            {
+                reader.ReadBytes((int)extra);
+            }
+        }
+
+        if (h.SectionHeaderStringIndex >= h.SectionHeaderCount)
+        {
+            throw new InvalidDataException($"Invalid e_shstrndx {h.SectionHeaderStringIndex} (section count {h.SectionHeaderCount}).");
+        }
+
+        var shstr = raw[h.SectionHeaderStringIndex];
+        if (shstr.Size > int.MaxValue)
+        {
+            throw new InvalidDataException("Section header string table is too large.");
+        }
+
+        if (shstr.Size > 0 && (long)shstr.Offset + (long)shstr.Size > stream.Length)
+        {
+            throw new InvalidDataException("Section header string table extends past end of file.");
+        }
+
+        stream.Seek((long)shstr.Offset, SeekOrigin.Begin);
+        var shstrtab = shstr.Size == 0 ? Array.Empty<byte>() : reader.ReadBytes((int)shstr.Size);
+
+        for (var i = 0; i < h.SectionHeaderCount; i++)
+        {
+            var r = raw[i];
+            var name = ReadSectionName(shstrtab, r.NameIndex);
+            obj.Sections.Add(new Section
+            {
+                Name = name,
+                Type = r.Type,
+                Flags = r.Flags,
+                Address = r.Address,
+                Offset = r.Offset,
+                Size = r.Size,
+                Link = r.Link,
+                Info = r.Info,
+                AddressAlign = r.Addralign,
+                EntrySize = r.Entsize
+            });
+        }
+    }
+
+    private static string ReadSectionName(byte[] shstrtab, uint nameIndex)
+    {
+        if (shstrtab.Length == 0 || nameIndex >= shstrtab.Length)
+        {
+            return string.Empty;
+        }
+
+        var end = (int)nameIndex;
+        while (end < shstrtab.Length && shstrtab[end] != 0)
+        {
+            end++;
+        }
+
+        return Encoding.UTF8.GetString(shstrtab, (int)nameIndex, end - (int)nameIndex);
+    }
+
+    private static RawSectionHeader ReadSectionHeader64(BinaryReader reader)
+    {
+        var name = reader.ReadUInt32();
+        var type = reader.ReadUInt32();
+        var flags = reader.ReadUInt64();
+        var addr = reader.ReadUInt64();
+        var offset = reader.ReadUInt64();
+        var size = reader.ReadUInt64();
+        var link = reader.ReadUInt32();
+        var info = reader.ReadUInt32();
+        var addralign = reader.ReadUInt64();
+        var entsize = reader.ReadUInt64();
+        return new RawSectionHeader
+        {
+            NameIndex = name,
+            Type = type,
+            Flags = flags,
+            Address = addr,
+            Offset = offset,
+            Size = size,
+            Link = link,
+            Info = info,
+            Addralign = addralign,
+            Entsize = entsize
+        };
+    }
+
+    private static RawSectionHeader ReadSectionHeader32(BinaryReader reader)
+    {
+        var name = reader.ReadUInt32();
+        var type = reader.ReadUInt32();
+        var flags = reader.ReadUInt32();
+        var addr = reader.ReadUInt32();
+        var offset = reader.ReadUInt32();
+        var size = reader.ReadUInt32();
+        var link = reader.ReadUInt32();
+        var info = reader.ReadUInt32();
+        var addralign = reader.ReadUInt32();
+        var entsize = reader.ReadUInt32();
+        return new RawSectionHeader
+        {
+            NameIndex = name,
+            Type = type,
+            Flags = flags,
+            Address = addr,
+            Offset = offset,
+            Size = size,
+            Link = link,
+            Info = info,
+            Addralign = addralign,
+            Entsize = entsize
+        };
     }
 
     private static void LoadProgramHeaders(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)

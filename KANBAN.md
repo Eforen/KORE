@@ -191,9 +191,12 @@ The lowest priority tasks are at the bottom of the list.
 * [BUILD] `make build-docs` runs `docs` container build (`make local` / `Dockerfile.sphinx`) for local preview (`docs/build/html/index.html`)
 * [DOCS][ARCHITECTURE][ELF] ELF architecture page (beginner-friendly + RISC-V ELF): `docs/source/architecture/elf_format.rst`
 * [DOCS][Development] Kuick.Elf library page + cross-links: `docs/source/development/kuick_elf_library.rst`
-### Next Commit (Eforen)
 * [CLI][READELF] `-l` / `--program-headers` (program header table; KORE output)
 * [DOCS][CLI][READELF] Readelf CLI docs for `-l` / `--program-headers`
+### Next Commit (Eforen)
+* [CLI][READELF] `-S` / `--section-headers` Display the ELF section headers info similar to `riscv32-unknown-elf-readelf -S`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-S`
+* [CLI][READELF] `--sections` Simple Alias for `--section-headers`
 
 # Working On
 ## Working on (Eforen)
@@ -210,9 +213,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] `-S` / `--section-headers` Display the ELF section headers info similar to `riscv32-unknown-elf-readelf -S`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-S`
-* [CLI][READELF] `--sections` Simple Alias for `--section-headers`
 * [CLI][READELF] `-s` / `--symbols` Display the ELF symbol table info similar to `riscv32-unknown-elf-readelf -s`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-s`
 * [CLI][READELF] `--syms` Simple Alias for `--symbols`
@@ -231,6 +231,7 @@ The lowest priority tasks are at the bottom of the list.
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-I`
 * [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--got-contents`
+* [CLI][READELF][BUG] Multiple flags not working when combined with other flags.
 * [CLI][READELF] `-a` / `-all` Equivalent to: -h -l -S -s -r -d -V -A -I --got-contents
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-a`
 * [KUICKER] Write simple new 2 pass assembler

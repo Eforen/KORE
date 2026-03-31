@@ -7,6 +7,8 @@ public sealed class ReadelfOptions
     public bool FileHeaderOnly { get; init; }
     /// <summary>Only print program headers / segment table (-l, --program-headers).</summary>
     public bool ProgramHeadersOnly { get; init; }
+    /// <summary>Only print section header table (-S, --section-headers, --sections).</summary>
+    public bool SectionHeadersOnly { get; init; }
     public bool IncludeEmpty { get; init; }
     public bool Verbose { get; init; }
 }

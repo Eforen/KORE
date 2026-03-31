@@ -6,21 +6,22 @@ internal static class ReadelfDisplayModeHelper
 {
     public static ReadelfDisplayMode FromOptions(ReadelfOptions o)
     {
-        if (o.FileHeaderOnly && o.ProgramHeadersOnly)
+        if (!o.FileHeaderOnly && !o.ProgramHeadersOnly && !o.SectionHeadersOnly)
         {
-            return ReadelfDisplayMode.FileHeaderAndProgramHeaders;
+            return ReadelfDisplayMode.Default;
         }
 
-        if (o.FileHeaderOnly)
+        var mask = (o.FileHeaderOnly ? 1 : 0) | (o.ProgramHeadersOnly ? 2 : 0) | (o.SectionHeadersOnly ? 4 : 0);
+        return mask switch
         {
-            return ReadelfDisplayMode.FileHeaderOnly;
-        }
-
-        if (o.ProgramHeadersOnly)
-        {
-            return ReadelfDisplayMode.ProgramHeadersOnly;
-        }
-
-        return ReadelfDisplayMode.Default;
+            1 => ReadelfDisplayMode.FileHeaderOnly,
+            2 => ReadelfDisplayMode.ProgramHeadersOnly,
+            4 => ReadelfDisplayMode.SectionHeadersOnly,
+            3 => ReadelfDisplayMode.FileHeaderAndProgramHeaders,
+            5 => ReadelfDisplayMode.FileHeaderAndSectionHeaders,
+            6 => ReadelfDisplayMode.ProgramHeaderAndSectionHeaders,
+            7 => ReadelfDisplayMode.FileHeaderProgramHeadersAndSectionHeaders,
+            _ => ReadelfDisplayMode.Default
+        };
     }
 }

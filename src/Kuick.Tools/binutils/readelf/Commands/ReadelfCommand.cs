@@ -26,7 +26,7 @@ public sealed class ReadelfCommand
                 ReadelfDisplayModeHelper.FromOptions(options),
                 new FormatterOptions
                 {
-                    IncludeEmptyTables = options.IncludeEmpty || options.ProgramHeadersOnly,
+                    IncludeEmptyTables = options.IncludeEmpty || options.ProgramHeadersOnly || options.SectionHeadersOnly,
                     Verbose = options.Verbose
                 });
 

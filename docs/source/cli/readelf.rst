@@ -23,6 +23,8 @@ This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfL
      - Print **only** the ELF executable (file) header.
    * - :ref:`-l / --program-headers <readelf-program-headers>`
      - Print the **program header table** (segments).
+   * - :ref:`-S / --section-headers / --sections <readelf-section-headers>`
+     - Print the **section header table** (section descriptors).
    * - :ref:`--include-empty <readelf-other-options>`
      - Include empty tables when applicable.
    * - :ref:`--verbose <readelf-other-options>`
@@ -104,6 +106,34 @@ Equivalent:
 
    ./riscv32-kuick-elf-readelf --program-headers /path/to/a.out
 
+.. _readelf-section-headers:
+
+Section headers (``-S`` / ``--section-headers`` / ``--sections``)
+-----------------------------------------------------------------
+
+``-S``
+   Short form for printing the **section header table** (section names, types, offsets, sizes, flags, link/info, etc.).
+
+``--section-headers``
+   Long form with the same meaning as ``-S``.
+
+``--sections``
+   Alias for ``--section-headers`` (same behavior as GNU ``readelf``).
+
+When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h`` and/or ``-l`` to print those views in order; other tables (symbols, relocations, etc.) are omitted when any single-view mode is active.
+
+Example:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf -S /path/to/object.o
+
+Equivalent:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf --section-headers /path/to/object.o
+
 .. _readelf-other-options:
 
 Other options (summary)
@@ -118,7 +148,7 @@ Other options (summary)
 Default behavior
 ----------------
 
-If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, or both together), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, etc., as implemented). See ``--help`` for the current list.
+If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, etc., as implemented). See ``--help`` for the current list.
 
 See also
 --------

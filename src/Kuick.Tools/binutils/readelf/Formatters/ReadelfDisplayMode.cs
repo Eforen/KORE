@@ -15,5 +15,17 @@ public enum ReadelfDisplayMode
     ProgramHeadersOnly,
 
     /// <summary><c>-h</c> and <c>-l</c> together, nothing else.</summary>
-    FileHeaderAndProgramHeaders
+    FileHeaderAndProgramHeaders,
+
+    /// <summary><c>-S</c> only.</summary>
+    SectionHeadersOnly,
+
+    /// <summary><c>-h</c> and <c>-S</c>.</summary>
+    FileHeaderAndSectionHeaders,
+
+    /// <summary><c>-l</c> and <c>-S</c>.</summary>
+    ProgramHeaderAndSectionHeaders,
+
+    /// <summary><c>-h</c>, <c>-l</c>, and <c>-S</c>.</summary>
+    FileHeaderProgramHeadersAndSectionHeaders
 }

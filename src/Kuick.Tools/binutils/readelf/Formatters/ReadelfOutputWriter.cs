@@ -19,9 +19,20 @@ public sealed class ReadelfOutputWriter
         {
             ReadelfDisplayMode.FileHeaderOnly => _headerFormatter.Format(elfObject, options),
             ReadelfDisplayMode.ProgramHeadersOnly => _programHeaderFormatter.Format(elfObject, options),
+            ReadelfDisplayMode.SectionHeadersOnly => _sectionFormatter.Format(elfObject, options),
             ReadelfDisplayMode.FileHeaderAndProgramHeaders => JoinNonEmpty(
                 _headerFormatter.Format(elfObject, options),
                 _programHeaderFormatter.Format(elfObject, options)),
+            ReadelfDisplayMode.FileHeaderAndSectionHeaders => JoinNonEmpty(
+                _headerFormatter.Format(elfObject, options),
+                _sectionFormatter.Format(elfObject, options)),
+            ReadelfDisplayMode.ProgramHeaderAndSectionHeaders => JoinNonEmpty(
+                _programHeaderFormatter.Format(elfObject, options),
+                _sectionFormatter.Format(elfObject, options)),
+            ReadelfDisplayMode.FileHeaderProgramHeadersAndSectionHeaders => JoinNonEmpty(
+                _headerFormatter.Format(elfObject, options),
+                _programHeaderFormatter.Format(elfObject, options),
+                _sectionFormatter.Format(elfObject, options)),
             _ => FormatDefault(elfObject, options)
         };
     }
