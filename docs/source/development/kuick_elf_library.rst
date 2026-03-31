@@ -31,7 +31,7 @@ Namespaces (overview)
    In-memory representation: ``ElfObject`` (aggregate), ``ElfHeader``, ``Section``, ``Symbol``, ``RelocationEntry``. These types describe what you *have* after loading (or what you *want* before writing).
 
 ``Kuick.Elf.IO``
-   Binary I/O: ``ElfLoader`` reads a path into an ``ElfObject``; ``ElfWriter`` writes an ``ElfObject`` to a path. The loader validates the ELF magic and parses the **executable header** for ELF32 and ELF64; additional tables (sections, symbols, …) are represented on ``ElfObject`` and can be filled as the implementation grows.
+   Binary I/O: ``ElfLoader`` reads a path into an ``ElfObject``; ``ElfWriter`` writes an ``ElfObject`` to a path. The loader validates the ELF magic, parses the **executable header** for ELF32 and ELF64, and reads the **program header table** when ``e_phoff`` / ``e_phnum`` indicate segments are present. Sections, symbols, and further tables are represented on ``ElfObject`` and can be filled as the implementation grows.
 
 ``Kuick.Elf.Formatting``
    Text output helpers: ``FormatterOptions``, ``IElfFormatter``, and **ReadelfFormatters** (e.g. header, section, symbol, relocation, string-table formatters) used by the readelf-style CLI to turn an ``ElfObject`` into printable strings without tying core parsing to one console style.
@@ -72,7 +72,7 @@ For flags and behavior, see :doc:`../cli/readelf`.
 Implementation notes
 --------------------
 
-* **Parsing depth** — The loader focuses on a correct **ELF header** parse (including program/section header *offsets and counts* in the header). Populating ``Sections``, ``Symbols``, ``Relocations``, and string tables from the section header table is the natural next step for features like ``readelf -S`` / ``-s``; the **model** types are already present on ``ElfObject`` for that work.
+* **Parsing depth** — The loader parses the **ELF header** and the **program header** entries (``ProgramHeaders``) when present. Populating ``Sections``, ``Symbols``, ``Relocations``, and string tables from the section header table is the natural next step for features like ``readelf -S`` / ``-s``; the **model** types are already present on ``ElfObject`` for that work.
 * **Output style** — Formatters under ``Kuick.Elf.Formatting`` are **KORE-specific** text; they are not guaranteed to match GNU readelf.
 
 See also

@@ -38,7 +38,7 @@ static void PrintHelp()
 {
     Console.WriteLine("Kuick.Tools");
     Console.WriteLine("Usage:");
-    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [--header] [--include-empty] [--verbose]");
     Console.WriteLine("  kuick-readelf readelf <input-path> [options]");
     Console.WriteLine("  kuick-readelf --version");
     Console.WriteLine("  kuick-readelf --help");
@@ -53,6 +53,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
 
     string? inputPath = null;
     var fileHeaderOnly = false;
+    var programHeadersOnly = false;
     var includeEmpty = false;
     var verbose = false;
 
@@ -64,6 +65,10 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
             case "--file-header":
             case "--header":
                 fileHeaderOnly = true;
+                break;
+            case "-l":
+            case "--program-headers":
+                programHeadersOnly = true;
                 break;
             case "--include-empty":
                 includeEmpty = true;
@@ -96,6 +101,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     {
         InputPath = inputPath,
         FileHeaderOnly = fileHeaderOnly,
+        ProgramHeadersOnly = programHeadersOnly,
         IncludeEmpty = includeEmpty,
         Verbose = verbose
     }, string.Empty);

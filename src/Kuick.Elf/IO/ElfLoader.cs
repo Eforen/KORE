@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using Kuick.Elf.Models;
 
 namespace Kuick.Elf.IO;
@@ -72,9 +71,95 @@ public sealed class ElfLoader
             SectionHeaderStringIndex = shstrndx
         };
 
-        return new ElfObject
+        var elfObject = new ElfObject
         {
             Header = header
+        };
+
+        LoadProgramHeaders(stream, reader, elfObject, elfClass);
+        return elfObject;
+    }
+
+    private static void LoadProgramHeaders(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)
+    {
+        var h = obj.Header;
+        if (h.ProgramHeaderCount == 0 || h.ProgramHeaderOffset == 0)
+        {
+            return;
+        }
+
+        var expected = elfClass == ElfClass64 ? 56u : 32u;
+        if (h.ProgramHeaderEntrySize < expected)
+        {
+            throw new InvalidDataException(
+                $"Invalid program header entry size {h.ProgramHeaderEntrySize}; expected at least {expected} for ELF{elfClass * 32}.");
+        }
+
+        stream.Seek((long)h.ProgramHeaderOffset, SeekOrigin.Begin);
+        var extra = h.ProgramHeaderEntrySize - expected;
+        for (var i = 0; i < h.ProgramHeaderCount; i++)
+        {
+            ProgramHeader ph;
+            if (elfClass == ElfClass64)
+            {
+                ph = ReadProgramHeader64(reader);
+            }
+            else
+            {
+                ph = ReadProgramHeader32(reader);
+            }
+
+            obj.ProgramHeaders.Add(ph);
+            if (extra > 0)
+            {
+                reader.ReadBytes((int)extra);
+            }
+        }
+    }
+
+    private static ProgramHeader ReadProgramHeader64(BinaryReader reader)
+    {
+        var type = reader.ReadUInt32();
+        var flags = reader.ReadUInt32();
+        var offset = reader.ReadUInt64();
+        var vaddr = reader.ReadUInt64();
+        var paddr = reader.ReadUInt64();
+        var filesz = reader.ReadUInt64();
+        var memsz = reader.ReadUInt64();
+        var align = reader.ReadUInt64();
+        return new ProgramHeader
+        {
+            Type = type,
+            Flags = flags,
+            Offset = offset,
+            VirtualAddress = vaddr,
+            PhysicalAddress = paddr,
+            FileSize = filesz,
+            MemorySize = memsz,
+            Align = align
+        };
+    }
+
+    private static ProgramHeader ReadProgramHeader32(BinaryReader reader)
+    {
+        var type = reader.ReadUInt32();
+        var offset = reader.ReadUInt32();
+        var vaddr = reader.ReadUInt32();
+        var paddr = reader.ReadUInt32();
+        var filesz = reader.ReadUInt32();
+        var memsz = reader.ReadUInt32();
+        var flags = reader.ReadUInt32();
+        var align = reader.ReadUInt32();
+        return new ProgramHeader
+        {
+            Type = type,
+            Flags = flags,
+            Offset = offset,
+            VirtualAddress = vaddr,
+            PhysicalAddress = paddr,
+            FileSize = filesz,
+            MemorySize = memsz,
+            Align = align
         };
     }
 }

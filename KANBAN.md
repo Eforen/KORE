@@ -61,6 +61,7 @@ The lowest priority tasks are at the bottom of the list.
   - [Done 2025/06/19](#done-20250619)
   - [Done 2025/06/20](#done-20250620)
   - [Done 2025/06/21](#done-20250621)
+  - [Done 2026/03/31](#done-20260331)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -191,12 +192,12 @@ The lowest priority tasks are at the bottom of the list.
 * [DOCS][ARCHITECTURE][ELF] ELF architecture page (beginner-friendly + RISC-V ELF): `docs/source/architecture/elf_format.rst`
 * [DOCS][Development] Kuick.Elf library page + cross-links: `docs/source/development/kuick_elf_library.rst`
 ### Next Commit (Eforen)
+* [CLI][READELF] `-l` / `--program-headers` (program header table; KORE output)
+* [DOCS][CLI][READELF] Readelf CLI docs for `-l` / `--program-headers`
 
 # Working On
 ## Working on (Eforen)
 * [CLI][READELF] Add Help system that shows in `-h` / `--help`
-* [CLI][READELF] `-l` / `--program-headers` Display the ELF program headers info similar to `riscv32-unknown-elf-readelf -l`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-l`
 
 ## Set aside (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
