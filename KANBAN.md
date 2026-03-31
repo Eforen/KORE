@@ -136,17 +136,17 @@
 * [LIB][ELF] new elf reading writing library
 * [CLI][READELF] riscv32-kuick-elf-readelf Scaffolding (Basic Command Line Interface)
 * [CLI][READELF] Add Versioning system that shows in `--version`
-### Next Commit (Eforen)
 * [CLI][READELF] `-h` / `--file-header` Display the ELF file header info similar to `riscv32-unknown-elf-readelf -h`
 * [DOCS][CLI] Create a CLI Documentation Section for CLI Tools used outside of the emulator
 * [DOCS][CLI] Create a CLI Documentation Page for binutils with link to the readelf page and placeholders for the other binutils tools
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-h`
 * [BUILD] `make build-docs` runs `docs` container build (`make local` / `Dockerfile.sphinx`) for local preview (`docs/build/html/index.html`)
+### Next Commit (Eforen)
+* [DOCS][ARCHITECTURE][ELF] ELF architecture page (beginner-friendly + RISC-V ELF): `docs/source/architecture/elf_format.rst`
 
 # Working On
 ## Working on (Eforen)
 * [CLI][READELF] Add Help system that shows in `-h` / `--help`
-* [DOCS][ARCHITECTURE][ELF] Create a ELF Architecture Page that explains the RISCV ELF format and how it works
 * [DOCS][Development] Create a libraries page that talks about how to use the elf library
 
 ## Set aside (Eforen)

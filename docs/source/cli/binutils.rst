@@ -5,6 +5,8 @@ KORE Binutils (host)
 
 The **KORE binutils** are command-line tools modeled after the familiar GNU binutils family. They live under ``src/Kuick.Tools/binutils/`` in the repository. The first implemented tool is **readelf** for inspecting ELF objects; other utilities will be added alongside it without reshuffling the tree.
 
+These tools assume you are working with **ELF**-format RISC-V artifacts. If you want a plain-language explanation of what that means (headers, sections, symbols, relocations), read :doc:`../architecture/elf_format` first.
+
 .. contents::
    :local:
    :depth: 2
@@ -49,4 +51,5 @@ Output is written under ``bin/Kuick.Tools/bin/<Configuration>/net8.0/`` as ``ris
 See also
 --------
 
+* :doc:`../architecture/elf_format` — ELF, object files, and RISC-V (conceptual background)
 * :ref:`cli-host-tools` — parent section for all host CLI tools

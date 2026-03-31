@@ -5,6 +5,8 @@ riscv32-kuick-elf-readelf
 
 ``riscv32-kuick-elf-readelf`` is the KORE **readelf**-style utility. It reads ELF files and prints information in a **KORE-defined** format. The output is **not** meant to match GNU ``readelf`` byte-for-byte; it is intended to be readable and stable for KORE workflows.
 
+New to ELF or ``.o`` files? Read :doc:`../architecture/elf_format` for a beginner-friendly explanation of what is inside an object file and how RISC-V fits in.
+
 Synopsis
 --------
 
@@ -67,4 +69,5 @@ If you do **not** pass ``-h``, ``--file-header``, or ``--header``, the tool may 
 See also
 --------
 
+* :doc:`../architecture/elf_format` — ELF, object files, and RISC-V (what the tool is inspecting)
 * :ref:`cli-binutils` — KORE binutils overview and other planned tools

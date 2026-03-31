@@ -84,6 +84,7 @@ Indices and tables
     :caption: Architecture Documentation
 
     architecture/design
+    architecture/elf_format
     architecture/structure
     architecture/symbol_table
 

@@ -5,6 +5,15 @@ Glossary
 .. glossary::
    :sorted:
 
+   ELF
+      Executable and Linkable Format. A common **file format** for storing machine code, data, and metadata (sections, symbols, relocations) on disk so assemblers, linkers, and loaders can interoperate. See :ref:`architecture-elf-riscv`.
+
+   object file
+      A compiled **chunk** of a program (often a ``.o`` file) containing machine code and data in a format such as ELF, usually produced **before** the final link step that builds an executable or shared library.
+
+   relocation
+      A record in an object file that tells the linker **where** and **how** to patch bytes once the **final address** of a symbol is known.
+
    compilation unit
       A single source file and all the header files that are included in it, either directly or indirectly. In assembly, this typically refers to a single `.s` or `.asm` file that gets processed by the assembler.
 
