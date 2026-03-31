@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>riscv32-kuick-elf-readelf</AssemblyName>
+    <BaseOutputPath>..\..\bin\Kuick.Tools\bin\</BaseOutputPath>
+    <RollForward>Major</RollForward>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kuick.Elf\Kuick.Elf.csproj" />
+  </ItemGroup>
+
+</Project>

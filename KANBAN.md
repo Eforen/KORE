@@ -124,7 +124,6 @@
 * [KIUCK][PARSER][TEST] Pseudo Instruction `bgtz`
 
 ## Done 2025/06/21
-### Next Commit (Eforen)
 * [KUICK][AST] Maintain Program Node Maintains a Symbols Tables (Multi Scope (Local, Global))
 * [KUICK][AST] Symbol Table with Address Assignment in CodeGenerator
 * [KUICK][AST] Symbol-based AST Nodes (SymbolReferenceNode, InstructionNodeTypeBSymbol, etc.)
@@ -133,8 +132,15 @@
 * [KUICK][CODEGEN] Symbol Address Assignment and Resolution
 * [KUICK][CODEGEN] Multi-pass Assembly with Symbol Cache Miss Handling
 
+## Done 2026/03/31
+### Next Commit (Eforen)
+* [LIB][ELF] new elf reading writing library
+
 # Working On
 ## Working on (Eforen)
+* [CLI] Readelf
+
+## Set aside (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
 * [KANBAN][KIUCK][PARSER] Add Tasks for remaining Pseudo Instruction implementations
 * Confirm that all the tests for the previous Pseudo Instruction implementations exist (Rushed atm)
@@ -145,6 +151,7 @@
 
 # Todos
 ## Todo
+* [KUICKER] Write simple new 2 pass assembler
 * [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED
 

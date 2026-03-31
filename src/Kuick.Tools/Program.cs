@@ -1,0 +1,95 @@
+using Kuick.Tools.Commands;
+using Kuick.Tools.Commands.Options;
+
+const string ToolVersion = "0.1.0";
+
+if (args.Length == 0 || args[0] is "-h" or "--help")
+{
+    PrintHelp();
+    return 0;
+}
+
+if (args[0] is "-v" or "--version")
+{
+    Console.WriteLine($"riscv32-kuick-elf-readelf {ToolVersion}");
+    return 0;
+}
+
+var readelfArgs = string.Equals(args[0], "readelf", StringComparison.OrdinalIgnoreCase)
+    ? args.Skip(1).ToArray()
+    : args;
+
+var parseResult = ParseReadelfOptions(readelfArgs);
+if (!parseResult.Success || parseResult.Options is null)
+{
+    Console.Error.WriteLine(parseResult.ErrorMessage);
+    Console.WriteLine();
+    PrintHelp();
+    return 1;
+}
+
+return new ReadelfCommand().Execute(parseResult.Options);
+
+static void PrintHelp()
+{
+    Console.WriteLine("Kuick.Tools");
+    Console.WriteLine("Usage:");
+    Console.WriteLine("  kuick-readelf readelf <input-path> [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf <input-path> [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf --version");
+}
+
+static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelfOptions(string[] args)
+{
+    if (args.Length == 0)
+    {
+        return (false, null, "Missing input path.");
+    }
+
+    string? inputPath = null;
+    var headerOnly = false;
+    var includeEmpty = false;
+    var verbose = false;
+
+    foreach (var arg in args)
+    {
+        switch (arg)
+        {
+            case "--header":
+                headerOnly = true;
+                break;
+            case "--include-empty":
+                includeEmpty = true;
+                break;
+            case "--verbose":
+                verbose = true;
+                break;
+            default:
+                if (arg.StartsWith("-", StringComparison.Ordinal))
+                {
+                    return (false, null, $"Unknown option '{arg}'.");
+                }
+
+                if (inputPath is not null)
+                {
+                    return (false, null, "Only one input path is supported.");
+                }
+
+                inputPath = arg;
+                break;
+        }
+    }
+
+    if (string.IsNullOrWhiteSpace(inputPath))
+    {
+        return (false, null, "Missing input path.");
+    }
+
+    return (true, new ReadelfOptions
+    {
+        InputPath = inputPath,
+        HeaderOnly = headerOnly,
+        IncludeEmpty = includeEmpty,
+        Verbose = verbose
+    }, string.Empty);
+}
