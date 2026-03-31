@@ -9,6 +9,8 @@ public sealed class ReadelfOptions
     public bool ProgramHeadersOnly { get; init; }
     /// <summary>Only print section header table (-S, --section-headers, --sections).</summary>
     public bool SectionHeadersOnly { get; init; }
+    /// <summary>Only print symbol tables (-s, --symbols, --syms).</summary>
+    public bool SymbolsOnly { get; init; }
     public bool IncludeEmpty { get; init; }
     public bool Verbose { get; init; }
 }

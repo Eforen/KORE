@@ -25,6 +25,8 @@ This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfL
      - Print the **program header table** (segments).
    * - :ref:`-S / --section-headers / --sections <readelf-section-headers>`
      - Print the **section header table** (section descriptors).
+   * - :ref:`-s / --symbols / --syms <readelf-symbols>`
+     - Print **symbol tables** (``.symtab``, ``.dynsym``, etc.).
    * - :ref:`--include-empty <readelf-other-options>`
      - Include empty tables when applicable.
    * - :ref:`--verbose <readelf-other-options>`
@@ -120,7 +122,7 @@ Section headers (``-S`` / ``--section-headers`` / ``--sections``)
 ``--sections``
    Alias for ``--section-headers`` (same behavior as GNU ``readelf``).
 
-When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h`` and/or ``-l`` to print those views in order; other tables (symbols, relocations, etc.) are omitted when any single-view mode is active.
+When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h``, ``-l``, and/or ``-s`` to print those views in order; other tables (relocations, etc.) are omitted when any single-view mode is active.
 
 Example:
 
@@ -133,6 +135,34 @@ Equivalent:
 .. code-block:: bash
 
    ./riscv32-kuick-elf-readelf --section-headers /path/to/object.o
+
+.. _readelf-symbols:
+
+Symbols (``-s`` / ``--symbols`` / ``--syms``)
+---------------------------------------------
+
+``-s``
+   Short form for printing **symbol tables** loaded from ``SHT_SYMTAB`` and ``SHT_DYNSYM`` sections (names resolved via the linked string table).
+
+``--symbols``
+   Long form with the same meaning as ``-s``.
+
+``--syms``
+   Alias for ``--symbols`` (same idea as GNU ``readelf``).
+
+When set alone, only symbol-table output is shown (KORE format). Combine with ``-h``, ``-l``, and/or ``-S`` to print those views first, in that order.
+
+Example:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf -s /path/to/object.o
+
+Equivalent:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf --symbols /path/to/object.o
 
 .. _readelf-other-options:
 
@@ -148,7 +178,7 @@ Other options (summary)
 Default behavior
 ----------------
 
-If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, etc., as implemented). See ``--help`` for the current list.
+If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, etc., as implemented). See ``--help`` for the current list.
 
 See also
 --------

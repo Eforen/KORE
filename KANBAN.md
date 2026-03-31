@@ -193,10 +193,13 @@ The lowest priority tasks are at the bottom of the list.
 * [DOCS][Development] Kuick.Elf library page + cross-links: `docs/source/development/kuick_elf_library.rst`
 * [CLI][READELF] `-l` / `--program-headers` (program header table; KORE output)
 * [DOCS][CLI][READELF] Readelf CLI docs for `-l` / `--program-headers`
-### Next Commit (Eforen)
 * [CLI][READELF] `-S` / `--section-headers` Display the ELF section headers info similar to `riscv32-unknown-elf-readelf -S`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-S`
 * [CLI][READELF] `--sections` Simple Alias for `--section-headers`
+### Next Commit (Eforen)
+* [CLI][READELF] `-s` / `--symbols` Display the ELF symbol table info similar to `riscv32-unknown-elf-readelf -s`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-s`
+* [CLI][READELF] `--syms` Simple Alias for `--symbols`
 
 # Working On
 ## Working on (Eforen)
@@ -213,9 +216,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] `-s` / `--symbols` Display the ELF symbol table info similar to `riscv32-unknown-elf-readelf -s`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-s`
-* [CLI][READELF] `--syms` Simple Alias for `--symbols`
 * [CLI][READELF] `-r` / `--relocations` Display the ELF relocation table info similar to `riscv32-unknown-elf-readelf -r`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-r`
 * [CLI][READELF] `--relocs` Simple Alias for `--relocations`

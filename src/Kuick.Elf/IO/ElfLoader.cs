@@ -79,6 +79,7 @@ public sealed class ElfLoader
 
         LoadProgramHeaders(stream, reader, elfObject, elfClass);
         LoadSectionHeaders(stream, reader, elfObject, elfClass);
+        LoadSymbols(stream, reader, elfObject, elfClass);
         return elfObject;
     }
 
@@ -229,6 +230,108 @@ public sealed class ElfLoader
             Info = info,
             Addralign = addralign,
             Entsize = entsize
+        };
+    }
+
+    private const uint ShtSymtab = 2;
+    private const uint ShtStrtab = 3;
+    private const uint ShtDynsym = 11;
+
+    private static void LoadSymbols(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)
+    {
+        var expectedEs = elfClass == ElfClass64 ? 24u : 16u;
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type is not (ShtSymtab or ShtDynsym))
+            {
+                continue;
+            }
+
+            if (sec.Size == 0 || sec.EntrySize < expectedEs || sec.Link >= (uint)obj.Sections.Count)
+            {
+                continue;
+            }
+
+            var strtabSec = obj.Sections[(int)sec.Link];
+            if (strtabSec.Type != ShtStrtab)
+            {
+                continue;
+            }
+
+            if (strtabSec.Size > int.MaxValue || sec.Size > int.MaxValue)
+            {
+                continue;
+            }
+
+            if ((long)strtabSec.Offset + (long)strtabSec.Size > stream.Length
+                || (long)sec.Offset + (long)sec.Size > stream.Length)
+            {
+                continue;
+            }
+
+            var count = sec.Size / sec.EntrySize;
+            if (count == 0)
+            {
+                continue;
+            }
+
+            stream.Seek((long)strtabSec.Offset, SeekOrigin.Begin);
+            var strtab = reader.ReadBytes((int)strtabSec.Size);
+
+            stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+            var extra = (int)(sec.EntrySize - expectedEs);
+            for (ulong n = 0; n < count; n++)
+            {
+                var sym = elfClass == ElfClass64
+                    ? ReadSymbol64(reader, strtab, sec.Name)
+                    : ReadSymbol32(reader, strtab, sec.Name);
+                if (extra > 0)
+                {
+                    reader.ReadBytes(extra);
+                }
+
+                obj.Symbols.Add(sym);
+            }
+        }
+    }
+
+    private static Symbol ReadSymbol64(BinaryReader reader, byte[] strtab, string tableName)
+    {
+        var nameIdx = reader.ReadUInt32();
+        var info = reader.ReadByte();
+        var other = reader.ReadByte();
+        var shndx = reader.ReadUInt16();
+        var value = reader.ReadUInt64();
+        var size = reader.ReadUInt64();
+        return new Symbol
+        {
+            Name = ReadSectionName(strtab, nameIdx),
+            TableName = tableName,
+            Value = value,
+            Size = size,
+            Info = info,
+            Other = other,
+            SectionIndex = shndx
+        };
+    }
+
+    private static Symbol ReadSymbol32(BinaryReader reader, byte[] strtab, string tableName)
+    {
+        var nameIdx = reader.ReadUInt32();
+        var value = reader.ReadUInt32();
+        var size = reader.ReadUInt32();
+        var info = reader.ReadByte();
+        var other = reader.ReadByte();
+        var shndx = reader.ReadUInt16();
+        return new Symbol
+        {
+            Name = ReadSectionName(strtab, nameIdx),
+            TableName = tableName,
+            Value = value,
+            Size = size,
+            Info = info,
+            Other = other,
+            SectionIndex = shndx
         };
     }
 

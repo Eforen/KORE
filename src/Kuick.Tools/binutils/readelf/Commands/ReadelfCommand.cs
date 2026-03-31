@@ -23,10 +23,11 @@ public sealed class ReadelfCommand
             var elfObject = _loader.Load(options.InputPath);
             var output = _writer.Format(
                 elfObject,
-                ReadelfDisplayModeHelper.FromOptions(options),
+                options,
                 new FormatterOptions
                 {
-                    IncludeEmptyTables = options.IncludeEmpty || options.ProgramHeadersOnly || options.SectionHeadersOnly,
+                    IncludeEmptyTables = options.IncludeEmpty || options.ProgramHeadersOnly || options.SectionHeadersOnly
+                        || options.SymbolsOnly,
                     Verbose = options.Verbose
                 });
 

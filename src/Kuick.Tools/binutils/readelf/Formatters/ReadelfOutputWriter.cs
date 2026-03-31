@@ -1,11 +1,17 @@
 using Kuick.Elf.Formatting;
 using Kuick.Elf.Formatting.ReadelfFormatters;
 using Kuick.Elf.Models;
+using Kuick.Tools.Commands.Options;
 
 namespace Kuick.Tools.Formatters;
 
 public sealed class ReadelfOutputWriter
 {
+    private const int MaskFileHeader = 1;
+    private const int MaskProgramHeaders = 2;
+    private const int MaskSectionHeaders = 4;
+    private const int MaskSymbols = 8;
+
     private readonly HeaderFormatter _headerFormatter = new();
     private readonly ProgramHeaderFormatter _programHeaderFormatter = new();
     private readonly SectionFormatter _sectionFormatter = new();
@@ -13,28 +19,43 @@ public sealed class ReadelfOutputWriter
     private readonly RelocationFormatter _relocationFormatter = new();
     private readonly StringTableFormatter _stringTableFormatter = new();
 
-    public string Format(ElfObject elfObject, ReadelfDisplayMode mode, FormatterOptions options)
+    /// <summary>Bit order: file header, program headers, section headers, symbols (same order as output).</summary>
+    public static int GetViewMask(ReadelfOptions o) =>
+        (o.FileHeaderOnly ? MaskFileHeader : 0)
+        | (o.ProgramHeadersOnly ? MaskProgramHeaders : 0)
+        | (o.SectionHeadersOnly ? MaskSectionHeaders : 0)
+        | (o.SymbolsOnly ? MaskSymbols : 0);
+
+    public string Format(ElfObject elfObject, ReadelfOptions opts, FormatterOptions options)
     {
-        return mode switch
+        var mask = GetViewMask(opts);
+        if (mask == 0)
         {
-            ReadelfDisplayMode.FileHeaderOnly => _headerFormatter.Format(elfObject, options),
-            ReadelfDisplayMode.ProgramHeadersOnly => _programHeaderFormatter.Format(elfObject, options),
-            ReadelfDisplayMode.SectionHeadersOnly => _sectionFormatter.Format(elfObject, options),
-            ReadelfDisplayMode.FileHeaderAndProgramHeaders => JoinNonEmpty(
-                _headerFormatter.Format(elfObject, options),
-                _programHeaderFormatter.Format(elfObject, options)),
-            ReadelfDisplayMode.FileHeaderAndSectionHeaders => JoinNonEmpty(
-                _headerFormatter.Format(elfObject, options),
-                _sectionFormatter.Format(elfObject, options)),
-            ReadelfDisplayMode.ProgramHeaderAndSectionHeaders => JoinNonEmpty(
-                _programHeaderFormatter.Format(elfObject, options),
-                _sectionFormatter.Format(elfObject, options)),
-            ReadelfDisplayMode.FileHeaderProgramHeadersAndSectionHeaders => JoinNonEmpty(
-                _headerFormatter.Format(elfObject, options),
-                _programHeaderFormatter.Format(elfObject, options),
-                _sectionFormatter.Format(elfObject, options)),
-            _ => FormatDefault(elfObject, options)
-        };
+            return FormatDefault(elfObject, options);
+        }
+
+        var parts = new List<string>();
+        if ((mask & MaskFileHeader) != 0)
+        {
+            parts.Add(_headerFormatter.Format(elfObject, options));
+        }
+
+        if ((mask & MaskProgramHeaders) != 0)
+        {
+            parts.Add(_programHeaderFormatter.Format(elfObject, options));
+        }
+
+        if ((mask & MaskSectionHeaders) != 0)
+        {
+            parts.Add(_sectionFormatter.Format(elfObject, options));
+        }
+
+        if ((mask & MaskSymbols) != 0)
+        {
+            parts.Add(_symbolFormatter.Format(elfObject, options));
+        }
+
+        return JoinNonEmpty(parts.ToArray());
     }
 
     private static string JoinNonEmpty(params string[] parts) =>
