@@ -1,3 +1,50 @@
+How to use KANBAN.md
+====================
+To use KANBAN.md, you can use the following commands:
+
+Make sure you have a `### Next Commit ({YOUR_NAME})]` line that is inside one of the `## Done {DATE}` sections.
+This is where you will put the tasks you have completed but have not yet committed.
+
+NOTE: If there is no `## Done {TODAY'S_DATE}` section, you can create one. If there is a blank `## Done {DATE}` section that is in the past you may delete it.
+
+```markdown
+# Done
+## Done {TODAY'S_DATE}
+### Next Commit ({SOMEONE_ELSE})
+- [EXAMPLE] Task completed and committed by someone else.
+- [EXAMPLE] Task completed by yourself earlier today and committed.
+### Next Commit ({YOUR_NAME})
+- [EXAMPLE] Description of the task completed but not yet committed.
+```
+
+When you commit your changes move the `- [Next Commit ({YOUR_NAME})]` line to the `## Done {TODAY'S_DATE}` section end of the list.
+
+```markdown
+# Done
+## Done {TODAY'S_DATE}
+### Next Commit ({SOMEONE_ELSE})
+- [EXAMPLE] Task completed and committed by someone else.
+- [EXAMPLE] Task completed by yourself earlier today and committed.
+- [EXAMPLE] Description of the task you completed and just committed.
+### Next Commit ({YOUR_NAME})
+```
+
+## Working On Stuff
+
+When you start working on a task, you can move it to your own `## Working On ({YOUR_NAME})` section under `# Working On` section [Link](#working-on).
+NOTE: You should beable to just alt+arrow move the line to your working on section because the task should ideally already be in the `# Todos` section [Link](#todos).
+
+## Todos Priority
+The todos section is actually very straight forward, it is sorted by priority.
+The highest priority tasks are at the top of the list.
+The lowest priority tasks are at the bottom of the list.
+
+```markdown
+# Working On
+## Working On ({YOUR_NAME})
+- [EXAMPLE] Description of the task you are working on.
+```
+
 - [Done](#done)
   - [Done 10/18/2021](#done-10182021)
   - [Done 10/21/2021](#done-10212021)
@@ -7,13 +54,12 @@
   - [Done 2023/05/20](#done-20230520)
   - [Done 2023/05/21](#done-20230521)
   - [Done 2023/05/26](#done-20230526)
-    - [Next Commit (Eforen)](#next-commit-eforen)
   - [Done 2024/05/04](#done-20240504)
   - [Done 2025/06/16](#done-20250616)
   - [Done 2025/06/19](#done-20250619)
   - [Done 2025/06/20](#done-20250620)
   - [Done 2025/06/21](#done-20250621)
-    - [Next Commit (Eforen)](#next-commit-eforen-1)
+    - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
 - [Todos](#todos)
@@ -87,7 +133,6 @@
 * [KIUCK][PARSER][BUG] Fix test case for `bltz x3, 0x00000001`
 
 ## Done 2023/05/26
-### Next Commit (Eforen)
 * [KUICK][LEXER] Implement Binary Literals
 * [KUICK][PARSER] Implement Inline Directive `%hi`
 * [KUICK][PARSER] Implement Inline Directive `%lo`
@@ -142,12 +187,14 @@
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-h`
 * [BUILD] `make build-docs` runs `docs` container build (`make local` / `Dockerfile.sphinx`) for local preview (`docs/build/html/index.html`)
 * [DOCS][ARCHITECTURE][ELF] ELF architecture page (beginner-friendly + RISC-V ELF): `docs/source/architecture/elf_format.rst`
-### Next Commit (Eforen)
 * [DOCS][Development] Kuick.Elf library page + cross-links: `docs/source/development/kuick_elf_library.rst`
+### Next Commit (Eforen)
 
 # Working On
 ## Working on (Eforen)
 * [CLI][READELF] Add Help system that shows in `-h` / `--help`
+* [CLI][READELF] `-l` / `--program-headers` Display the ELF program headers info similar to `riscv32-unknown-elf-readelf -l`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-l`
 
 ## Set aside (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
@@ -160,8 +207,6 @@
 
 # Todos
 ## Todo
-* [CLI][READELF] `-l` / `--program-headers` Display the ELF program headers info similar to `riscv32-unknown-elf-readelf -l`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-l`
 * [CLI][READELF] `-S` / `--section-headers` Display the ELF section headers info similar to `riscv32-unknown-elf-readelf -S`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-S`
 * [CLI][READELF] `--sections` Simple Alias for `--section-headers`
