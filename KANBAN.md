@@ -45,6 +45,8 @@ The lowest priority tasks are at the bottom of the list.
 - [EXAMPLE] Description of the task you are working on.
 ```
 
+# Table of Contents
+
 - [Done](#done)
   - [Done 10/18/2021](#done-10182021)
   - [Done 10/21/2021](#done-10212021)
