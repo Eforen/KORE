@@ -7,6 +7,8 @@ These programs run on your development machine (Linux, macOS, or Windows with .N
 
 If you are new to **ELF** files, **object files** (``.o``), or how RISC-V programs are stored on disk, start with the conceptual overview: :doc:`../architecture/elf_format`.
 
+To use the **Kuick.Elf** .NET library from code (the same library these tools use), see :doc:`../development/kuick_elf_library`.
+
 .. toctree::
    :maxdepth: 2
 

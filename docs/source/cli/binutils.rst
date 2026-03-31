@@ -7,6 +7,8 @@ The **KORE binutils** are command-line tools modeled after the familiar GNU binu
 
 These tools assume you are working with **ELF**-format RISC-V artifacts. If you want a plain-language explanation of what that means (headers, sections, symbols, relocations), read :doc:`../architecture/elf_format` first.
 
+They are built on the **Kuick.Elf** library; for namespaces, loaders, and how to reference the project from your own C# code, see :doc:`../development/kuick_elf_library`.
+
 .. contents::
    :local:
    :depth: 2
@@ -52,4 +54,5 @@ See also
 --------
 
 * :doc:`../architecture/elf_format` — ELF, object files, and RISC-V (conceptual background)
+* :doc:`../development/kuick_elf_library` — Kuick.Elf .NET API (what these tools use under the hood)
 * :ref:`cli-host-tools` — parent section for all host CLI tools

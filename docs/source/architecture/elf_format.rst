@@ -116,6 +116,8 @@ How KORE uses ELF
 
 KORE’s toolchain ultimately **targets RISC-V** and produces ELF **object files** and related artifacts. The **Kuick.Elf** library in this repository is responsible for **reading and writing** ELF data in a structured way (headers, sections, symbols, relocations, and so on). The **readelf**-style host tool (`riscv32-kuick-elf-readelf`) is a **friendly viewer** for inspecting those files on your development machine.
 
+For **using the library from C#** (namespaces, ``ElfLoader`` / ``ElfWriter``, how the CLI ties in), see :doc:`../development/kuick_elf_library`.
+
 For command-line usage, see :doc:`../cli/readelf` and the :doc:`../cli/binutils` overview.
 
 Reading order

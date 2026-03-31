@@ -141,13 +141,13 @@
 * [DOCS][CLI] Create a CLI Documentation Page for binutils with link to the readelf page and placeholders for the other binutils tools
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-h`
 * [BUILD] `make build-docs` runs `docs` container build (`make local` / `Dockerfile.sphinx`) for local preview (`docs/build/html/index.html`)
-### Next Commit (Eforen)
 * [DOCS][ARCHITECTURE][ELF] ELF architecture page (beginner-friendly + RISC-V ELF): `docs/source/architecture/elf_format.rst`
+### Next Commit (Eforen)
+* [DOCS][Development] Kuick.Elf library page + cross-links: `docs/source/development/kuick_elf_library.rst`
 
 # Working On
 ## Working on (Eforen)
 * [CLI][READELF] Add Help system that shows in `-h` / `--help`
-* [DOCS][Development] Create a libraries page that talks about how to use the elf library
 
 ## Set aside (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions

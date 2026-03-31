@@ -5,6 +5,12 @@ This section contains detailed information about KORE's implementation, architec
 
 .. toctree::
     :maxdepth: 2
+    :caption: Libraries
+
+    kuick_elf_library
+
+.. toctree::
+    :maxdepth: 2
     :caption: KUICK Assembler
 
     kuick/index

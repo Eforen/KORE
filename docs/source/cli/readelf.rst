@@ -7,6 +7,8 @@ riscv32-kuick-elf-readelf
 
 New to ELF or ``.o`` files? Read :doc:`../architecture/elf_format` for a beginner-friendly explanation of what is inside an object file and how RISC-V fits in.
 
+This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfLoader``, ``ElfObject``, formatters), see :doc:`../development/kuick_elf_library`.
+
 Synopsis
 --------
 
@@ -70,4 +72,5 @@ See also
 --------
 
 * :doc:`../architecture/elf_format` — ELF, object files, and RISC-V (what the tool is inspecting)
+* :doc:`../development/kuick_elf_library` — Kuick.Elf library (how this tool loads and formats ELF)
 * :ref:`cli-binutils` — KORE binutils overview and other planned tools
