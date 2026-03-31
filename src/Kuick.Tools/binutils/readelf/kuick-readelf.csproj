@@ -4,14 +4,18 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>riscv32-kuick-elf-readelf</AssemblyName>
-    <BaseOutputPath>..\..\bin\Kuick.Tools\bin\</BaseOutputPath>
+    <BaseOutputPath>..\..\..\..\bin\Kuick.Tools\bin\</BaseOutputPath>
     <RollForward>Major</RollForward>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kuick.Elf\Kuick.Elf.csproj" />
+    <ProjectReference Include="..\..\..\Kuick.Elf\Kuick.Elf.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Version\*.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

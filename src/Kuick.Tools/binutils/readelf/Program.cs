@@ -1,7 +1,6 @@
 using Kuick.Tools.Commands;
 using Kuick.Tools.Commands.Options;
-
-const string ToolVersion = "0.1.0";
+using Kuick.Tools.Versioning;
 
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
@@ -11,7 +10,12 @@ if (args.Length == 0 || args[0] is "-h" or "--help")
 
 if (args[0] is "-v" or "--version")
 {
-    Console.WriteLine($"riscv32-kuick-elf-readelf {ToolVersion}");
+    var version = ToolVersion.Load();
+    Console.WriteLine($"KORE readelf (KORE Binutils) {version.ToSemanticString()}");
+    Console.WriteLine("Copyright (C) 2026 Eforen (Ariel Lothlorien)");
+    Console.WriteLine("This program is free software; you may redistribute it under the terms of");
+    Console.WriteLine("the GNU General Public License version 3.");
+    Console.WriteLine("This program has absolutely no warranty.");
     return 0;
 }
 

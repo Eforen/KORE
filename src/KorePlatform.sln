@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuick.Elf.Tests", "Kuick.El
 		{6E2F4E5D-1F7E-4D11-8F64-0B2A9C0F6D21} = {6E2F4E5D-1F7E-4D11-8F64-0B2A9C0F6D21}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuick.Tools", "Kuick.Tools\kuick-readelf.csproj", "{F2B2A6A0-B57B-4F47-AEC5-3D8798AC6C31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuick.Tools", "Kuick.Tools\binutils\readelf\kuick-readelf.csproj", "{F2B2A6A0-B57B-4F47-AEC5-3D8798AC6C31}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6E2F4E5D-1F7E-4D11-8F64-0B2A9C0F6D21} = {6E2F4E5D-1F7E-4D11-8F64-0B2A9C0F6D21}
 	EndProjectSection

@@ -133,12 +133,14 @@
 * [KUICK][CODEGEN] Multi-pass Assembly with Symbol Cache Miss Handling
 
 ## Done 2026/03/31
-### Next Commit (Eforen)
 * [LIB][ELF] new elf reading writing library
+* [CLI][READELF] riscv32-kuick-elf-readelf Scaffolding (Basic Command Line Interface)
+### Next Commit (Eforen)
+* [CLI][READELF] Add Versioning system that shows in `--version`
 
 # Working On
 ## Working on (Eforen)
-* [CLI] Readelf
+* [CLI][READELF] Add Help system that shows in `-h` / `--help`
 
 ## Set aside (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
@@ -151,6 +153,21 @@
 
 # Todos
 ## Todo
+* [CLI][READELF] `-h` / `--file-header` Display the ELF file header info similar to `riscv32-unknown-elf-readelf -h`
+* [CLI][READELF] `-l` / `--program-headers` Display the ELF program headers info similar to `riscv32-unknown-elf-readelf -l`
+* [CLI][READELF] `-S` / `--section-headers` Display the ELF section headers info similar to `riscv32-unknown-elf-readelf -S`
+* [CLI][READELF] `--sections` Simple Alias for `--section-headers`
+* [CLI][READELF] `-s` / `--symbols` Display the ELF symbol table info similar to `riscv32-unknown-elf-readelf -s`
+* [CLI][READELF] `--syms` Simple Alias for `--symbols`
+* [CLI][READELF] `-r` / `--relocations` Display the ELF relocation table info similar to `riscv32-unknown-elf-readelf -r`
+* [CLI][READELF] `--relocs` Simple Alias for `--relocations`
+* [CLI][READELF] `-d` / `--dynamic-section` Display the ELF dynamic section info similar to `riscv32-unknown-elf-readelf -d`
+* [CLI][READELF] `--dynamic` Simple Alias for `--dynamic-section`
+* [CLI][READELF] `-V` / `--version-info` Display the ELF version info similar to `riscv32-unknown-elf-readelf -V`
+* [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`
+* [CLI][READELF] `-I` / `--histogram` Display the ELF histogram of bucket list lengths similar to `riscv32-unknown-elf-readelf -I`
+* [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
+* [CLI][READELF] `-a` / `-all` Equivalent to: -h -l -S -s -r -d -V -A -I --got-contents
 * [KUICKER] Write simple new 2 pass assembler
 * [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED
