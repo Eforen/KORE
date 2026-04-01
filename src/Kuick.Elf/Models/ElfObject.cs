@@ -15,5 +15,7 @@ public sealed class ElfObject
     public byte[]? RiscvAttributes { get; set; }
     /// <summary>Raw bytes of <c>.gnu.hash</c> (<c>SHT_GNU_HASH</c>) when present.</summary>
     public byte[]? GnuHash { get; set; }
+    /// <summary>Raw bytes of the first <c>.got</c> section when present (for <c>--got-contents</c>).</summary>
+    public byte[]? GotSectionBytes { get; set; }
     public IList<string> StringTableEntries { get; } = new List<string>();
 }

@@ -38,7 +38,7 @@ static void PrintHelp()
 {
     Console.WriteLine("Kuick.Tools");
     Console.WriteLine("Usage:");
-    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [-r|--relocations|--relocs] [-d|--dynamic-section|--dynamic] [-V|--version-info] [-A|--arch-specific] [-I|--histogram] [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [-r|--relocations|--relocs] [-d|--dynamic-section|--dynamic] [-V|--version-info] [-A|--arch-specific] [-I|--histogram] [--got-contents] [--header] [--include-empty] [--verbose]");
     Console.WriteLine("  kuick-readelf readelf <input-path> [options]");
     Console.WriteLine("  kuick-readelf --version");
     Console.WriteLine("  kuick-readelf --help");
@@ -61,6 +61,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     var versionInfoOnly = false;
     var archSpecificOnly = false;
     var histogramOnly = false;
+    var gotContentsOnly = false;
     var includeEmpty = false;
     var verbose = false;
 
@@ -109,6 +110,9 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
             case "--histogram":
                 histogramOnly = true;
                 break;
+            case "--got-contents":
+                gotContentsOnly = true;
+                break;
             case "--include-empty":
                 includeEmpty = true;
                 break;
@@ -148,6 +152,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
         VersionInfoOnly = versionInfoOnly,
         ArchSpecificOnly = archSpecificOnly,
         HistogramOnly = histogramOnly,
+        GotContentsOnly = gotContentsOnly,
         IncludeEmpty = includeEmpty,
         Verbose = verbose
     }, string.Empty);

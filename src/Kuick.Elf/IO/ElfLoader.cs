@@ -79,6 +79,7 @@ public sealed class ElfLoader
 
         LoadProgramHeaders(stream, reader, elfObject, elfClass);
         LoadSectionHeaders(stream, reader, elfObject, elfClass);
+        LoadGotSectionBytes(stream, reader, elfObject);
         LoadSymbols(stream, reader, elfObject, elfClass);
         LoadRelocations(stream, reader, elfObject, elfClass);
         LoadDynamic(stream, reader, elfObject, elfClass);
@@ -165,6 +166,26 @@ public sealed class ElfLoader
                 AddressAlign = r.Addralign,
                 EntrySize = r.Entsize
             });
+        }
+    }
+
+    private static void LoadGotSectionBytes(Stream stream, BinaryReader reader, ElfObject obj)
+    {
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Name != ".got" || sec.Size == 0 || sec.Size > int.MaxValue)
+            {
+                continue;
+            }
+
+            if ((long)sec.Offset + (long)sec.Size > stream.Length)
+            {
+                continue;
+            }
+
+            stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+            obj.GotSectionBytes = reader.ReadBytes((int)sec.Size);
+            return;
         }
     }
 
@@ -293,11 +314,15 @@ public sealed class ElfLoader
                 RelocationEntry re;
                 if (elfClass == ElfClass64)
                 {
-                    re = isRela ? ReadRela64(reader, sec.Name, sec.Link) : ReadRel64(reader, sec.Name, sec.Link);
+                    re = isRela
+                        ? ReadRela64(reader, sec.Name, sec.Link, sec.Info)
+                        : ReadRel64(reader, sec.Name, sec.Link, sec.Info);
                 }
                 else
                 {
-                    re = isRela ? ReadRela32(reader, sec.Name, sec.Link) : ReadRel32(reader, sec.Name, sec.Link);
+                    re = isRela
+                        ? ReadRela32(reader, sec.Name, sec.Link, sec.Info)
+                        : ReadRel32(reader, sec.Name, sec.Link, sec.Info);
                 }
 
                 if (extra > 0)
@@ -310,7 +335,7 @@ public sealed class ElfLoader
         }
     }
 
-    private static RelocationEntry ReadRela64(BinaryReader reader, string sectionName, uint symTabLink)
+    private static RelocationEntry ReadRela64(BinaryReader reader, string sectionName, uint symTabLink, uint targetSectionIndex)
     {
         var offset = reader.ReadUInt64();
         var info = reader.ReadUInt64();
@@ -319,13 +344,14 @@ public sealed class ElfLoader
         {
             SectionName = sectionName,
             SymTabLink = symTabLink,
+            TargetSectionIndex = targetSectionIndex,
             Offset = offset,
             Info = info,
             Addend = addend
         };
     }
 
-    private static RelocationEntry ReadRel64(BinaryReader reader, string sectionName, uint symTabLink)
+    private static RelocationEntry ReadRel64(BinaryReader reader, string sectionName, uint symTabLink, uint targetSectionIndex)
     {
         var offset = reader.ReadUInt64();
         var info = reader.ReadUInt64();
@@ -333,13 +359,14 @@ public sealed class ElfLoader
         {
             SectionName = sectionName,
             SymTabLink = symTabLink,
+            TargetSectionIndex = targetSectionIndex,
             Offset = offset,
             Info = info,
             Addend = 0
         };
     }
 
-    private static RelocationEntry ReadRela32(BinaryReader reader, string sectionName, uint symTabLink)
+    private static RelocationEntry ReadRela32(BinaryReader reader, string sectionName, uint symTabLink, uint targetSectionIndex)
     {
         var offset = reader.ReadUInt32();
         var info = reader.ReadUInt32();
@@ -348,13 +375,14 @@ public sealed class ElfLoader
         {
             SectionName = sectionName,
             SymTabLink = symTabLink,
+            TargetSectionIndex = targetSectionIndex,
             Offset = offset,
             Info = info,
             Addend = addend
         };
     }
 
-    private static RelocationEntry ReadRel32(BinaryReader reader, string sectionName, uint symTabLink)
+    private static RelocationEntry ReadRel32(BinaryReader reader, string sectionName, uint symTabLink, uint targetSectionIndex)
     {
         var offset = reader.ReadUInt32();
         var info = reader.ReadUInt32();
@@ -362,6 +390,7 @@ public sealed class ElfLoader
         {
             SectionName = sectionName,
             SymTabLink = symTabLink,
+            TargetSectionIndex = targetSectionIndex,
             Offset = offset,
             Info = info,
             Addend = 0

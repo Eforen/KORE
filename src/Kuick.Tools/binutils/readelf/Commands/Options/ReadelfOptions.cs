@@ -21,6 +21,8 @@ public sealed class ReadelfOptions
     public bool ArchSpecificOnly { get; init; }
     /// <summary>Only print GNU hash bucket histogram (-I, --histogram).</summary>
     public bool HistogramOnly { get; init; }
+    /// <summary>Only print Global Offset Table (.got) slot listing (--got-contents).</summary>
+    public bool GotContentsOnly { get; init; }
     public bool IncludeEmpty { get; init; }
     public bool Verbose { get; init; }
 }

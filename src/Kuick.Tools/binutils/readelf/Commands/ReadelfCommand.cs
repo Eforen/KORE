@@ -28,7 +28,8 @@ public sealed class ReadelfCommand
                 {
                     IncludeEmptyTables = options.IncludeEmpty || options.ProgramHeadersOnly || options.SectionHeadersOnly
                         || options.SymbolsOnly || options.RelocationsOnly || options.DynamicSectionOnly
-                        || options.VersionInfoOnly || options.ArchSpecificOnly || options.HistogramOnly,
+                        || options.VersionInfoOnly || options.ArchSpecificOnly || options.HistogramOnly
+                        || options.GotContentsOnly,
                     Verbose = options.Verbose
                 });
 

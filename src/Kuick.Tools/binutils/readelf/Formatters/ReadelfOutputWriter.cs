@@ -16,6 +16,7 @@ public sealed class ReadelfOutputWriter
     private const int MaskVersionInfo = 64;
     private const int MaskArchSpecific = 128;
     private const int MaskHistogram = 256;
+    private const int MaskGotContents = 512;
 
     private readonly HeaderFormatter _headerFormatter = new();
     private readonly ProgramHeaderFormatter _programHeaderFormatter = new();
@@ -26,9 +27,10 @@ public sealed class ReadelfOutputWriter
     private readonly VersionInfoFormatter _versionInfoFormatter = new();
     private readonly ArchSpecificFormatter _archSpecificFormatter = new();
     private readonly HistogramFormatter _histogramFormatter = new();
+    private readonly GotContentsFormatter _gotContentsFormatter = new();
     private readonly StringTableFormatter _stringTableFormatter = new();
 
-    /// <summary>Bit order: file header, program headers, section headers, symbols, relocations, dynamic, version info, arch-specific, histogram (same order as output).</summary>
+    /// <summary>Bit order: file header, program headers, section headers, symbols, relocations, dynamic, version info, arch-specific, histogram, got-contents (same order as output).</summary>
     public static int GetViewMask(ReadelfOptions o) =>
         (o.FileHeaderOnly ? MaskFileHeader : 0)
         | (o.ProgramHeadersOnly ? MaskProgramHeaders : 0)
@@ -38,7 +40,8 @@ public sealed class ReadelfOutputWriter
         | (o.DynamicSectionOnly ? MaskDynamic : 0)
         | (o.VersionInfoOnly ? MaskVersionInfo : 0)
         | (o.ArchSpecificOnly ? MaskArchSpecific : 0)
-        | (o.HistogramOnly ? MaskHistogram : 0);
+        | (o.HistogramOnly ? MaskHistogram : 0)
+        | (o.GotContentsOnly ? MaskGotContents : 0);
 
     public string Format(ElfObject elfObject, ReadelfOptions opts, FormatterOptions options)
     {
@@ -94,6 +97,11 @@ public sealed class ReadelfOutputWriter
             parts.Add(_histogramFormatter.Format(elfObject, options));
         }
 
+        if ((mask & MaskGotContents) != 0)
+        {
+            parts.Add(_gotContentsFormatter.Format(elfObject, options));
+        }
+
         return JoinNonEmpty(parts.ToArray());
     }
 
@@ -120,6 +128,7 @@ public sealed class ReadelfOutputWriter
         sections.Add(_versionInfoFormatter.Format(elfObject, options));
         sections.Add(_archSpecificFormatter.Format(elfObject, options));
         sections.Add(_histogramFormatter.Format(elfObject, options));
+        sections.Add(_gotContentsFormatter.Format(elfObject, options));
         sections.Add(_stringTableFormatter.Format(elfObject, options));
 
         return string.Join(Environment.NewLine, sections.Where(static s => !string.IsNullOrWhiteSpace(s)));

@@ -37,6 +37,8 @@ This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfL
      - Print **architecture-specific** information (RISC-V ``e_flags`` and ``.riscv.attributes`` when present).
    * - :ref:`-I / --histogram <readelf-histogram>`
      - Print **GNU hash** bucket chain-length histogram (``.gnu.hash`` / ``SHT_GNU_HASH``).
+   * - :ref:`--got-contents <readelf-got-contents>`
+     - Print **Global Offset Table** slot listing for ``.got`` (relocations and raw slot values).
    * - :ref:`--include-empty <readelf-other-options>`
      - Include empty tables when applicable.
    * - :ref:`--verbose <readelf-other-options>`
@@ -267,7 +269,7 @@ Equivalent:
 .. _readelf-arch-specific:
 
 Architecture-specific (``-A`` / ``--arch-specific``)
---------------------------------------------------
+-----------------------------------------------------
 
 ``-A``
    Short form for printing **architecture-specific** information. For **RISC-V** (``EM_RISCV``), KORE prints a breakdown of ``e_flags`` (``EF_RISCV_*``) and, when present, the ``SHT_RISCV_ATTRIBUTES`` section (``.riscv.attributes``), including ``Tag_RISCV_arch`` when it can be read from the section bytes. For other ELF machines, output is minimal unless ``--include-empty`` is used (see below).
@@ -318,6 +320,26 @@ Equivalent:
 
    ./riscv32-kuick-elf-readelf --histogram /path/to/a.out
 
+.. _readelf-got-contents:
+
+GOT contents (``--got-contents``)
+----------------------------------
+
+``--got-contents``
+   Print a **Global Offset Table** listing for the ``.got`` section: one row per pointer-sized slot (4 bytes for ELF32, 8 for ELF64), with the slot address, relocation type when a relocation targets that slot, and symbol + addend (or the raw value read from the file when there is no relocation record for that slot).
+
+Dynamic executables and shared objects that use a GOT usually have a non-empty ``.got``; relocatable ``.o`` files may have one when the object participates in position-independent code. Relocation matching uses the relocation section’s ``sh_info`` when it points at ``.got``; when ``sh_info`` is zero (common for ``.rela.dyn``), entries are matched by virtual address range, like GNU ``readelf --got-contents``.
+
+Relocation **type** names are decoded for **x86-64**, **i386**, and **RISC-V** when ``e_machine`` matches; other architectures show numeric types. Output is KORE format, not GNU-identical.
+
+When set alone, only GOT output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, ``-V``, ``-A``, and/or ``-I`` to print those views first, in that order.
+
+Example:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf --got-contents /path/to/a.out
+
 .. _readelf-other-options:
 
 Other options (summary)
@@ -332,7 +354,7 @@ Other options (summary)
 Default behavior
 ----------------
 
-If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, ``-V`` / ``--version-info``, ``-A`` / ``--arch-specific``, ``-I`` / ``--histogram``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, GNU version sections when present, architecture-specific block for RISC-V when applicable, GNU hash histogram when ``.gnu.hash`` is present, etc., as implemented). See ``--help`` for the current list.
+If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, ``-V`` / ``--version-info``, ``-A`` / ``--arch-specific``, ``-I`` / ``--histogram``, ``--got-contents``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, GNU version sections when present, architecture-specific block for RISC-V when applicable, GNU hash histogram when ``.gnu.hash`` is present, GOT contents when ``.got`` is present, etc., as implemented). See ``--help`` for the current list.
 
 See also
 --------

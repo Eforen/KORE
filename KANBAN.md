@@ -209,9 +209,11 @@ The lowest priority tasks are at the bottom of the list.
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-V`
 * [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-A`
-### Next Commit (Eforen)
 * [CLI][READELF] `-I` / `--histogram` Display the ELF histogram of bucket list lengths similar to `riscv32-unknown-elf-readelf -I`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-I`
+### Next Commit (Eforen)
+* [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--got-contents`
 
 # Working On
 ## Working on (Eforen)
@@ -228,8 +230,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--got-contents`
 * [CLI][READELF][BUG] Multiple flags not working when combined with other flags.
 * [CLI][READELF] `-a` / `-all` Equivalent to: -h -l -S -s -r -d -V -A -I --got-contents
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-a`
