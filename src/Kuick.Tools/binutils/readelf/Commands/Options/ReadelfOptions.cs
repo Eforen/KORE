@@ -17,6 +17,8 @@ public sealed class ReadelfOptions
     public bool DynamicSectionOnly { get; init; }
     /// <summary>Only print GNU version sections (-V, --version-info).</summary>
     public bool VersionInfoOnly { get; init; }
+    /// <summary>Only print architecture-specific information (-A, --arch-specific).</summary>
+    public bool ArchSpecificOnly { get; init; }
     public bool IncludeEmpty { get; init; }
     public bool Verbose { get; init; }
 }

@@ -205,9 +205,11 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF] `-d` / `--dynamic-section` Display the ELF dynamic section info similar to `riscv32-unknown-elf-readelf -d`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-d`
 * [CLI][READELF] `--dynamic` Simple Alias for `--dynamic-section`
-### Next Commit (Eforen)
 * [CLI][READELF] `-V` / `--version-info` Display the ELF version info similar to `riscv32-unknown-elf-readelf -V`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-V`
+### Next Commit (Eforen)
+* [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-A`
 
 # Working On
 ## Working on (Eforen)
@@ -224,8 +226,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-A`
 * [CLI][READELF] `-I` / `--histogram` Display the ELF histogram of bucket list lengths similar to `riscv32-unknown-elf-readelf -I`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-I`
 * [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
@@ -233,6 +233,7 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF][BUG] Multiple flags not working when combined with other flags.
 * [CLI][READELF] `-a` / `-all` Equivalent to: -h -l -S -s -r -d -V -A -I --got-contents
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-a`
+* [CLI][READELF] Write a single test for each of the Readelf command flags by compiling a simple .S file and running the readelf command against the resulting .o file for now using riscv32-unknown-elf-gcc until kuick can compile .S files.
 * [KUICKER] Write simple new 2 pass assembler
 * [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED

@@ -83,6 +83,7 @@ public sealed class ElfLoader
         LoadRelocations(stream, reader, elfObject, elfClass);
         LoadDynamic(stream, reader, elfObject, elfClass);
         LoadGnuVersion(stream, reader, elfObject);
+        LoadRiscvAttributes(stream, reader, elfObject);
         return elfObject;
     }
 
@@ -242,6 +243,8 @@ public sealed class ElfLoader
     private const uint ShtGnuVerdef = 0x6ffffffd;
     private const uint ShtGnuVerneed = 0x6ffffffe;
     private const uint ShtGnuVersym = 0x6fffffff;
+    /// <summary><c>SHT_RISCV_ATTRIBUTES</c> (<c>SHT_LOPROC + 3</c>).</summary>
+    private const uint ShtRiscvAttributes = 0x70000003;
     private const uint ShtRela = 4;
     private const uint ShtRel = 9;
     private const uint ShtDynsym = 11;
@@ -694,6 +697,31 @@ public sealed class ElfLoader
         if (parsed.Entries.Count > 0)
         {
             obj.GnuVersion.Verdef.Add(parsed);
+        }
+    }
+
+    private static void LoadRiscvAttributes(Stream stream, BinaryReader reader, ElfObject obj)
+    {
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type != ShtRiscvAttributes)
+            {
+                continue;
+            }
+
+            if (sec.Size == 0 || sec.Size > int.MaxValue)
+            {
+                continue;
+            }
+
+            if ((long)sec.Offset + (long)sec.Size > stream.Length)
+            {
+                continue;
+            }
+
+            stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+            obj.RiscvAttributes = reader.ReadBytes((int)sec.Size);
+            return;
         }
     }
 
