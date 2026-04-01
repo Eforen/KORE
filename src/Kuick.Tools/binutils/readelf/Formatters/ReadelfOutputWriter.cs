@@ -11,6 +11,7 @@ public sealed class ReadelfOutputWriter
     private const int MaskProgramHeaders = 2;
     private const int MaskSectionHeaders = 4;
     private const int MaskSymbols = 8;
+    private const int MaskRelocations = 16;
 
     private readonly HeaderFormatter _headerFormatter = new();
     private readonly ProgramHeaderFormatter _programHeaderFormatter = new();
@@ -19,12 +20,13 @@ public sealed class ReadelfOutputWriter
     private readonly RelocationFormatter _relocationFormatter = new();
     private readonly StringTableFormatter _stringTableFormatter = new();
 
-    /// <summary>Bit order: file header, program headers, section headers, symbols (same order as output).</summary>
+    /// <summary>Bit order: file header, program headers, section headers, symbols, relocations (same order as output).</summary>
     public static int GetViewMask(ReadelfOptions o) =>
         (o.FileHeaderOnly ? MaskFileHeader : 0)
         | (o.ProgramHeadersOnly ? MaskProgramHeaders : 0)
         | (o.SectionHeadersOnly ? MaskSectionHeaders : 0)
-        | (o.SymbolsOnly ? MaskSymbols : 0);
+        | (o.SymbolsOnly ? MaskSymbols : 0)
+        | (o.RelocationsOnly ? MaskRelocations : 0);
 
     public string Format(ElfObject elfObject, ReadelfOptions opts, FormatterOptions options)
     {
@@ -53,6 +55,11 @@ public sealed class ReadelfOutputWriter
         if ((mask & MaskSymbols) != 0)
         {
             parts.Add(_symbolFormatter.Format(elfObject, options));
+        }
+
+        if ((mask & MaskRelocations) != 0)
+        {
+            parts.Add(_relocationFormatter.Format(elfObject, options));
         }
 
         return JoinNonEmpty(parts.ToArray());

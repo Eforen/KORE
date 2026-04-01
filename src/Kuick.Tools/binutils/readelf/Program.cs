@@ -38,7 +38,7 @@ static void PrintHelp()
 {
     Console.WriteLine("Kuick.Tools");
     Console.WriteLine("Usage:");
-    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [-r|--relocations|--relocs] [--header] [--include-empty] [--verbose]");
     Console.WriteLine("  kuick-readelf readelf <input-path> [options]");
     Console.WriteLine("  kuick-readelf --version");
     Console.WriteLine("  kuick-readelf --help");
@@ -56,6 +56,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     var programHeadersOnly = false;
     var sectionHeadersOnly = false;
     var symbolsOnly = false;
+    var relocationsOnly = false;
     var includeEmpty = false;
     var verbose = false;
 
@@ -81,6 +82,11 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
             case "--symbols":
             case "--syms":
                 symbolsOnly = true;
+                break;
+            case "-r":
+            case "--relocations":
+            case "--relocs":
+                relocationsOnly = true;
                 break;
             case "--include-empty":
                 includeEmpty = true;
@@ -116,6 +122,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
         ProgramHeadersOnly = programHeadersOnly,
         SectionHeadersOnly = sectionHeadersOnly,
         SymbolsOnly = symbolsOnly,
+        RelocationsOnly = relocationsOnly,
         IncludeEmpty = includeEmpty,
         Verbose = verbose
     }, string.Empty);

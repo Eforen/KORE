@@ -80,6 +80,7 @@ public sealed class ElfLoader
         LoadProgramHeaders(stream, reader, elfObject, elfClass);
         LoadSectionHeaders(stream, reader, elfObject, elfClass);
         LoadSymbols(stream, reader, elfObject, elfClass);
+        LoadRelocations(stream, reader, elfObject, elfClass);
         return elfObject;
     }
 
@@ -235,7 +236,126 @@ public sealed class ElfLoader
 
     private const uint ShtSymtab = 2;
     private const uint ShtStrtab = 3;
+    private const uint ShtRela = 4;
+    private const uint ShtRel = 9;
     private const uint ShtDynsym = 11;
+
+    private static void LoadRelocations(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)
+    {
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type is not (ShtRela or ShtRel))
+            {
+                continue;
+            }
+
+            var isRela = sec.Type == ShtRela;
+            var expectedEs = elfClass == ElfClass64
+                ? (isRela ? 24u : 16u)
+                : (isRela ? 12u : 8u);
+
+            if (sec.Size == 0 || sec.EntrySize < expectedEs || sec.Size > int.MaxValue)
+            {
+                continue;
+            }
+
+            if ((long)sec.Offset + (long)sec.Size > stream.Length)
+            {
+                continue;
+            }
+
+            if (sec.Link >= (uint)obj.Sections.Count)
+            {
+                continue;
+            }
+
+            var count = sec.Size / sec.EntrySize;
+            if (count == 0)
+            {
+                continue;
+            }
+
+            stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+            var extra = (int)(sec.EntrySize - expectedEs);
+            for (ulong n = 0; n < count; n++)
+            {
+                RelocationEntry re;
+                if (elfClass == ElfClass64)
+                {
+                    re = isRela ? ReadRela64(reader, sec.Name, sec.Link) : ReadRel64(reader, sec.Name, sec.Link);
+                }
+                else
+                {
+                    re = isRela ? ReadRela32(reader, sec.Name, sec.Link) : ReadRel32(reader, sec.Name, sec.Link);
+                }
+
+                if (extra > 0)
+                {
+                    reader.ReadBytes(extra);
+                }
+
+                obj.Relocations.Add(re);
+            }
+        }
+    }
+
+    private static RelocationEntry ReadRela64(BinaryReader reader, string sectionName, uint symTabLink)
+    {
+        var offset = reader.ReadUInt64();
+        var info = reader.ReadUInt64();
+        var addend = reader.ReadInt64();
+        return new RelocationEntry
+        {
+            SectionName = sectionName,
+            SymTabLink = symTabLink,
+            Offset = offset,
+            Info = info,
+            Addend = addend
+        };
+    }
+
+    private static RelocationEntry ReadRel64(BinaryReader reader, string sectionName, uint symTabLink)
+    {
+        var offset = reader.ReadUInt64();
+        var info = reader.ReadUInt64();
+        return new RelocationEntry
+        {
+            SectionName = sectionName,
+            SymTabLink = symTabLink,
+            Offset = offset,
+            Info = info,
+            Addend = 0
+        };
+    }
+
+    private static RelocationEntry ReadRela32(BinaryReader reader, string sectionName, uint symTabLink)
+    {
+        var offset = reader.ReadUInt32();
+        var info = reader.ReadUInt32();
+        var addend = reader.ReadInt32();
+        return new RelocationEntry
+        {
+            SectionName = sectionName,
+            SymTabLink = symTabLink,
+            Offset = offset,
+            Info = info,
+            Addend = addend
+        };
+    }
+
+    private static RelocationEntry ReadRel32(BinaryReader reader, string sectionName, uint symTabLink)
+    {
+        var offset = reader.ReadUInt32();
+        var info = reader.ReadUInt32();
+        return new RelocationEntry
+        {
+            SectionName = sectionName,
+            SymTabLink = symTabLink,
+            Offset = offset,
+            Info = info,
+            Addend = 0
+        };
+    }
 
     private static void LoadSymbols(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)
     {

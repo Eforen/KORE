@@ -11,6 +11,8 @@ public sealed class ReadelfOptions
     public bool SectionHeadersOnly { get; init; }
     /// <summary>Only print symbol tables (-s, --symbols, --syms).</summary>
     public bool SymbolsOnly { get; init; }
+    /// <summary>Only print relocation sections (-r, --relocations, --relocs).</summary>
+    public bool RelocationsOnly { get; init; }
     public bool IncludeEmpty { get; init; }
     public bool Verbose { get; init; }
 }
