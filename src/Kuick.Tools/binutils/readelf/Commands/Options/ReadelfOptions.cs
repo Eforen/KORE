@@ -19,6 +19,8 @@ public sealed class ReadelfOptions
     public bool VersionInfoOnly { get; init; }
     /// <summary>Only print architecture-specific information (-A, --arch-specific).</summary>
     public bool ArchSpecificOnly { get; init; }
+    /// <summary>Only print GNU hash bucket histogram (-I, --histogram).</summary>
+    public bool HistogramOnly { get; init; }
     public bool IncludeEmpty { get; init; }
     public bool Verbose { get; init; }
 }

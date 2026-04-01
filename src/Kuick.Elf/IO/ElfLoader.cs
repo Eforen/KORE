@@ -84,6 +84,7 @@ public sealed class ElfLoader
         LoadDynamic(stream, reader, elfObject, elfClass);
         LoadGnuVersion(stream, reader, elfObject);
         LoadRiscvAttributes(stream, reader, elfObject);
+        LoadGnuHash(stream, reader, elfObject);
         return elfObject;
     }
 
@@ -240,6 +241,7 @@ public sealed class ElfLoader
     private const uint ShtSymtab = 2;
     private const uint ShtStrtab = 3;
     private const uint ShtDynamic = 6;
+    private const uint ShtGnuHash = 0x6ffffff6;
     private const uint ShtGnuVerdef = 0x6ffffffd;
     private const uint ShtGnuVerneed = 0x6ffffffe;
     private const uint ShtGnuVersym = 0x6fffffff;
@@ -721,6 +723,31 @@ public sealed class ElfLoader
 
             stream.Seek((long)sec.Offset, SeekOrigin.Begin);
             obj.RiscvAttributes = reader.ReadBytes((int)sec.Size);
+            return;
+        }
+    }
+
+    private static void LoadGnuHash(Stream stream, BinaryReader reader, ElfObject obj)
+    {
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type != ShtGnuHash)
+            {
+                continue;
+            }
+
+            if (sec.Size == 0 || sec.Size > int.MaxValue)
+            {
+                continue;
+            }
+
+            if ((long)sec.Offset + (long)sec.Size > stream.Length)
+            {
+                continue;
+            }
+
+            stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+            obj.GnuHash = reader.ReadBytes((int)sec.Size);
             return;
         }
     }

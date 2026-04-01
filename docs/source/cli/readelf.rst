@@ -35,6 +35,8 @@ This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfL
      - Print **GNU symbol versioning** (``.gnu.version``, ``.gnu.version_d``, ``.gnu.version_r``).
    * - :ref:`-A / --arch-specific <readelf-arch-specific>`
      - Print **architecture-specific** information (RISC-V ``e_flags`` and ``.riscv.attributes`` when present).
+   * - :ref:`-I / --histogram <readelf-histogram>`
+     - Print **GNU hash** bucket chain-length histogram (``.gnu.hash`` / ``SHT_GNU_HASH``).
    * - :ref:`--include-empty <readelf-other-options>`
      - Include empty tables when applicable.
    * - :ref:`--verbose <readelf-other-options>`
@@ -130,7 +132,7 @@ Section headers (``-S`` / ``--section-headers`` / ``--sections``)
 ``--sections``
    Alias for ``--section-headers`` (same behavior as GNU ``readelf``).
 
-When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h``, ``-l``, ``-s``, ``-r``, ``-d``, ``-V``, and/or ``-A`` to print those views in order; other tables are omitted when any single-view mode is active.
+When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h``, ``-l``, ``-s``, ``-r``, ``-d``, ``-V``, ``-A``, and/or ``-I`` to print those views in order; other tables are omitted when any single-view mode is active.
 
 Example:
 
@@ -158,7 +160,7 @@ Symbols (``-s`` / ``--symbols`` / ``--syms``)
 ``--syms``
    Alias for ``--symbols`` (same idea as GNU ``readelf``).
 
-When set alone, only symbol-table output is shown (KORE format). Combine with ``-h``, ``-l``, ``-S``, ``-r``, ``-d``, ``-V``, and/or ``-A`` to print those views first, in that order.
+When set alone, only symbol-table output is shown (KORE format). Combine with ``-h``, ``-l``, ``-S``, ``-r``, ``-d``, ``-V``, ``-A``, and/or ``-I`` to print those views first, in that order.
 
 Example:
 
@@ -188,7 +190,7 @@ Relocations (``-r`` / ``--relocations`` / ``--relocs``)
 
 Relocation **type** names are decoded for **RISC-V** (``e_machine == EM_RISCV``); other architectures show numeric types. Output is KORE format, not GNU-identical.
 
-When set alone, only relocation output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-d``, ``-V``, and/or ``-A`` to print those views first, in that order.
+When set alone, only relocation output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-d``, ``-V``, ``-A``, and/or ``-I`` to print those views first, in that order.
 
 Example:
 
@@ -218,7 +220,7 @@ Dynamic section (``-d`` / ``--dynamic-section`` / ``--dynamic``)
 
 Relocatable object files (``.o``) usually have **no** dynamic section; executables and shared objects typically do. Output is KORE format, not GNU-identical.
 
-When set alone, only dynamic-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-V``, and/or ``-A`` to print those views first, in that order.
+When set alone, only dynamic-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-V``, ``-A``, and/or ``-I`` to print those views first, in that order.
 
 Example:
 
@@ -248,7 +250,7 @@ This is **not** the same as ``-v`` / ``--version`` (which prints the **readelf p
 
 Object files without dynamic linking often have **no** GNU version sections; shared objects and linked executables may. Output is KORE format, not GNU-identical.
 
-When set alone, only version-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, and/or ``-A`` to print those views first, in that order.
+When set alone, only version-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, ``-A``, and/or ``-I`` to print those views first, in that order.
 
 Example:
 
@@ -275,7 +277,7 @@ Architecture-specific (``-A`` / ``--arch-specific``)
 
 Output is KORE format, not GNU-identical. Non-RISC-V objects omit this block in the default bundle unless you pass ``--include-empty`` (then a short notice is printed).
 
-When set alone, only architecture-specific output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, and/or ``-V`` to print those views first, in that order.
+When set alone, only architecture-specific output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, ``-V``, and/or ``-I`` to print those views first, in that order.
 
 Example:
 
@@ -288,6 +290,33 @@ Equivalent:
 .. code-block:: bash
 
    ./riscv32-kuick-elf-readelf --arch-specific /path/to/object.o
+
+.. _readelf-histogram:
+
+Histogram (``-I`` / ``--histogram``)
+-------------------------------------
+
+``-I``
+   Short form for printing a **histogram of GNU hash bucket chain lengths** from the ``SHT_GNU_HASH`` section (``.gnu.hash``): how many buckets have each chain length, percentage of buckets, and cumulative **coverage** of symbols in the hash table (same idea as GNU ``readelf -I``).
+
+``--histogram``
+   Long form with the same meaning as ``-I``.
+
+Relocatable objects and static ``.a`` members often have **no** ``.gnu.hash``; dynamically linked executables and shared objects usually do. Output is KORE format, not GNU-identical (column spacing may differ).
+
+When set alone, only histogram output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, ``-V``, and/or ``-A`` to print those views first, in that order.
+
+Example:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf -I /path/to/a.out
+
+Equivalent:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf --histogram /path/to/a.out
 
 .. _readelf-other-options:
 
@@ -303,7 +332,7 @@ Other options (summary)
 Default behavior
 ----------------
 
-If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, ``-V`` / ``--version-info``, ``-A`` / ``--arch-specific``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, GNU version sections when present, architecture-specific block for RISC-V when applicable, etc., as implemented). See ``--help`` for the current list.
+If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, ``-V`` / ``--version-info``, ``-A`` / ``--arch-specific``, ``-I`` / ``--histogram``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, GNU version sections when present, architecture-specific block for RISC-V when applicable, GNU hash histogram when ``.gnu.hash`` is present, etc., as implemented). See ``--help`` for the current list.
 
 See also
 --------

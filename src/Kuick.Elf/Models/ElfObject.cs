@@ -13,5 +13,7 @@ public sealed class ElfObject
     public GnuVersionInfo GnuVersion { get; } = new();
     /// <summary>Raw bytes of <c>.riscv.attributes</c> (<c>SHT_RISCV_ATTRIBUTES</c>) when present.</summary>
     public byte[]? RiscvAttributes { get; set; }
+    /// <summary>Raw bytes of <c>.gnu.hash</c> (<c>SHT_GNU_HASH</c>) when present.</summary>
+    public byte[]? GnuHash { get; set; }
     public IList<string> StringTableEntries { get; } = new List<string>();
 }

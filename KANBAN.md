@@ -207,9 +207,11 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF] `--dynamic` Simple Alias for `--dynamic-section`
 * [CLI][READELF] `-V` / `--version-info` Display the ELF version info similar to `riscv32-unknown-elf-readelf -V`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-V`
-### Next Commit (Eforen)
 * [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-A`
+### Next Commit (Eforen)
+* [CLI][READELF] `-I` / `--histogram` Display the ELF histogram of bucket list lengths similar to `riscv32-unknown-elf-readelf -I`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-I`
 
 # Working On
 ## Working on (Eforen)
@@ -226,8 +228,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] `-I` / `--histogram` Display the ELF histogram of bucket list lengths similar to `riscv32-unknown-elf-readelf -I`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-I`
 * [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--got-contents`
 * [CLI][READELF][BUG] Multiple flags not working when combined with other flags.
