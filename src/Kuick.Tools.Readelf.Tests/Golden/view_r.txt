@@ -1,0 +1,6 @@
+Relocation sections
+────────────────────────────────────────────────────────────────────────────────────────────────
+  Section '.rela.plt'  (1 entry)
+    Num                Offset                Info                    Type  Symbol's Name + Addend
+    0              0x000032A0          0x00000105       R_RISCV_JUMP_SLOT  readelf_undefined_reloc_target + 0
+

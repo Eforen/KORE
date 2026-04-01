@@ -1,0 +1,8 @@
+Global offset table (.got)
+────────────────────────────────────────────────────────────────────────
+  Section '.got.plt' contains 3 entries (4-byte slots)
+    Index      Address                   Reloc  Symbol + addend / value
+    0       0x00003298                          0x00000000
+    1       0x0000329C                          0x00000000
+    2       0x000032A0       R_RISCV_JUMP_SLOT  readelf_undefined_reloc_target + 0
+

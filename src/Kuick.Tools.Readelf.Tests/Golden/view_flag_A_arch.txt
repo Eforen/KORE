@@ -1,0 +1,15 @@
+Architecture-specific information
+────────────────────────────────────────────────────────
+RISC-V (EM_RISCV)
+
+ELF header flags (e_flags)
+  Value: 0x0
+  EF_RISCV_RVC: no
+  EF_RISCV_FLOAT_ABI: EF_RISCV_FLOAT_ABI_SOFT (0)
+  EF_RISCV_RVE: no
+  EF_RISCV_TSO: no
+
+Attribute Section: riscv
+File Attributes
+  Tag_RISCV_arch: "rv32i2p1"
+

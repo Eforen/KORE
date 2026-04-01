@@ -214,9 +214,10 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF] `--got-contents` Display GOT (Global Offset Table) section contents similar to `riscv32-unknown-elf-readelf --got-contents`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--got-contents`
 * [CLI][READELF][BUG] Multiple flags not working when combined with other flags (fixed: grouped short options e.g. `-hl` like GNU readelf).
-### Next Commit (Eforen)
 * [CLI][READELF] `-a` / `-all` Equivalent to: -h -l -S -s -r -d -V -A -I --got-contents
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-a`
+### Next Commit (Eforen)
+* [CLI][READELF] Write a single test for each of the Readelf command flags by compiling a simple .S file and running the readelf command against the resulting .o file for now using riscv32-unknown-elf-gcc until kuick can compile .S files (`Kuick.Tools.Readelf.Tests`).
 
 # Working On
 ## Working on (Eforen)
@@ -233,7 +234,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] Write a single test for each of the Readelf command flags by compiling a simple .S file and running the readelf command against the resulting .o file for now using riscv32-unknown-elf-gcc until kuick can compile .S files.
 * [KUICKER] Write simple new 2 pass assembler
 * [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED

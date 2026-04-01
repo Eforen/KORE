@@ -171,21 +171,24 @@ public sealed class ElfLoader
 
     private static void LoadGotSectionBytes(Stream stream, BinaryReader reader, ElfObject obj)
     {
-        foreach (var sec in obj.Sections)
+        foreach (var name in new[] { ".got", ".got.plt" })
         {
-            if (sec.Name != ".got" || sec.Size == 0 || sec.Size > int.MaxValue)
+            foreach (var sec in obj.Sections)
             {
-                continue;
-            }
+                if (sec.Name != name || sec.Size == 0 || sec.Size > int.MaxValue)
+                {
+                    continue;
+                }
 
-            if ((long)sec.Offset + (long)sec.Size > stream.Length)
-            {
-                continue;
-            }
+                if ((long)sec.Offset + (long)sec.Size > stream.Length)
+                {
+                    continue;
+                }
 
-            stream.Seek((long)sec.Offset, SeekOrigin.Begin);
-            obj.GotSectionBytes = reader.ReadBytes((int)sec.Size);
-            return;
+                stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+                obj.GotSectionBytes = reader.ReadBytes((int)sec.Size);
+                return;
+            }
         }
     }
 

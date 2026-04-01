@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Kuick.Elf.Models;
@@ -17,7 +18,7 @@ public sealed class GotContentsFormatter : IElfFormatter
 
     public string Format(ElfObject elfObject, FormatterOptions? options = null)
     {
-        var gotSec = elfObject.Sections.FirstOrDefault(static s => s.Name == ".got");
+        var gotSec = SelectGotSection(elfObject.Sections);
         if (gotSec is null)
         {
             if (options?.IncludeEmptyTables != true)
@@ -27,7 +28,7 @@ public sealed class GotContentsFormatter : IElfFormatter
 
             return "Global offset table (.got)" + Environment.NewLine
                 + new string('─', 48) + Environment.NewLine
-                + "  (no .got section)" + Environment.NewLine;
+                + "  (no .got or .got.plt section)" + Environment.NewLine;
         }
 
         var is64 = elfObject.Header.ElfClass == 2;
@@ -41,7 +42,7 @@ public sealed class GotContentsFormatter : IElfFormatter
 
             return "Global offset table (.got)" + Environment.NewLine
                 + new string('─', 48) + Environment.NewLine
-                + "  Section '.got' is empty" + Environment.NewLine;
+                + $"  Section '{gotSec.Name}' is empty" + Environment.NewLine;
         }
 
         var nSlots = (int)(gotSec.Size / (ulong)ptrSize);
@@ -50,11 +51,12 @@ public sealed class GotContentsFormatter : IElfFormatter
         var gotIdx = elfObject.Sections.IndexOf(gotSec);
         var relBySlot = BuildRelocationMap(elfObject, gotSec, gotIdx, ptrSize);
 
+        var secName = gotSec.Name;
         var b = new StringBuilder();
         b.AppendLine("Global offset table (.got)");
         b.AppendLine(new string('─', 72));
         b.AppendLine(
-            $"  Section '.got' contains {nSlots} entr{(nSlots == 1 ? "y" : "ies")} ({ptrSize}-byte slots)");
+            $"  Section '{secName}' contains {nSlots} entr{(nSlots == 1 ? "y" : "ies")} ({ptrSize}-byte slots)");
         b.AppendLine(
             string.Concat(
                 "    ",
@@ -101,6 +103,40 @@ public sealed class GotContentsFormatter : IElfFormatter
         }
 
         return b.ToString().TrimEnd() + Environment.NewLine;
+    }
+
+    /// <summary>
+    /// Matches <see cref="Kuick.Elf.IO.ElfLoader"/> <c>LoadGotSectionBytes</c>: prefer the first of
+    /// <c>.got</c>, <c>.got.plt</c> with non-zero size (and loadable size). If only empty sections exist,
+    /// returns the first present section so empty-table output stays consistent.
+    /// </summary>
+    private static Section? SelectGotSection(IList<Section> sections)
+    {
+        foreach (var name in new[] { ".got", ".got.plt" })
+        {
+            foreach (var s in sections)
+            {
+                if (s.Name != name || s.Size == 0 || s.Size > int.MaxValue)
+                {
+                    continue;
+                }
+
+                return s;
+            }
+        }
+
+        foreach (var name in new[] { ".got", ".got.plt" })
+        {
+            foreach (var s in sections)
+            {
+                if (s.Name == name)
+                {
+                    return s;
+                }
+            }
+        }
+
+        return null;
     }
 
     private static Dictionary<int, RelocationEntry> BuildRelocationMap(

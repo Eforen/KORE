@@ -1,0 +1,16 @@
+Symbol tables
+────────────────────────────────────────────────────────────────────────────────────────────────
+  Table '.dynsym'  (3 entries)
+    Num                 Value        Size      Type      Bind     Ndx  Name
+    0              0x00000000  0x00000000    NOTYPE     LOCAL     UND  
+    1              0x00000000  0x00000000    NOTYPE    GLOBAL     UND  readelf_undefined_reloc_target
+    2              0x00001200  0x00000000    NOTYPE    GLOBAL       6  readelf_test_entry
+
+  Table '.symtab'  (5 entries)
+    Num                 Value        Size      Type      Bind     Ndx  Name
+    0              0x00000000  0x00000000    NOTYPE     LOCAL     UND  
+    1              0x00001200  0x00000000    NOTYPE     LOCAL       6  $xrv32i2p1
+    2              0x00002240  0x00000000    NOTYPE     LOCAL       8  _DYNAMIC
+    3              0x00001200  0x00000000    NOTYPE    GLOBAL       6  readelf_test_entry
+    4              0x00000000  0x00000000    NOTYPE    GLOBAL     UND  readelf_undefined_reloc_target
+
