@@ -82,6 +82,7 @@ public sealed class ElfLoader
         LoadSymbols(stream, reader, elfObject, elfClass);
         LoadRelocations(stream, reader, elfObject, elfClass);
         LoadDynamic(stream, reader, elfObject, elfClass);
+        LoadGnuVersion(stream, reader, elfObject);
         return elfObject;
     }
 
@@ -238,6 +239,9 @@ public sealed class ElfLoader
     private const uint ShtSymtab = 2;
     private const uint ShtStrtab = 3;
     private const uint ShtDynamic = 6;
+    private const uint ShtGnuVerdef = 0x6ffffffd;
+    private const uint ShtGnuVerneed = 0x6ffffffe;
+    private const uint ShtGnuVersym = 0x6fffffff;
     private const uint ShtRela = 4;
     private const uint ShtRel = 9;
     private const uint ShtDynsym = 11;
@@ -421,6 +425,275 @@ public sealed class ElfLoader
             }
 
             break;
+        }
+    }
+
+    private static void LoadGnuVersion(Stream stream, BinaryReader reader, ElfObject obj)
+    {
+        var le = obj.Header.DataEncoding == 1;
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type == ShtGnuVersym)
+            {
+                TryLoadVersym(stream, reader, obj, sec, le);
+            }
+        }
+
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type == ShtGnuVerdef)
+            {
+                TryLoadVerdef(stream, reader, obj, sec);
+            }
+        }
+
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type == ShtGnuVerneed)
+            {
+                TryLoadVerneed(stream, reader, obj, sec);
+            }
+        }
+    }
+
+    private static void TryLoadVersym(Stream stream, BinaryReader reader, ElfObject obj, Section sec, bool littleEndian)
+    {
+        if (sec.Size < 2 || sec.Size % 2 != 0 || sec.Size > int.MaxValue)
+        {
+            return;
+        }
+
+        if ((long)sec.Offset + (long)sec.Size > stream.Length || sec.Link >= (uint)obj.Sections.Count)
+        {
+            return;
+        }
+
+        stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+        var bytes = reader.ReadBytes((int)sec.Size);
+        var n = bytes.Length / 2;
+        var entries = new ushort[n];
+        for (var i = 0; i < n; i++)
+        {
+            entries[i] = ReadUInt16Elf(bytes, i * 2, littleEndian);
+        }
+
+        obj.GnuVersion.Versym = new VersymSection
+        {
+            Name = sec.Name,
+            Address = sec.Address,
+            Offset = sec.Offset,
+            DynsymLinkName = obj.Sections[(int)sec.Link].Name,
+            Entries = entries
+        };
+    }
+
+    private static ushort ReadUInt16Elf(byte[] b, int i, bool littleEndian) =>
+        littleEndian
+            ? (ushort)(b[i] | (b[i + 1] << 8))
+            : (ushort)((b[i] << 8) | b[i + 1]);
+
+    private static void TryLoadVerneed(Stream stream, BinaryReader reader, ElfObject obj, Section sec)
+    {
+        if (sec.Size == 0 || sec.Size > int.MaxValue || (long)sec.Offset + (long)sec.Size > stream.Length)
+        {
+            return;
+        }
+
+        if (sec.Link >= (uint)obj.Sections.Count)
+        {
+            return;
+        }
+
+        var dynstrSec = obj.Sections[(int)sec.Link];
+        if (dynstrSec.Type != ShtStrtab || dynstrSec.Size > int.MaxValue
+            || (long)dynstrSec.Offset + (long)dynstrSec.Size > stream.Length)
+        {
+            return;
+        }
+
+        stream.Seek((long)dynstrSec.Offset, SeekOrigin.Begin);
+        var dynstr = reader.ReadBytes((int)dynstrSec.Size);
+
+        var parsed = new VerneedSection
+        {
+            Name = sec.Name,
+            Address = sec.Address,
+            Offset = sec.Offset,
+            DynstrLinkName = dynstrSec.Name
+        };
+
+        ulong pos = 0;
+        while (pos < sec.Size)
+        {
+            if (pos + 16 > sec.Size)
+            {
+                break;
+            }
+
+            var headerStart = pos;
+            stream.Seek((long)(sec.Offset + pos), SeekOrigin.Begin);
+            var vnVersion = reader.ReadUInt16();
+            var vnCnt = reader.ReadUInt16();
+            var vnFile = reader.ReadUInt32();
+            var vnAux = reader.ReadUInt32();
+            var vnNext = reader.ReadUInt32();
+
+            var chain = new VerneedChain
+            {
+                HeaderOffsetInSection = headerStart,
+                VnVersion = vnVersion,
+                VnCount = vnCnt,
+                FileName = ReadSectionName(dynstr, vnFile)
+            };
+
+            var auxPos = headerStart + vnAux;
+            while (true)
+            {
+                if (auxPos + 16 > sec.Size)
+                {
+                    break;
+                }
+
+                stream.Seek((long)(sec.Offset + auxPos), SeekOrigin.Begin);
+                var vnaHash = reader.ReadUInt32();
+                var vnaFlags = reader.ReadUInt16();
+                var vnaOther = reader.ReadUInt16();
+                var vnaName = reader.ReadUInt32();
+                var vnaNext = reader.ReadUInt32();
+
+                chain.Aux.Add(new VernauxEntry
+                {
+                    OffsetInSection = auxPos,
+                    Hash = vnaHash,
+                    Flags = vnaFlags,
+                    VersionIndex = vnaOther,
+                    Name = ReadSectionName(dynstr, vnaName)
+                });
+
+                if (vnaNext == 0)
+                {
+                    break;
+                }
+
+                auxPos += vnaNext;
+            }
+
+            parsed.Chains.Add(chain);
+            if (vnNext == 0)
+            {
+                break;
+            }
+
+            pos += vnNext;
+        }
+
+        if (parsed.Chains.Count > 0)
+        {
+            obj.GnuVersion.Verneed.Add(parsed);
+        }
+    }
+
+    private static void TryLoadVerdef(Stream stream, BinaryReader reader, ElfObject obj, Section sec)
+    {
+        if (sec.Size == 0 || sec.Size > int.MaxValue || (long)sec.Offset + (long)sec.Size > stream.Length)
+        {
+            return;
+        }
+
+        if (sec.Link >= (uint)obj.Sections.Count)
+        {
+            return;
+        }
+
+        var dynstrSec = obj.Sections[(int)sec.Link];
+        if (dynstrSec.Type != ShtStrtab || dynstrSec.Size > int.MaxValue
+            || (long)dynstrSec.Offset + (long)dynstrSec.Size > stream.Length)
+        {
+            return;
+        }
+
+        stream.Seek((long)dynstrSec.Offset, SeekOrigin.Begin);
+        var dynstr = reader.ReadBytes((int)dynstrSec.Size);
+
+        var parsed = new VerdefSection
+        {
+            Name = sec.Name,
+            Address = sec.Address,
+            Offset = sec.Offset,
+            DynstrLinkName = dynstrSec.Name
+        };
+
+        ulong pos = 0;
+        while (pos < sec.Size)
+        {
+            if (pos + 20 > sec.Size)
+            {
+                break;
+            }
+
+            var entryStart = pos;
+            stream.Seek((long)(sec.Offset + pos), SeekOrigin.Begin);
+            var vdVersion = reader.ReadUInt16();
+            var vdFlags = reader.ReadUInt16();
+            var vdNdx = reader.ReadUInt16();
+            var vdCnt = reader.ReadUInt16();
+            _ = reader.ReadUInt32();
+            var vdAux = reader.ReadUInt32();
+            var vdNext = reader.ReadUInt32();
+
+            var auxPos = entryStart + vdAux;
+            var names = new List<(ulong Off, string Name)>();
+            while (true)
+            {
+                if (auxPos + 8 > sec.Size)
+                {
+                    break;
+                }
+
+                stream.Seek((long)(sec.Offset + auxPos), SeekOrigin.Begin);
+                var vdaName = reader.ReadUInt32();
+                var vdaNext = reader.ReadUInt32();
+                names.Add((auxPos, ReadSectionName(dynstr, vdaName)));
+                if (vdaNext == 0)
+                {
+                    break;
+                }
+
+                auxPos += vdaNext;
+            }
+
+            var entry = new VerdefEntry
+            {
+                VerdefOffsetInSection = entryStart,
+                VdVersion = vdVersion,
+                VdFlags = vdFlags,
+                VdNdx = vdNdx,
+                VdCount = vdCnt,
+                Name = names.Count > 0 ? names[0].Name : string.Empty
+            };
+
+            for (var p = 1; p < names.Count; p++)
+            {
+                entry.Parents.Add(new VerdefParentLine
+                {
+                    OffsetInSection = names[p].Off,
+                    ParentIndex = p,
+                    Name = names[p].Name
+                });
+            }
+
+            parsed.Entries.Add(entry);
+            if (vdNext == 0)
+            {
+                break;
+            }
+
+            pos += vdNext;
+        }
+
+        if (parsed.Entries.Count > 0)
+        {
+            obj.GnuVersion.Verdef.Add(parsed);
         }
     }
 

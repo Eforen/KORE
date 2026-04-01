@@ -15,6 +15,8 @@ public sealed class ReadelfOptions
     public bool RelocationsOnly { get; init; }
     /// <summary>Only print the dynamic section (-d, --dynamic-section, --dynamic).</summary>
     public bool DynamicSectionOnly { get; init; }
+    /// <summary>Only print GNU version sections (-V, --version-info).</summary>
+    public bool VersionInfoOnly { get; init; }
     public bool IncludeEmpty { get; init; }
     public bool Verbose { get; init; }
 }

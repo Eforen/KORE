@@ -27,7 +27,8 @@ public sealed class ReadelfCommand
                 new FormatterOptions
                 {
                     IncludeEmptyTables = options.IncludeEmpty || options.ProgramHeadersOnly || options.SectionHeadersOnly
-                        || options.SymbolsOnly || options.RelocationsOnly || options.DynamicSectionOnly,
+                        || options.SymbolsOnly || options.RelocationsOnly || options.DynamicSectionOnly
+                        || options.VersionInfoOnly,
                     Verbose = options.Verbose
                 });
 

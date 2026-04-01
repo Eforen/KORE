@@ -13,6 +13,7 @@ public sealed class ReadelfOutputWriter
     private const int MaskSymbols = 8;
     private const int MaskRelocations = 16;
     private const int MaskDynamic = 32;
+    private const int MaskVersionInfo = 64;
 
     private readonly HeaderFormatter _headerFormatter = new();
     private readonly ProgramHeaderFormatter _programHeaderFormatter = new();
@@ -20,16 +21,18 @@ public sealed class ReadelfOutputWriter
     private readonly SymbolFormatter _symbolFormatter = new();
     private readonly RelocationFormatter _relocationFormatter = new();
     private readonly DynamicFormatter _dynamicFormatter = new();
+    private readonly VersionInfoFormatter _versionInfoFormatter = new();
     private readonly StringTableFormatter _stringTableFormatter = new();
 
-    /// <summary>Bit order: file header, program headers, section headers, symbols, relocations, dynamic (same order as output).</summary>
+    /// <summary>Bit order: file header, program headers, section headers, symbols, relocations, dynamic, version info (same order as output).</summary>
     public static int GetViewMask(ReadelfOptions o) =>
         (o.FileHeaderOnly ? MaskFileHeader : 0)
         | (o.ProgramHeadersOnly ? MaskProgramHeaders : 0)
         | (o.SectionHeadersOnly ? MaskSectionHeaders : 0)
         | (o.SymbolsOnly ? MaskSymbols : 0)
         | (o.RelocationsOnly ? MaskRelocations : 0)
-        | (o.DynamicSectionOnly ? MaskDynamic : 0);
+        | (o.DynamicSectionOnly ? MaskDynamic : 0)
+        | (o.VersionInfoOnly ? MaskVersionInfo : 0);
 
     public string Format(ElfObject elfObject, ReadelfOptions opts, FormatterOptions options)
     {
@@ -70,6 +73,11 @@ public sealed class ReadelfOutputWriter
             parts.Add(_dynamicFormatter.Format(elfObject, options));
         }
 
+        if ((mask & MaskVersionInfo) != 0)
+        {
+            parts.Add(_versionInfoFormatter.Format(elfObject, options));
+        }
+
         return JoinNonEmpty(parts.ToArray());
     }
 
@@ -93,6 +101,7 @@ public sealed class ReadelfOutputWriter
         sections.Add(_symbolFormatter.Format(elfObject, options));
         sections.Add(_relocationFormatter.Format(elfObject, options));
         sections.Add(_dynamicFormatter.Format(elfObject, options));
+        sections.Add(_versionInfoFormatter.Format(elfObject, options));
         sections.Add(_stringTableFormatter.Format(elfObject, options));
 
         return string.Join(Environment.NewLine, sections.Where(static s => !string.IsNullOrWhiteSpace(s)));

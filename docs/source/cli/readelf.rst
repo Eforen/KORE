@@ -31,6 +31,8 @@ This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfL
      - Print **relocation** sections (``REL`` / ``RELA``).
    * - :ref:`-d / --dynamic-section / --dynamic <readelf-dynamic>`
      - Print the **dynamic** section (``.dynamic`` / ``SHT_DYNAMIC``).
+   * - :ref:`-V / --version-info <readelf-version-info>`
+     - Print **GNU symbol versioning** (``.gnu.version``, ``.gnu.version_d``, ``.gnu.version_r``).
    * - :ref:`--include-empty <readelf-other-options>`
      - Include empty tables when applicable.
    * - :ref:`--verbose <readelf-other-options>`
@@ -126,7 +128,7 @@ Section headers (``-S`` / ``--section-headers`` / ``--sections``)
 ``--sections``
    Alias for ``--section-headers`` (same behavior as GNU ``readelf``).
 
-When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h``, ``-l``, ``-s``, ``-r``, and/or ``-d`` to print those views in order; other tables are omitted when any single-view mode is active.
+When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h``, ``-l``, ``-s``, ``-r``, ``-d``, and/or ``-V`` to print those views in order; other tables are omitted when any single-view mode is active.
 
 Example:
 
@@ -154,7 +156,7 @@ Symbols (``-s`` / ``--symbols`` / ``--syms``)
 ``--syms``
    Alias for ``--symbols`` (same idea as GNU ``readelf``).
 
-When set alone, only symbol-table output is shown (KORE format). Combine with ``-h``, ``-l``, ``-S``, ``-r``, and/or ``-d`` to print those views first, in that order.
+When set alone, only symbol-table output is shown (KORE format). Combine with ``-h``, ``-l``, ``-S``, ``-r``, ``-d``, and/or ``-V`` to print those views first, in that order.
 
 Example:
 
@@ -184,7 +186,7 @@ Relocations (``-r`` / ``--relocations`` / ``--relocs``)
 
 Relocation **type** names are decoded for **RISC-V** (``e_machine == EM_RISCV``); other architectures show numeric types. Output is KORE format, not GNU-identical.
 
-When set alone, only relocation output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, and/or ``-d`` to print those views first, in that order.
+When set alone, only relocation output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-d``, and/or ``-V`` to print those views first, in that order.
 
 Example:
 
@@ -214,7 +216,7 @@ Dynamic section (``-d`` / ``--dynamic-section`` / ``--dynamic``)
 
 Relocatable object files (``.o``) usually have **no** dynamic section; executables and shared objects typically do. Output is KORE format, not GNU-identical.
 
-When set alone, only dynamic-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, and/or ``-r`` to print those views first, in that order.
+When set alone, only dynamic-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, and/or ``-V`` to print those views first, in that order.
 
 Example:
 
@@ -228,6 +230,35 @@ Equivalent:
 
    ./riscv32-kuick-elf-readelf --dynamic-section /path/to/a.out
    ./riscv32-kuick-elf-readelf --dynamic /path/to/a.out
+
+.. _readelf-version-info:
+
+GNU version sections (``-V`` / ``--version-info``)
+--------------------------------------------------
+
+``-V``
+   Short form for printing **GNU symbol versioning** information: ``SHT_GNU_versym`` (``.gnu.version``), ``SHT_GNU_verdef`` (``.gnu.version_d``), and ``SHT_GNU_verneed`` (``.gnu.version_r``) when present.
+
+``--version-info``
+   Long form with the same meaning as ``-V``.
+
+This is **not** the same as ``-v`` / ``--version`` (which prints the **readelf program** version). KORE follows GNU ``readelf`` usage: ``-V`` is reserved for version **sections**.
+
+Object files without dynamic linking often have **no** GNU version sections; shared objects and linked executables may. Output is KORE format, not GNU-identical.
+
+When set alone, only version-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, and/or ``-d`` to print those views first, in that order.
+
+Example:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf -V /path/to/libc.so.6
+
+Equivalent:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf --version-info /path/to/libc.so.6
 
 .. _readelf-other-options:
 
@@ -243,7 +274,7 @@ Other options (summary)
 Default behavior
 ----------------
 
-If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, etc., as implemented). See ``--help`` for the current list.
+If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, ``-V`` / ``--version-info``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, GNU version sections when present, etc., as implemented). See ``--help`` for the current list.
 
 See also
 --------

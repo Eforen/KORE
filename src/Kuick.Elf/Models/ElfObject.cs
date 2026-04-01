@@ -10,5 +10,6 @@ public sealed class ElfObject
     public IList<DynamicEntry> DynamicEntries { get; } = new List<DynamicEntry>();
     /// <summary>Bytes of <c>.dynstr</c> when a <c>SHT_DYNAMIC</c> section was loaded (for resolving string-valued tags).</summary>
     public byte[] DynamicStrtab { get; set; } = Array.Empty<byte>();
+    public GnuVersionInfo GnuVersion { get; } = new();
     public IList<string> StringTableEntries { get; } = new List<string>();
 }

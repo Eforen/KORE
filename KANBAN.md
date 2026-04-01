@@ -202,10 +202,12 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF] `-r` / `--relocations` Display the ELF relocation table info similar to `riscv32-unknown-elf-readelf -r`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-r`
 * [CLI][READELF] `--relocs` Simple Alias for `--relocations`
-### Next Commit (Eforen)
 * [CLI][READELF] `-d` / `--dynamic-section` Display the ELF dynamic section info similar to `riscv32-unknown-elf-readelf -d`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-d`
 * [CLI][READELF] `--dynamic` Simple Alias for `--dynamic-section`
+### Next Commit (Eforen)
+* [CLI][READELF] `-V` / `--version-info` Display the ELF version info similar to `riscv32-unknown-elf-readelf -V`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-V`
 
 # Working On
 ## Working on (Eforen)
@@ -222,8 +224,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] `-V` / `--version-info` Display the ELF version info similar to `riscv32-unknown-elf-readelf -V`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-V`
 * [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-A`
 * [CLI][READELF] `-I` / `--histogram` Display the ELF histogram of bucket list lengths similar to `riscv32-unknown-elf-readelf -I`
