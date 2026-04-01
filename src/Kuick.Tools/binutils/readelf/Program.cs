@@ -65,7 +65,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     var includeEmpty = false;
     var verbose = false;
 
-    foreach (var arg in args)
+    foreach (var arg in ExpandBundledShortOptions(args))
     {
         switch (arg)
         {
@@ -156,4 +156,31 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
         IncludeEmpty = includeEmpty,
         Verbose = verbose
     }, string.Empty);
+}
+
+/// <summary>
+/// Split UNIX-style clustered short options (e.g. <c>-hl</c> → <c>-h</c>, <c>-l</c>) so they match GNU readelf behavior.
+/// Long options (<c>--name</c>), a lone <c>-</c>, and a single short flag (<c>-h</c>) are left unchanged.
+/// </summary>
+static IEnumerable<string> ExpandBundledShortOptions(string[] args)
+{
+    foreach (var arg in args)
+    {
+        if (arg.Length < 2 || arg[0] != '-' || arg[1] == '-')
+        {
+            yield return arg;
+            continue;
+        }
+
+        if (arg.Length == 2)
+        {
+            yield return arg;
+            continue;
+        }
+
+        for (var i = 1; i < arg.Length; i++)
+        {
+            yield return "-" + arg[i];
+        }
+    }
 }

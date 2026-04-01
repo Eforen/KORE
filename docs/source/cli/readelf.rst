@@ -54,6 +54,8 @@ Synopsis
 
 You may omit the ``readelf`` subcommand; the same options apply.
 
+**Grouped short options:** as with GNU ``readelf``, you may combine single-letter flags after one ``-`` (for example ``-hl`` means ``-h`` and ``-l``; ``-hlS`` means ``-h``, ``-l``, and ``-S``). Long options beginning with ``--`` are never split.
+
 .. _readelf-global-options:
 
 Global options
