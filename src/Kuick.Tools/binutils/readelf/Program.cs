@@ -38,7 +38,7 @@ static void PrintHelp()
 {
     Console.WriteLine("Kuick.Tools");
     Console.WriteLine("Usage:");
-    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [-r|--relocations|--relocs] [-d|--dynamic-section|--dynamic] [-V|--version-info] [-A|--arch-specific] [-I|--histogram] [--got-contents] [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf <input-path> [-a|--all] [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [-r|--relocations|--relocs] [-d|--dynamic-section|--dynamic] [-V|--version-info] [-A|--arch-specific] [-I|--histogram] [--got-contents] [--header] [--include-empty] [--verbose]");
     Console.WriteLine("  kuick-readelf readelf <input-path> [options]");
     Console.WriteLine("  kuick-readelf --version");
     Console.WriteLine("  kuick-readelf --help");
@@ -69,6 +69,19 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     {
         switch (arg)
         {
+            case "-a":
+            case "--all":
+                fileHeaderOnly = true;
+                programHeadersOnly = true;
+                sectionHeadersOnly = true;
+                symbolsOnly = true;
+                relocationsOnly = true;
+                dynamicSectionOnly = true;
+                versionInfoOnly = true;
+                archSpecificOnly = true;
+                histogramOnly = true;
+                gotContentsOnly = true;
+                break;
             case "-h":
             case "--file-header":
             case "--header":
@@ -166,6 +179,13 @@ static IEnumerable<string> ExpandBundledShortOptions(string[] args)
 {
     foreach (var arg in args)
     {
+        // Spellings like "-all" must not be split into -a, -l, -l (KORE treats "-all"/"--all" as "all views").
+        if (string.Equals(arg, "-all", StringComparison.OrdinalIgnoreCase))
+        {
+            yield return "--all";
+            continue;
+        }
+
         if (arg.Length < 2 || arg[0] != '-' || arg[1] == '-')
         {
             yield return arg;

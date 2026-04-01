@@ -19,6 +19,8 @@ This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfL
      - Show usage and exit.
    * - :ref:`-v / --version <readelf-global-options>`
      - Print version, copyright, and license, then exit.
+   * - :ref:`-a / --all <readelf-all>`
+     - Enable **all** implemented single-view sections (same as combining ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, ``-V``, ``-A``, ``-I``, and ``--got-contents``).
    * - :ref:`-h / --file-header / --header <readelf-file-header>`
      - Print **only** the ELF executable (file) header.
    * - :ref:`-l / --program-headers <readelf-program-headers>`
@@ -66,6 +68,20 @@ Global options
 
 ``-v`` / ``--version``
    Print version, copyright, and license lines, then exit.
+
+.. _readelf-all:
+
+All views (``-a`` / ``--all``)
+-------------------------------
+
+``-a``
+   Enable **every** implemented “single-view” option at once: same as passing ``-h``, ``-l``, ``-S``, ``-s``, ``-r``, ``-d``, ``-V``, ``-A``, ``-I``, and ``--got-contents`` together. Sections are printed in that order. This does **not** add the default-only **string table** block; run with **no** single-view flags to get the default bundle (which includes the string table when implemented).
+
+``--all``
+   Long form with the same meaning as ``-a``.
+
+``-all``
+   Accepted spelling for ``--all`` (it is not split into ``-a`` ``-l`` ``-l``).
 
 .. _readelf-file-header:
 
@@ -356,7 +372,7 @@ Other options (summary)
 Default behavior
 ----------------
 
-If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, ``-V`` / ``--version-info``, ``-A`` / ``--arch-specific``, ``-I`` / ``--histogram``, ``--got-contents``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, GNU version sections when present, architecture-specific block for RISC-V when applicable, GNU hash histogram when ``.gnu.hash`` is present, GOT contents when ``.got`` is present, etc., as implemented). See ``--help`` for the current list.
+If you do **not** pass any of the “single-view” flags (``-a`` / ``--all`` / ``-all``, ``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, ``-V`` / ``--version-info``, ``-A`` / ``--arch-specific``, ``-I`` / ``--histogram``, ``--got-contents``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, GNU version sections when present, architecture-specific block for RISC-V when applicable, GNU hash histogram when ``.gnu.hash`` is present, GOT contents when ``.got`` is present, etc., as implemented). See ``--help`` for the current list.
 
 See also
 --------
