@@ -7,5 +7,8 @@ public sealed class ElfObject
     public IList<Section> Sections { get; } = new List<Section>();
     public IList<Symbol> Symbols { get; } = new List<Symbol>();
     public IList<RelocationEntry> Relocations { get; } = new List<RelocationEntry>();
+    public IList<DynamicEntry> DynamicEntries { get; } = new List<DynamicEntry>();
+    /// <summary>Bytes of <c>.dynstr</c> when a <c>SHT_DYNAMIC</c> section was loaded (for resolving string-valued tags).</summary>
+    public byte[] DynamicStrtab { get; set; } = Array.Empty<byte>();
     public IList<string> StringTableEntries { get; } = new List<string>();
 }

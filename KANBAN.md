@@ -199,10 +199,13 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF] `-s` / `--symbols` Display the ELF symbol table info similar to `riscv32-unknown-elf-readelf -s`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-s`
 * [CLI][READELF] `--syms` Simple Alias for `--symbols`
-### Next Commit (Eforen)
 * [CLI][READELF] `-r` / `--relocations` Display the ELF relocation table info similar to `riscv32-unknown-elf-readelf -r`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-r`
 * [CLI][READELF] `--relocs` Simple Alias for `--relocations`
+### Next Commit (Eforen)
+* [CLI][READELF] `-d` / `--dynamic-section` Display the ELF dynamic section info similar to `riscv32-unknown-elf-readelf -d`
+* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-d`
+* [CLI][READELF] `--dynamic` Simple Alias for `--dynamic-section`
 
 # Working On
 ## Working on (Eforen)
@@ -219,10 +222,6 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [CLI][READELF] `-d` / `--dynamic-section` Display the ELF dynamic section info similar to `riscv32-unknown-elf-readelf -d`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-d`
-* [CLI][READELF] `--dynamic` Simple Alias for `--dynamic-section`
-* [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `--dynamic`
 * [CLI][READELF] `-V` / `--version-info` Display the ELF version info similar to `riscv32-unknown-elf-readelf -V`
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-V`
 * [CLI][READELF] `-A` / `--arch-specific` Display the ELF architecture specific info similar to `riscv32-unknown-elf-readelf -A`

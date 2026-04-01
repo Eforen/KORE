@@ -38,7 +38,7 @@ static void PrintHelp()
 {
     Console.WriteLine("Kuick.Tools");
     Console.WriteLine("Usage:");
-    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [-r|--relocations|--relocs] [--header] [--include-empty] [--verbose]");
+    Console.WriteLine("  kuick-readelf <input-path> [-h|--file-header] [-l|--program-headers] [-S|--section-headers|--sections] [-s|--symbols|--syms] [-r|--relocations|--relocs] [-d|--dynamic-section|--dynamic] [--header] [--include-empty] [--verbose]");
     Console.WriteLine("  kuick-readelf readelf <input-path> [options]");
     Console.WriteLine("  kuick-readelf --version");
     Console.WriteLine("  kuick-readelf --help");
@@ -57,6 +57,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
     var sectionHeadersOnly = false;
     var symbolsOnly = false;
     var relocationsOnly = false;
+    var dynamicSectionOnly = false;
     var includeEmpty = false;
     var verbose = false;
 
@@ -87,6 +88,11 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
             case "--relocations":
             case "--relocs":
                 relocationsOnly = true;
+                break;
+            case "-d":
+            case "--dynamic-section":
+            case "--dynamic":
+                dynamicSectionOnly = true;
                 break;
             case "--include-empty":
                 includeEmpty = true;
@@ -123,6 +129,7 @@ static (bool Success, ReadelfOptions? Options, string ErrorMessage) ParseReadelf
         SectionHeadersOnly = sectionHeadersOnly,
         SymbolsOnly = symbolsOnly,
         RelocationsOnly = relocationsOnly,
+        DynamicSectionOnly = dynamicSectionOnly,
         IncludeEmpty = includeEmpty,
         Verbose = verbose
     }, string.Empty);

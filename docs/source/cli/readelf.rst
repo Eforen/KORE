@@ -29,6 +29,8 @@ This program uses **Kuick.Elf** to load and format ELF data. For the API (``ElfL
      - Print **symbol tables** (``.symtab``, ``.dynsym``, etc.).
    * - :ref:`-r / --relocations / --relocs <readelf-relocations>`
      - Print **relocation** sections (``REL`` / ``RELA``).
+   * - :ref:`-d / --dynamic-section / --dynamic <readelf-dynamic>`
+     - Print the **dynamic** section (``.dynamic`` / ``SHT_DYNAMIC``).
    * - :ref:`--include-empty <readelf-other-options>`
      - Include empty tables when applicable.
    * - :ref:`--verbose <readelf-other-options>`
@@ -124,7 +126,7 @@ Section headers (``-S`` / ``--section-headers`` / ``--sections``)
 ``--sections``
    Alias for ``--section-headers`` (same behavior as GNU ``readelf``).
 
-When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h``, ``-l``, ``-s``, and/or ``-r`` to print those views in order; other tables are omitted when any single-view mode is active.
+When set **without** other single-view flags, only the section-header view is printed (KORE format, not GNU-identical). You may combine ``-S`` with ``-h``, ``-l``, ``-s``, ``-r``, and/or ``-d`` to print those views in order; other tables are omitted when any single-view mode is active.
 
 Example:
 
@@ -152,7 +154,7 @@ Symbols (``-s`` / ``--symbols`` / ``--syms``)
 ``--syms``
    Alias for ``--symbols`` (same idea as GNU ``readelf``).
 
-When set alone, only symbol-table output is shown (KORE format). Combine with ``-h``, ``-l``, ``-S``, and/or ``-r`` to print those views first, in that order.
+When set alone, only symbol-table output is shown (KORE format). Combine with ``-h``, ``-l``, ``-S``, ``-r``, and/or ``-d`` to print those views first, in that order.
 
 Example:
 
@@ -169,7 +171,7 @@ Equivalent:
 .. _readelf-relocations:
 
 Relocations (``-r`` / ``--relocations`` / ``--relocs``)
-------------------------------------------------------
+-------------------------------------------------------
 
 ``-r``
    Short form for printing **relocation** records from ``SHT_REL`` and ``SHT_RELA`` sections (e.g. ``.rel.text``, ``.rela.text``).
@@ -182,7 +184,7 @@ Relocations (``-r`` / ``--relocations`` / ``--relocs``)
 
 Relocation **type** names are decoded for **RISC-V** (``e_machine == EM_RISCV``); other architectures show numeric types. Output is KORE format, not GNU-identical.
 
-When set alone, only relocation output is shown. Combine with ``-h``, ``-l``, ``-S``, and/or ``-s`` to print those views first, in that order.
+When set alone, only relocation output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, and/or ``-d`` to print those views first, in that order.
 
 Example:
 
@@ -195,6 +197,37 @@ Equivalent:
 .. code-block:: bash
 
    ./riscv32-kuick-elf-readelf --relocations /path/to/object.o
+
+.. _readelf-dynamic:
+
+Dynamic section (``-d`` / ``--dynamic-section`` / ``--dynamic``)
+------------------------------------------------------------------
+
+``-d``
+   Short form for printing **dynamic** entries from the ``SHT_DYNAMIC`` section (tags and values, with ``NEEDED`` / ``SONAME`` / ``RPATH`` / ``RUNPATH`` strings resolved via the linked ``.dynstr`` when present).
+
+``--dynamic-section``
+   Long form with the same meaning as ``-d``.
+
+``--dynamic``
+   Alias for ``--dynamic-section`` (same idea as GNU ``readelf`` spelling for the dynamic table).
+
+Relocatable object files (``.o``) usually have **no** dynamic section; executables and shared objects typically do. Output is KORE format, not GNU-identical.
+
+When set alone, only dynamic-section output is shown. Combine with ``-h``, ``-l``, ``-S``, ``-s``, and/or ``-r`` to print those views first, in that order.
+
+Example:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf -d /path/to/a.out
+
+Equivalent:
+
+.. code-block:: bash
+
+   ./riscv32-kuick-elf-readelf --dynamic-section /path/to/a.out
+   ./riscv32-kuick-elf-readelf --dynamic /path/to/a.out
 
 .. _readelf-other-options:
 
@@ -210,7 +243,7 @@ Other options (summary)
 Default behavior
 ----------------
 
-If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, etc., as implemented). See ``--help`` for the current list.
+If you do **not** pass any of the “single-view” flags (``-h`` / ``--file-header`` / ``--header``, ``-l`` / ``--program-headers``, ``-S`` / ``--section-headers`` / ``--sections``, ``-s`` / ``--symbols`` / ``--syms``, ``-r`` / ``--relocations`` / ``--relocs``, ``-d`` / ``--dynamic-section`` / ``--dynamic``, or any combination of those), the tool prints a **default** bundle of views (file header, program headers when present, then sections, symbols, relocations, dynamic section when present, etc., as implemented). See ``--help`` for the current list.
 
 See also
 --------

@@ -81,6 +81,7 @@ public sealed class ElfLoader
         LoadSectionHeaders(stream, reader, elfObject, elfClass);
         LoadSymbols(stream, reader, elfObject, elfClass);
         LoadRelocations(stream, reader, elfObject, elfClass);
+        LoadDynamic(stream, reader, elfObject, elfClass);
         return elfObject;
     }
 
@@ -236,6 +237,7 @@ public sealed class ElfLoader
 
     private const uint ShtSymtab = 2;
     private const uint ShtStrtab = 3;
+    private const uint ShtDynamic = 6;
     private const uint ShtRela = 4;
     private const uint ShtRel = 9;
     private const uint ShtDynsym = 11;
@@ -355,6 +357,71 @@ public sealed class ElfLoader
             Info = info,
             Addend = 0
         };
+    }
+
+    private static void LoadDynamic(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)
+    {
+        foreach (var sec in obj.Sections)
+        {
+            if (sec.Type != ShtDynamic)
+            {
+                continue;
+            }
+
+            var expectedEs = elfClass == ElfClass64 ? 16u : 8u;
+            if (sec.EntrySize < expectedEs || sec.Size == 0 || sec.Size > int.MaxValue)
+            {
+                continue;
+            }
+
+            if ((long)sec.Offset + (long)sec.Size > stream.Length)
+            {
+                continue;
+            }
+
+            if (sec.Link < (uint)obj.Sections.Count)
+            {
+                var strSec = obj.Sections[(int)sec.Link];
+                if (strSec.Type == ShtStrtab && strSec.Size <= int.MaxValue
+                    && (long)strSec.Offset + (long)strSec.Size <= stream.Length)
+                {
+                    stream.Seek((long)strSec.Offset, SeekOrigin.Begin);
+                    obj.DynamicStrtab = reader.ReadBytes((int)strSec.Size);
+                }
+            }
+
+            stream.Seek((long)sec.Offset, SeekOrigin.Begin);
+            var extra = (int)(sec.EntrySize - expectedEs);
+            var count = sec.Size / sec.EntrySize;
+            for (ulong n = 0; n < count; n++)
+            {
+                long tag;
+                ulong val;
+                if (elfClass == ElfClass64)
+                {
+                    tag = reader.ReadInt64();
+                    val = reader.ReadUInt64();
+                }
+                else
+                {
+                    tag = reader.ReadInt32();
+                    val = reader.ReadUInt32();
+                }
+
+                if (extra > 0)
+                {
+                    reader.ReadBytes(extra);
+                }
+
+                obj.DynamicEntries.Add(new DynamicEntry { Tag = tag, Value = val });
+                if (tag == 0)
+                {
+                    break;
+                }
+            }
+
+            break;
+        }
     }
 
     private static void LoadSymbols(Stream stream, BinaryReader reader, ElfObject obj, byte elfClass)
