@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,6 +58,10 @@ namespace Kore.AST {
                 return hash;
             }
         }
+
+        public override int GetOwnByteSize() => WrappedInstruction != null ? WrappedInstruction.GetOwnByteSize() : 0;
+
+        public override int GetTotalByteSize() => GetOwnByteSize();
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
             addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"INLINE DIRECTIVE {Name} LABEL:{Label} {{");

@@ -301,6 +301,10 @@ namespace Kore.Kuick.Assembler {
             return null;
         }
 
+        public AstNode ProcessASTNode(AlignmentNode node) {
+            return null;
+        }
+
         // New symbol-based node processing methods
         public AstNode ProcessASTNode(SymbolDirectiveNode node) {
             // For now, just pass through - symbol directives are handled at parse time

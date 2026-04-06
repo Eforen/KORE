@@ -885,6 +885,38 @@ namespace Kore.Kuick {
                 }
             }
 
+            // GNU RISC-V `as`: `.align n` and `.p2align n` both mean align to a 2^n-byte boundary; we store that byte count in <see cref="AlignmentNode.Bytes"/>.
+            if (name == ".align" || name == ".p2align") {
+                if (currentToken.token == Lexer.Token.NUMBER_INT) {
+                    var exp = int.Parse(currentToken.value);
+                    if (exp < 0 || exp > 30) {
+                        throw new SyntaxException($"{name} exponent must be between 0 and 30, got {exp}.");
+                    }
+                    var boundary = 1 << exp;
+                    return ComposeInstructionArray(expectReturnEOL(new AlignmentNode { Bytes = boundary }, lexer));
+                }
+                if (currentToken.token == Lexer.Token.NUMBER_HEX) {
+                    var exp = int.Parse(currentToken.value, System.Globalization.NumberStyles.HexNumber);
+                    if (exp < 0 || exp > 30) {
+                        throw new SyntaxException($"{name} exponent must be between 0 and 30, got {exp}.");
+                    }
+                    var boundary = 1 << exp;
+                    return ComposeInstructionArray(expectReturnEOL(new AlignmentNode { Bytes = boundary }, lexer));
+                }
+            }
+
+            // GNU `.balign n` → align to an n-byte boundary (absolute size, not a log2 exponent).
+            if (name == ".balign") {
+                if (currentToken.token == Lexer.Token.NUMBER_INT) {
+                    var alignValue = int.Parse(currentToken.value);
+                    return ComposeInstructionArray(expectReturnEOL(new AlignmentNode { Bytes = alignValue }, lexer));
+                }
+                if (currentToken.token == Lexer.Token.NUMBER_HEX) {
+                    var alignValue = int.Parse(currentToken.value, System.Globalization.NumberStyles.HexNumber);
+                    return ComposeInstructionArray(expectReturnEOL(new AlignmentNode { Bytes = alignValue }, lexer));
+                }
+            }
+
             if(currentToken.token == Lexer.Token.STRING || currentToken.token == Lexer.Token.IDENTIFIER) {
                 return ComposeInstructionArray(expectReturnEOL(new StringDirectiveNode { Name = name, Value = currentToken.value }, lexer));
             } else if(currentToken.token == Lexer.Token.NUMBER_INT) {
@@ -1029,17 +1061,7 @@ namespace Kore.Kuick {
         }
 
         /// <summary>Rough code size for PC tracking: one RVI slot per instruction; labeled inline emits one slot per wrapped instruction.</summary>
-        private static int GetEmittedByteSize(AstNode node) {
-            if (node is InstructionNode) {
-                return 4;
-            }
-            var t = node.GetType();
-            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(LabeledInlineDirectiveNode<>)) {
-                var wrapped = t.GetProperty(nameof(LabeledInlineDirectiveNode<InstructionNode>.WrappedInstruction))?.GetValue(node) as InstructionNode;
-                return wrapped != null ? 4 : 0;
-            }
-            return 0;
-        }
+        private static int GetEmittedByteSize(AstNode node) => node.GetTotalByteSize();
 
         /// <summary>
         /// Integrates symbol directives, defines labels at the current PC, and registers all label references.

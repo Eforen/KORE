@@ -219,12 +219,14 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF] Write a single test for each of the Readelf command flags by compiling a simple .S file and running the readelf command against the resulting .o file for now using riscv32-unknown-elf-gcc until kuick can compile .S files (`Kuick.Tools.Readelf.Tests`).
 * [CLI][READELF] Add Help system that shows in `-h` / `--help`
 
-## Done 2026/04/01
+## Done 2026/04/06
 ### Next Commit (Eforen)
-
+* [KUICK][PARSER] Implement Alignment ASTNode with tests
 
 # Working On
 ## Working on (Eforen)
+* [KUICK][PARSER] Implement the Relocation type wrapper for label usage
+* [KUICK][ASSEMBLER] Impliment the byte alignment in the code generator
 * Complete the RiscVMetadata
 * [KUICK][PARSER] Based on new understanding of the assemblers role, rewrite the parser to write code into sections and just imit relocations for anything dynamic at all and let it be the linker's problem later.
 

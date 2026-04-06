@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,8 @@ namespace Kore.Kuick
             new TokenFinder(@"^-?\d+", Token.NUMBER_INT), // NUMBER_INT 12578
             new TokenFinder(@"^""[^""]*""", Token.STRING), // " String //TODO: Make this allow escapes
             new TokenFinder(@"^'[^']*'", Token.STRING), // ' String //TODO: Make this allow escapes
-            new TokenFinder(@"^\.[a-zA-Z]*", Token.DIRECTIVE), // Directive
+            // GAS directives may contain digits after the first letter (e.g. `.p2align`, `.balign`).
+            new TokenFinder(@"^\.[a-zA-Z][a-zA-Z0-9]*", Token.DIRECTIVE),
             new TokenFinder(@"^[a-zA-Z_][a-zA-Z0-9_]*:", Token.LABEL), // Label - updated to include underscores and digits
             new TokenFinder(@"^[\w\[\]\._]+", Token.IDENTIFIER), // Identifier
             new TokenFinder(@"^\(", Token.PARREN_OPEN), // Open Parren (

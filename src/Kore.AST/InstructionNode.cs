@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,11 @@ namespace Kore.AST {
     
     /// <summary> Intermediate type used only for type targeting of instructions </summary>
     public abstract class InstructionNode : AstNode {
+        /// <summary>RV32I (or other 32-bit) instruction slot size in bytes.</summary>
+        public override int GetOwnByteSize() => 4;
+
+        public override int GetTotalByteSize() => GetOwnByteSize();
+
         public override bool Equals(object obj) {
             if (obj == null || GetType() != obj.GetType())
                 return false;

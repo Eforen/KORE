@@ -36,6 +36,22 @@ namespace Kore.AST {
             return builder.Append(lineNumberOverride.ToString().PadLeft(DEBUG_LINE_NUMBER_LEN, '0')).Append(':').Append(' ', indentLevel * DEBUG_INDENT_COUNT);
         }
 
+        /// <summary>
+        /// Returns the byte size of the node and all its children including padding.
+        /// </summary>
+        /// <returns>The byte size of the node and all its children.</returns>
+        public virtual int GetTotalByteSize() {
+            return 0;
+        }
+
+        /// <summary>
+        /// Returns the byte size of the node itself or padding etc. excluding its children.
+        /// </summary>
+        /// <returns>The byte size of the node.</returns>
+        public virtual int GetOwnByteSize() {
+            return 0;
+        }
+
         public abstract StringBuilder getDebugText(int indentLevel, StringBuilder builder);
     }
 }

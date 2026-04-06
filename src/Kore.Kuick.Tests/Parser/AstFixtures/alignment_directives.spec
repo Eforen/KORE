@@ -1,5 +1,5 @@
 PROGRAM [1] Symbols:[0]{
-    SECTION .text [3]{
+    SECTION .text [7]{
         TypeI addi RD:x0 RS:x0 IMM:0
         ALIGN 8 BYTES
         TypeI addi RD:x0 RS:x0 IMM:0

@@ -1,4 +1,4 @@
-﻿namespace Kore.AST {
+namespace Kore.AST {
     public interface ASTProcessor {
         AstNode ProcessASTNode(ProgramNode node);
         AstNode ProcessASTNode(SectionNode node);
@@ -19,5 +19,6 @@
         AstNode ProcessASTNode(LabelNode node);
         AstNode ProcessASTNode(CommentNode node);
         AstNode ProcessASTNode(SymbolReferenceNode node);
+        AstNode ProcessASTNode(AlignmentNode node);
     }
 }
