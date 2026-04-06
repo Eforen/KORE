@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Kore.AST {
@@ -50,21 +51,21 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            addDebugTextHeader(indentLevel, builder).AppendLine($"PROGRAM [{Sections.Count}] Symbols:[{SymbolTable.Count}]{{");
+            addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"PROGRAM [{Sections.Count}] Symbols:[{SymbolTable.Count}]{{");
             
             // Add symbol table debug info
             if (SymbolTable.Count > 0) {
-                addDebugTextHeader(indentLevel + 1, builder).AppendLine("SYMBOL TABLE {");
-                foreach (var symbol in SymbolTable.GetAllSymbols()) {
-                    addDebugTextHeader(indentLevel + 2, builder).AppendLine(symbol.ToString());
+                addDebugTextHeader(false, -1, indentLevel + 1, builder).AppendLine("SYMBOL TABLE {");
+                foreach (var symbol in SymbolTable.GetAllSymbols().OrderBy(s => s.Id)) {
+                    addDebugTextHeader(false, -1, indentLevel + 2, builder).AppendLine(symbol.FormatSymbolTableDebugLine());
                 }
-                addDebugTextHeader(indentLevel + 1, builder).AppendLine("}");
+                addDebugTextHeader(false, -1, indentLevel + 1, builder).AppendLine("}");
             }
             
             foreach(var section in Sections) {
                 section.getDebugText(indentLevel+1, builder);
             }
-            return addDebugTextHeader(indentLevel, builder).AppendLine("}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine("}");
         }
 
         /// <summary>
@@ -103,9 +104,10 @@ namespace Kore.AST {
         /// <param name="labelName">The name of the label</param>
         /// <param name="lineNumber">The line number where the label is defined</param>
         /// <param name="section">The section where the label is defined</param>
+        /// <param name="address">Byte offset within the section (PC at this label).</param>
         /// <returns>The defined symbol</returns>
-        public Symbol DefineLabel(string labelName, int lineNumber, string section) {
-            return SymbolTable.DefineSymbol(labelName, lineNumber, section);
+        public Symbol DefineLabel(string labelName, int lineNumber, string section, long address = 0) {
+            return SymbolTable.DefineLabelRef(labelName, lineNumber, section, address);
         }
     }
 }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -17,6 +17,11 @@
     <ProjectReference Include="..\Kore.Kuick\Kore.Kuick.csproj" />
     <ProjectReference Include="..\Kore.RiscMeta\Kore.RiscMeta.csproj" />
     <ProjectReference Include="..\Kore.Utility\Kore.Utility.csproj" />
+  </ItemGroup>
+
+  <!-- Parser/AstFixtures: .S sources and .spec goldens copied next to the test assembly at build time. -->
+  <ItemGroup>
+    <None Include="Parser\AstFixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

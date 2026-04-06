@@ -22,6 +22,12 @@ namespace Kore.AST {
         public string getDebugText() {
             return getDebugText(0, new StringBuilder()).ToString();
         }
+        protected StringBuilder addDebugTextHeader(bool includeLineNumber, int lineNumberOverride, int indentLevel, StringBuilder builder) {
+            if(includeLineNumber) {
+                return addDebugTextHeader(lineNumberOverride, indentLevel, builder);
+            }
+            return builder.Append(' ', indentLevel * DEBUG_INDENT_COUNT);
+        }
         protected StringBuilder addDebugTextHeader(int indentLevel, StringBuilder builder) {
             return addDebugTextHeader(lineNumber, indentLevel, builder);
         }

@@ -53,11 +53,11 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            addDebugTextHeader(indentLevel, builder).AppendLine($"TypeB {op} RS1:{rs1} RS2:{rs2} SYMBOL:{{");
+            addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeB {op} RS1:{rs1} RS2:{rs2} SYMBOL:{{");
             if (SymbolReference != null) {
                 SymbolReference.getDebugText(indentLevel + 1, builder);
             }
-            return addDebugTextHeader(indentLevel, builder).AppendLine("}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine("}");
         }
     }
 
@@ -105,11 +105,11 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            addDebugTextHeader(indentLevel, builder).AppendLine($"TypeJ {op} RD:{rd} SYMBOL:{{");
+            addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeJ {op} RD:{rd} SYMBOL:{{");
             if (SymbolReference != null) {
                 SymbolReference.getDebugText(indentLevel + 1, builder);
             }
-            return addDebugTextHeader(indentLevel, builder).AppendLine("}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine("}");
         }
     }
 } 

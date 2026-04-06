@@ -134,8 +134,27 @@ namespace Kore.AST {
             }
         }
 
+        /// <summary>Single-line format used by <see cref="ProgramNode.getDebugText"/> for the symbol table block.</summary>
+        public string FormatSymbolTableDebugLine() {
+            string scopeUpper = Scope.ToString().ToUpperInvariant();
+            string sectionDisplay = IsDefined && !string.IsNullOrEmpty(Section) ? Section : "UNKNOWN";
+            string offsetDisplay = IsDefined ? Address.ToString() : "UNKNOWN";
+            string typeDisplay = !IsDefined ? "UNKNOWN" : FormatTypeForDebug(Type);
+            return $"Symbol[{Id}]: {scopeUpper} {Name}, SECTION: {sectionDisplay}, OFFSET: {offsetDisplay}, TYPE: {typeDisplay}, REF_COUNT: {References.Count}";
+        }
+
+        private static string FormatTypeForDebug(SymbolType type) {
+            switch (type) {
+                case SymbolType.Label: return "LABEL";
+                case SymbolType.Function: return "FUNC";
+                case SymbolType.Data: return "DATA";
+                case SymbolType.Section: return "SECTION";
+                default: return "UNKNOWN";
+            }
+        }
+
         public override string ToString() {
-            return $"Symbol[{Id}]: {Name} ({Scope}, {Type}) - Defined: {IsDefined}, Line: {LineNumber}, Refs: {References.Count}";
+            return FormatSymbolTableDebugLine();
         }
 
         public override bool Equals(object obj) {
@@ -159,6 +178,12 @@ namespace Kore.AST {
         private readonly Dictionary<SymbolScope, List<Symbol>> _symbolsByScope;
         private uint _nextId;
 
+        /// <summary>For each user basename (e.g. <c>foo</c>), the symbol that back-references currently resolve to.</summary>
+        private readonly Dictionary<string, Symbol> _activeLabelByBasename = new Dictionary<string, Symbol>(StringComparer.Ordinal);
+
+        /// <summary>How many colon-definitions seen per basename for local (non-global) labels; used to mint <c>1Lfoo</c>, <c>2Lfoo</c>, …</summary>
+        private readonly Dictionary<string, int> _localDefinitionOrdinal = new Dictionary<string, int>(StringComparer.Ordinal);
+
         public SymbolTable() {
             _symbols = new Dictionary<string, Symbol>();
             _symbolsById = new Dictionary<uint, Symbol>();
@@ -176,6 +201,63 @@ namespace Kore.AST {
         /// </summary>
         public void ResetIdCounter() {
             _nextId = 1;
+            _activeLabelByBasename.Clear();
+            _localDefinitionOrdinal.Clear();
+        }
+
+        /// <summary>
+        /// Resolves a label use (backward to the current active definition for this basename, or forward to an unknown symbol).
+        /// </summary>
+        public Symbol GetLabelRef(string basename, AstNode referringNode = null) {
+            if (_activeLabelByBasename.TryGetValue(basename, out var active)) {
+                if (referringNode != null) {
+                    active.AddReference(referringNode);
+                }
+                return active;
+            }
+
+            var sym = GetOrCreateSymbol(basename, SymbolScope.Unknown, SymbolType.Label);
+            if (referringNode != null) {
+                sym.AddReference(referringNode);
+            }
+            return sym;
+        }
+
+        /// <summary>
+        /// Defines a label at the given section/offset. Global basenames (from <c>.global</c>) may only be defined once.
+        /// Repeated local basenames mint storage names <c>1Lfoo</c>, <c>2Lfoo</c>, … while keeping the same basename for lookup via <see cref="GetLabelRef"/>.
+        /// </summary>
+        public Symbol DefineLabelRef(string basename, int lineNumber, string section, long address) {
+            var primary = GetSymbol(basename);
+            if (primary != null && primary.Scope == SymbolScope.Global) {
+                if (primary.IsDefined) {
+                    throw new InvalidOperationException($"Duplicate definition of global label '{basename}'.");
+                }
+                primary.Define(lineNumber, section);
+                primary.Address = address;
+                _activeLabelByBasename[basename] = primary;
+                return primary;
+            }
+
+            _localDefinitionOrdinal.TryGetValue(basename, out int ordinal);
+            string storageName = ordinal == 0 ? basename : $"{ordinal}L{basename}";
+            _localDefinitionOrdinal[basename] = ordinal + 1;
+
+            Symbol sym;
+            if (storageName == basename) {
+                sym = GetOrCreateSymbol(basename, SymbolScope.Unknown, SymbolType.Label);
+            } else {
+                sym = GetOrCreateSymbol(storageName, SymbolScope.Local, SymbolType.Label);
+            }
+
+            if (sym.IsDefined) {
+                throw new InvalidOperationException($"Label '{storageName}' is already defined.");
+            }
+
+            sym.Define(lineNumber, section);
+            sym.Address = address;
+            _activeLabelByBasename[basename] = sym;
+            return sym;
         }
 
         /// <summary>
@@ -289,6 +371,8 @@ namespace Kore.AST {
         public void Clear() {
             _symbols.Clear();
             _symbolsById.Clear();
+            _activeLabelByBasename.Clear();
+            _localDefinitionOrdinal.Clear();
             foreach (var list in _symbolsByScope.Values) {
                 list.Clear();
             }

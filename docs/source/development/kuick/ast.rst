@@ -18,6 +18,15 @@ The AST implements the visitor pattern through the `ASTProcessor` interface, ena
 **Efficient Traversal:**
 Node references and parent-child relationships are optimized for fast traversal during code generation.
 
+Debugging and inspection
+------------------------
+
+Every ``AstNode`` can render a stable, indented text snapshot via ``getDebugText()``. 
+
+Parser integration tests keep **golden files** under ``src/Kore.Kuick.Tests/Parser/AstFixtures/``: each ``*.S`` assembly sample has a sibling ``*.spec`` file with the expected ``getDebugText()`` output. See :ref:`kuick-ast-fixtures` in :doc:`development/kuick/testing` for how to add fixtures and maintain ``.spec`` files. 
+
+For a one-off dump of any ``.S`` file without committing a golden, use **Kore.Kuick.AstDump** (``make ast-dump`` or ``dotnet run --project src/Kore.Kuick.AstDump/...``); see :ref:`kuick-ast-dump`.
+
 Node Hierarchy
 ---------------
 

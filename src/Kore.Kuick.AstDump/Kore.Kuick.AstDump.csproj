@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Kore.Kuick.AstDump</RootNamespace>
+    <AssemblyName>Kore.Kuick.AstDump</AssemblyName>
+    <Nullable>enable</Nullable>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kore.Kuick\Kore.Kuick.csproj" />
+  </ItemGroup>
+
+</Project>

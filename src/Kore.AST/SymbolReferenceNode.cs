@@ -74,7 +74,7 @@ namespace Kore.AST {
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
             var symbol = GetSymbol();
             var status = symbol?.IsDefined == true ? "DEFINED" : "UNDEFINED";
-            return addDebugTextHeader(indentLevel, builder).AppendLine($"SYMBOL_REF [{SymbolId}] {SymbolName} ({status})");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"SYMBOL_REF [{SymbolId}] {SymbolName} ({status})");
         }
     }
 } 

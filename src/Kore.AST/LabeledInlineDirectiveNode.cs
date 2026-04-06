@@ -31,7 +31,7 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            return addDebugTextHeader(indentLevel, builder).Append($"INLINE DIRECTIVE {Name} LABEL:{Label}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).Append($"INLINE DIRECTIVE {Name} LABEL:{Label}");
         }
     }
     public class LabeledInlineDirectiveNode<T> : LabeledInlineDirectiveNode where T : InstructionNode {
@@ -60,9 +60,9 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            addDebugTextHeader(indentLevel, builder).AppendLine($"INLINE DIRECTIVE {Name} LABEL:{Label} {{");
+            addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"INLINE DIRECTIVE {Name} LABEL:{Label} {{");
             WrappedInstruction.getDebugText(indentLevel + 1, builder);
-            return addDebugTextHeader(indentLevel, builder).AppendLine("}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine("}");
         }
     }
 }

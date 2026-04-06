@@ -3,7 +3,8 @@
 
 .PHONY: all build build-solution build-docs test clean setup help debug release \
 	build-tools build-tools-binutils build-tools-binutils-readelf \
-	version-inc-readelf-major version-inc-readelf-minor version-inc-readelf-patch
+	version-inc-readelf-major version-inc-readelf-minor version-inc-readelf-patch \
+	ast-dump
 
 # Default configuration
 CONFIGURATION ?= Debug
@@ -98,6 +99,11 @@ test-kuick:
 	@echo "Testing Kuick components ($(CONFIGURATION))..."
 	@./TestKuick.sh $(CONFIGURATION)
 
+# Print AstNode.getDebugText() for a single assembly file (FILE= path from repo root or absolute)
+ast-dump:
+	@test -n "$(FILE)" || (echo "Usage: make ast-dump FILE=src/path/to/file.S"; exit 1)
+	@dotnet run --project src/Kore.Kuick.AstDump/Kore.Kuick.AstDump.csproj --configuration $(CONFIGURATION) -- "$(FILE)"
+
 # Clean build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
@@ -149,6 +155,7 @@ help:
 	@echo "  make test-utility  - Run Utility tests only"
 	@echo "  make test-ast      - Run AST tests only"
 	@echo "  make test-kuick    - Run Kuick tests only"
+	@echo "  make ast-dump FILE=src/path/to/file.S - Print AST getDebugText() for one .S file"
 	@echo "  make clean         - Clean build artifacts"
 	@echo "  make clean-builds  - Comprehensive build cleanup"
 	@echo "  make setup         - Setup development environment"

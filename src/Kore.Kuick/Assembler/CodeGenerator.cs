@@ -1,4 +1,4 @@
-﻿using Kore.AST;
+using Kore.AST;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Kore.Kuick.Assembler {
+    /// <summary>
+    /// Multi-pass visitor over the program AST: expand pseudos, assign line numbers, emit bytes.
+    /// Uses <see cref="ASTProcessor"/> without a separate context struct—pass state and caches live on this instance.
+    /// (The former <c>CodeGeneratorContext</c> carried section/symbol lists; relocation entries use <see cref="AssemblerContext"/>.)
+    /// </summary>
     public class CodeGenerator : ASTProcessor {
         private Exception ThrowAssemblerPanic(string msg = "Assembler Panic") {
             throw new Exception($"Assembler Panic: {msg}");
@@ -63,8 +68,11 @@ namespace Kore.Kuick.Assembler {
 
         public List<byte> machineCode = new List<byte>();
         public Dictionary<string, LabelNode> labels = new Dictionary<string, LabelNode>();
+        /// <summary>Set during the line-number pass if a label was used before it was defined.</summary>
         public bool labelCacheMiss = false;
+        /// <summary>Set during the line-number pass if a symbol could not yet be resolved.</summary>
         public bool symbolCacheMiss = false;
+        /// <summary>Sequential line counter while assigning addresses in the current pass.</summary>
         public int nextLineNumber = 0;
         private SymbolTable currentSymbolTable = null;
 

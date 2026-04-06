@@ -1,5 +1,6 @@
-﻿/*
-*/
+/*
+ * Kuick RISC-V assembly parser: lexer tokens → AST (sections, instructions, pseudos, directives).
+ */
 using Kore.AST;
 using Kore.RiscMeta;
 using System;
@@ -104,6 +105,13 @@ namespace Kore.Kuick {
 
         private static int ParseImmediate(Lexer lexer) {
             var currentToken = ExpectToken(lexer, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            return ParseImmediateValue(currentToken);
+        }
+
+        /// <summary>
+        /// Parses an immediate from a token already obtained (e.g. <c>J</c> pseudo reads the operand token first).
+        /// </summary>
+        private static int ParseImmediateValue(Lexer.TokenData currentToken) {
             if(currentToken.token == Lexer.Token.NUMBER_INT) return int.Parse(currentToken.value);
             if(currentToken.token == Lexer.Token.NUMBER_HEX) return Convert.ToInt32(currentToken.value, 16);
             throw ThrowParserPanic(currentToken);
@@ -122,21 +130,34 @@ namespace Kore.Kuick {
             // Make the node
             var labelNode = new LabelNode(currentToken.value);
 
-            // Get the next token
-            currentToken = lexer.ReadToken();
-
+            // Get the next token (ignore leading whitespace so a trailing `#` comment on the same line is seen)
+            currentToken = lexer.ReadToken(true);
+            // Optional same-line comment tokens after the label (e.g. `main: # note`)
+            var trailing = new List<AstNode>();
+            while(currentToken.token == Lexer.Token.COMMENT) {
+                trailing.Add(new CommentNode(currentToken.value));
+                currentToken = lexer.ReadToken(true);
+            }
             // If not the end of file or line
             // Check EOL first because its more likely
             if(currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
                 throw ThrowUnexpected(currentToken, "EOL || EOF");
             }
-            return ComposeInstructionArray(labelNode);
+            if(trailing.Count == 0) {
+                return ComposeInstructionArray(labelNode);
+            }
+            var all = new AstNode[1 + trailing.Count];
+            all[0] = labelNode;
+            for(int i = 0; i < trailing.Count; i++) {
+                all[1 + i] = trailing[i];
+            }
+            return all;
         }
 
         private static AstNode[] ProcessNodeComment(Lexer.TokenData currentToken, Lexer lexer) {
-            if(currentToken.token != Lexer.Token.LABEL) throw ThrowUnexpected(currentToken, "LABEL");
+            if(currentToken.token != Lexer.Token.COMMENT) throw ThrowUnexpected(currentToken, "COMMENT");
             // Make the node
-            var labelNode = new CommentNode(currentToken.value);
+            var commentNode = new CommentNode(currentToken.value);
 
             // Get the next token
             currentToken = lexer.ReadToken();
@@ -146,7 +167,7 @@ namespace Kore.Kuick {
             if(currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
                 throw ThrowUnexpected(currentToken, "EOL || EOF");
             }
-            return ComposeInstructionArray(labelNode);
+            return ComposeInstructionArray(commentNode);
         }
 
         private static AstNode[] ParseRInstruction(Lexer.TokenData currentToken, Lexer lexer) {
@@ -401,9 +422,26 @@ namespace Kore.Kuick {
                     return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(RiscMeta.Instructions.TypeI.jalr, Register.x0, Register.x1, 0), lexer));
                 ////////////////////////////////////////////////////////////////////////
                 case "J": // Pseduo instruction: J offset/label -> JAL x0, offset/label [TYPE J]
-                    return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeJImmediate(RiscMeta.Instructions.TypeJ.jal, Register.x0, ParseImmediate(lexer)), lexer));
+                {
+                    // Must consume the operand (false = not peek-only); otherwise expectReturnEOL still sees the operand token.
+                    var jTok = ExpectToken(lexer, false, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+                    switch(jTok.token) {
+                        case Lexer.Token.NUMBER_INT:
+                        case Lexer.Token.NUMBER_HEX:
+                            return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeJImmediate(RiscMeta.Instructions.TypeJ.jal, Register.x0, ParseImmediateValue(jTok)), lexer));
+                        case Lexer.Token.IDENTIFIER:
+                            return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeJLabel(RiscMeta.Instructions.TypeJ.jal, Register.x0, jTok.value), lexer));
+                        default:
+                            throw ThrowUnexpected(jTok, "Label Identifier or Number");
+                    }
+                }
                 case "JR": // Pseduo instruction: JR rs -> JALR x0, 0(rs) [TYPE I]
                     return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(RiscMeta.Instructions.TypeI.jalr, Register.x0, ParseRegister(lexer), 0), lexer));
+                case "LLA":
+                case "LA": // Pseduo instruction: LA rd, sym -> AUIPC rd,%pcrel_hi(sym); ADDI rd,rd,%pcrel_lo(sym)
+                    return ParsePseudoInstructionLoadAddress(lexer);
+                case "CALL": // Pseduo instruction: CALL sym -> AUIPC ra,%pcrel_hi(sym); JALR ra,ra,%pcrel_lo(sym)
+                    return ParsePseudoInstructionCall(lexer);
                 ////////////////////////////////////////////////////////////////////////
                 case "LB":
                     return ParsePseudoInstructionLoad(currentToken, RiscMeta.Instructions.TypeI.lb, lexer);
@@ -519,6 +557,65 @@ namespace Kore.Kuick {
             };
 
             return ComposeInstructionArray(command1, expectReturnEOL(command2, lexer));
+        }
+
+        /// <summary>
+        /// Pseudo LLA/LA: auipc + addi with %pcrel_hi/%pcrel_lo relocation placeholders.
+        /// </summary>
+        private static AstNode[] ParsePseudoInstructionLoadAddress(Lexer lexer) {
+            // Format: LA rd, symbol — same relocation pattern as pseudo LW/LD but destination is the address, not a load.
+            var rd = ParseRegister(lexer);
+            var symbol = ExpectToken(lexer, Lexer.Token.IDENTIFIER);
+            var auipc = new LabeledInlineDirectiveNode<InstructionNodeTypeU>() {
+                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_HI,
+                Label = symbol.value,
+                WrappedInstruction = new InstructionNodeTypeU(
+                    RiscMeta.Instructions.TypeU.auipc,
+                    rd,
+                    0
+                )
+            };
+            var addi = new LabeledInlineDirectiveNode<InstructionNodeTypeI>() {
+                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_LO,
+                Label = symbol.value,
+                WrappedInstruction = new InstructionNodeTypeI(
+                    RiscMeta.Instructions.TypeI.addi,
+                    rd,
+                    rd,
+                    0
+                )
+            };
+
+            return ComposeInstructionArray(auipc, expectReturnEOL(addi, lexer));
+        }
+
+        /// <summary>
+        /// Pseudo CALL: auipc ra,%pcrel_hi(sym); jalr ra,%pcrel_lo(sym)(ra)
+        /// </summary>
+        private static AstNode[] ParsePseudoInstructionCall(Lexer lexer) {
+            // Format: CALL symbol — fixed register ra for both AUIPC and JALR, matching common RISC-V toolchain lowering.
+            var symbol = ExpectToken(lexer, Lexer.Token.IDENTIFIER);
+            var auipc = new LabeledInlineDirectiveNode<InstructionNodeTypeU>() {
+                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_HI,
+                Label = symbol.value,
+                WrappedInstruction = new InstructionNodeTypeU(
+                    RiscMeta.Instructions.TypeU.auipc,
+                    Register.ra,
+                    0
+                )
+            };
+            var jalr = new LabeledInlineDirectiveNode<InstructionNodeTypeI>() {
+                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_LO,
+                Label = symbol.value,
+                WrappedInstruction = new InstructionNodeTypeI(
+                    RiscMeta.Instructions.TypeI.jalr,
+                    Register.ra,
+                    Register.ra,
+                    0
+                )
+            };
+
+            return ComposeInstructionArray(auipc, expectReturnEOL(jalr, lexer));
         }
 
         /// <summary>
@@ -699,6 +796,10 @@ namespace Kore.Kuick {
                 
                 // Now actually consume the token since we know it's not a section directive
                 currentToken = lexer.ReadToken(true);
+                // Blank lines inside a section: skip the EOL and keep scanning for instructions
+                if(currentToken.token == Lexer.Token.EOL) {
+                    continue;
+                }
 
                 AstNode[] newNodes = null;
                 //TODO: Refactor to a switch statement
@@ -921,21 +1022,36 @@ namespace Kore.Kuick {
                 throw ThrowUnexpected(currentToken, "Section");
             }
 
-            // Post-process to integrate symbol directives with symbol table
-            ProcessSymbolDirectives(programNode, currentSection);
+            // Post-process: directives, label defs/refs, and per-section offsets (fixed 4-byte RVI units for now).
+            ProcessAssemblySymbols(programNode);
 
             return programNode;
         }
 
+        /// <summary>Rough code size for PC tracking: one RVI slot per instruction; labeled inline emits one slot per wrapped instruction.</summary>
+        private static int GetEmittedByteSize(AstNode node) {
+            if (node is InstructionNode) {
+                return 4;
+            }
+            var t = node.GetType();
+            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(LabeledInlineDirectiveNode<>)) {
+                var wrapped = t.GetProperty(nameof(LabeledInlineDirectiveNode<InstructionNode>.WrappedInstruction))?.GetValue(node) as InstructionNode;
+                return wrapped != null ? 4 : 0;
+            }
+            return 0;
+        }
+
         /// <summary>
-        /// Post-processes the AST to integrate SymbolDirectiveNode instances with the program's symbol table
-        /// and to define labels in the symbol table
+        /// Integrates symbol directives, defines labels at the current PC, and registers all label references.
         /// </summary>
-        private static void ProcessSymbolDirectives(ProgramNode program, string defaultSection) {
+        private static void ProcessAssemblySymbols(ProgramNode program) {
             foreach (var section in program.Sections) {
+                long offset = 0;
                 foreach (var node in section.Contents) {
-                    if (node is SymbolDirectiveNode symbolDirective) {
-                        // Process the symbol directive using the ParserExtensions
+                    if (node is LabelNode labelNode) {
+                        program.DefineLabel(labelNode.Name, labelNode.lineNumber, section.Name, offset);
+                    }
+                    else if (node is SymbolDirectiveNode symbolDirective) {
                         if (symbolDirective.Type == SymbolDirectiveNode.DirectiveType.Global) {
                             var processedDirective = program.ProcessGlobalDirective(symbolDirective.SymbolName);
                             symbolDirective.Symbol = processedDirective.Symbol;
@@ -945,18 +1061,17 @@ namespace Kore.Kuick {
                             symbolDirective.Symbol = processedDirective.Symbol;
                         }
                     }
-                    else if (node is LabelNode labelNode) {
-                        // Define the label in the symbol table
-                        program.DefineLabel(labelNode.Name, labelNode.lineNumber, section.Name);
-                    }
                     else if (node is InstructionNodeTypeJLabel jLabelInstruction) {
-                        // J-type instruction with label reference - add to symbol table if not already present
-                        program.SymbolTable.GetOrCreateSymbol(jLabelInstruction.label, SymbolScope.Unknown, SymbolType.Label);
+                        program.SymbolTable.GetLabelRef(jLabelInstruction.label, jLabelInstruction);
                     }
                     else if (node is InstructionNodeTypeBLabel bLabelInstruction) {
-                        // B-type instruction with label reference - add to symbol table if not already present
-                        program.SymbolTable.GetOrCreateSymbol(bLabelInstruction.label, SymbolScope.Unknown, SymbolType.Label);
+                        program.SymbolTable.GetLabelRef(bLabelInstruction.label, bLabelInstruction);
                     }
+                    else if (node is LabeledInlineDirectiveNode labeledInline) {
+                        program.SymbolTable.GetLabelRef(labeledInline.Label, labeledInline);
+                    }
+
+                    offset += GetEmittedByteSize(node);
                 }
             }
         }

@@ -57,7 +57,7 @@ namespace Kore.AST {
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
             var symbolInfo = Symbol != null ? $" -> Symbol[{Symbol.Id}]" : "";
-            return addDebugTextHeader(indentLevel, builder).AppendLine($"SYMBOL_DIRECTIVE {Name} {SymbolName}{symbolInfo}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"SYMBOL_DIRECTIVE {Name} {SymbolName}{symbolInfo}");
         }
     }
 } 

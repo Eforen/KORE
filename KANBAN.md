@@ -216,12 +216,17 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF][BUG] Multiple flags not working when combined with other flags (fixed: grouped short options e.g. `-hl` like GNU readelf).
 * [CLI][READELF] `-a` / `-all` Equivalent to: -h -l -S -s -r -d -V -A -I --got-contents
 * [DOCS][CLI][READELF] Add Documentation for the Readelf Command Line Interface `-a`
-### Next Commit (Eforen)
 * [CLI][READELF] Write a single test for each of the Readelf command flags by compiling a simple .S file and running the readelf command against the resulting .o file for now using riscv32-unknown-elf-gcc until kuick can compile .S files (`Kuick.Tools.Readelf.Tests`).
+* [CLI][READELF] Add Help system that shows in `-h` / `--help`
+
+## Done 2026/04/01
+### Next Commit (Eforen)
+
 
 # Working On
 ## Working on (Eforen)
-* [CLI][READELF] Add Help system that shows in `-h` / `--help`
+* Complete the RiscVMetadata
+* [KUICK][PARSER] Based on new understanding of the assemblers role, rewrite the parser to write code into sections and just imit relocations for anything dynamic at all and let it be the linker's problem later.
 
 ## Set aside (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
@@ -234,7 +239,20 @@ The lowest priority tasks are at the bottom of the list.
 
 # Todos
 ## Todo
-* [KUICKER] Write simple new 2 pass assembler
+* [KUICK][PARSER] Make parser tolorate `.S` files that start with comments.
+
+* [KUICK] Make the code generator collapse to a number of sections, symbols, and relocations and then collapse the sections into binary with placeholders in relo instructions.
+
+* [KUICK] Change the leaf nodes of the AST to optionally contain a relocation entry. These will not be there when the AST is built from ELF only when building from source (for now).
+* [KUICK] Implement the linker
+
+* [KUICK][VISUALIZER] Make an assembly visualizer that lets the user inspect the tokenized source code
+* [KUICK][VISUALIZER] Make it beable to inspect the AST
+* [KUICK][VISUALIZER] Make it able to inspect the resulting raw binary output of the sections and the symbols and the relocations (with placeholders as stored in the ELF file)
+* [KUICK][VISUALIZER] Make it able to inspect the linked binary output
+
+* [KUICK] Embed the debugdata needed for the AST to reassosiate their relo instructions with the correct AST nodes for visualizer.
+
 * [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete] ✅ COMPLETED
 
