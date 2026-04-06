@@ -5,8 +5,8 @@ PROGRAM [1] Symbols:[2]{
     }
     SECTION .text [4]{
         LABEL block
-        TypeJ jal RD:zero LABEL:block
+        TypeJ jal RD:x0 LABEL:block
         LABEL block
-        TypeJ jal RD:zero LABEL:block
+        TypeJ jal RD:x0 LABEL:block
     }
 }

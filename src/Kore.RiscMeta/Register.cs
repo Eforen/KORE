@@ -98,5 +98,19 @@ namespace Kore.RiscMeta {
         {
             return reg == Register.PC ? 0xFEu : (uint)reg;
         }
+
+        /// <summary>
+        /// Canonical GPR name for AST debug output: always <c>x0</c>–<c>x31</c> (never ABI aliases like <c>a0</c> or <c>zero</c>).
+        /// </summary>
+        public static string ToDebugString(this Register reg) {
+            if (reg == Register.PC) {
+                return "PC";
+            }
+            uint n = (uint)reg;
+            if (n <= 31) {
+                return $"x{n}";
+            }
+            return reg.ToString();
+        }
     }
 }

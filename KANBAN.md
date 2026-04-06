@@ -322,3 +322,4 @@ The lowest priority tasks are at the bottom of the list.
 
 ## Planned for some time later
 ## Wishlist
+* [KUICK][PARSER] Make the assembler emit a warning when the source contains a `.align` directive because in modern assemblers it is just `.p2align` in legacy assemblers though it is `.balign`

@@ -6,8 +6,8 @@ PROGRAM [1] Symbols:[2]{
     SECTION .text [5]{
         SYMBOL_DIRECTIVE .global entry -> Symbol[1]
         LABEL entry
-        TypeI addi RD:zero RS:zero IMM:0
+        TypeI addi RD:x0 RS:x0 IMM:0
         LABEL after_entry
-        TypeI addi RD:zero RS:zero IMM:0
+        TypeI addi RD:x0 RS:x0 IMM:0
     }
 }

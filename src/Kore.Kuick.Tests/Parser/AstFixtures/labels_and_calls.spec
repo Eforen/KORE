@@ -24,6 +24,6 @@ PROGRAM [1] Symbols:[4]{
         LABEL loop
         COMMENT # ← label
         TypeI addi RD:x5 RS:x5 IMM:1
-        TypeJ jal RD:zero LABEL:loop
+        TypeJ jal RD:x0 LABEL:loop
     }
 }

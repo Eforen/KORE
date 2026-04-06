@@ -1,4 +1,4 @@
-﻿using Kore.RiscMeta;
+using Kore.RiscMeta;
 using Kore.RiscMeta.Instructions;
 using System.Text;
 
@@ -51,7 +51,7 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeR {op} RD:{rd} RS1:{rs1} RS2:{rs2}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeR {op} RD:{rd.ToDebugString()} RS1:{rs1.ToDebugString()} RS2:{rs2.ToDebugString()}");
         }
     }
 }
