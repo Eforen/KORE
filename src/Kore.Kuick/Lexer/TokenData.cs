@@ -25,6 +25,10 @@ namespace Kore.Kuick {
                 // if its none of these then just dump to false
                 return false;
             }
+            public override int GetHashCode()
+            {
+                return value.GetHashCode() ^ token.GetHashCode() ^ lineNumber.GetHashCode() ^ columnNumber.GetHashCode();
+            }
 
             public static bool operator ==(TokenData tokenData, Token token)
             {
