@@ -220,12 +220,13 @@ The lowest priority tasks are at the bottom of the list.
 * [CLI][READELF] Add Help system that shows in `-h` / `--help`
 
 ## Done 2026/04/06
-### Next Commit (Eforen)
 * [KUICK][PARSER] Implement Alignment ASTNode with tests
+### Next Commit (Eforen)
+* [KUICK][PARSER] Implement the Relocation type wrapper for label usage
 
 # Working On
 ## Working on (Eforen)
-* [KUICK][PARSER] Implement the Relocation type wrapper for label usage
+* [KUICK][PARSER] Impliment the bytewise relative addr on the ASTNodes.
 * [KUICK][ASSEMBLER] Impliment the byte alignment in the code generator
 * Complete the RiscVMetadata
 * [KUICK][PARSER] Based on new understanding of the assemblers role, rewrite the parser to write code into sections and just imit relocations for anything dynamic at all and let it be the linker's problem later.

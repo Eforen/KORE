@@ -126,3 +126,5 @@ Reading order
 1. **New to the topic** — read from :ref:`elf-big-picture` through :ref:`elf-riscv-parts`.
 2. **Comfortable with linkers** — skim the simple sections, read :ref:`elf-riscv-technical`, then use tools and specs for details.
 3. **Implementing or debugging** — use this page for orientation, then **ELF** and **RISC-V psABI** references for exact layouts.
+
+For a **relocation-by-relocation** summary of RISC-V ELF ``r_type`` values (formulas and how KORE exposes them), see :doc:`riscv_elf_relocations`.

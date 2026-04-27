@@ -85,6 +85,7 @@ Indices and tables
 
     architecture/design
     architecture/elf_format
+    architecture/riscv_elf_relocations
     architecture/structure
     architecture/symbol_table
 

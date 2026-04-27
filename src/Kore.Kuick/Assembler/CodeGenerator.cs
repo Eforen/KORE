@@ -305,6 +305,16 @@ namespace Kore.Kuick.Assembler {
             return null;
         }
 
+        public AstNode ProcessASTNode(RelocationInstructionNode node) {
+            var inner = node.GetWrappedInstruction();
+            inner.CallProcessor(this);
+            if (phase == GeneratorPass.LineNumber) {
+                node.lineNumber = inner.lineNumber;
+            }
+
+            return null;
+        }
+
         // New symbol-based node processing methods
         public AstNode ProcessASTNode(SymbolDirectiveNode node) {
             // For now, just pass through - symbol directives are handled at parse time

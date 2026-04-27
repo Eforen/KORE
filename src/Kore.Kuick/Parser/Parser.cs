@@ -10,7 +10,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Kore.Kuick {
+    /// <summary>
+    /// Kuick assembly parser: static methods take a <see cref="ParserContext"/> for program and current section.
+    /// </summary>
     public static class Parser {
+        /// <summary>Parses the lexer stream into a new program tree and symbol table.</summary>
+        public static ProgramNode Parse(Lexer lexer) {
+            var ctx = new ParserContext();
+            ParseInternal(ctx, lexer);
+            return ctx.Program;
+        }
+
         #region Utilities
         public class SyntaxException : Exception { public SyntaxException(string msg) : base(msg) { } }
         private static Exception ThrowUnexpected(Lexer.TokenData currentToken, string expectation) {
@@ -60,6 +70,11 @@ namespace Kore.Kuick {
             }
 
             throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}. Expected {string.Join(" or ", expectedTokens.Select(e => e.ToString()))}.");
+        }
+
+        /// <summary>Symbol or label reference: plain identifier or dotted name (e.g. <c>.Llocal_buffer</c>) lexed as DIRECTIVE.</summary>
+        private static Lexer.TokenData ExpectSymbolName(Lexer lexer) {
+            return ExpectToken(lexer, Lexer.Token.IDENTIFIER, Lexer.Token.DIRECTIVE);
         }
 
         private static T ParseOP<T>(Lexer lexer, Lexer.Token expectedToken)
@@ -130,17 +145,20 @@ namespace Kore.Kuick {
             // Make the node
             var labelNode = new LabelNode(currentToken.value);
 
-            // Get the next token (ignore leading whitespace so a trailing `#` comment on the same line is seen)
-            currentToken = lexer.ReadToken(true);
-            // Optional same-line comment tokens after the label (e.g. `main: # note`)
+            // Rest of this line only — do not use ReadToken(true): it skips newlines and would consume the next line (e.g. another label or `.section`).
             var trailing = new List<AstNode>();
-            while(currentToken.token == Lexer.Token.COMMENT) {
-                trailing.Add(new CommentNode(currentToken.value));
-                currentToken = lexer.ReadToken(true);
+            currentToken = lexer.ReadToken(false);
+            while (currentToken.token == Lexer.Token.WHITESPACE) {
+                currentToken = lexer.ReadToken(false);
             }
-            // If not the end of file or line
-            // Check EOL first because its more likely
-            if(currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
+            while (currentToken.token == Lexer.Token.COMMENT) {
+                trailing.Add(new CommentNode(currentToken.value));
+                currentToken = lexer.ReadToken(false);
+                while (currentToken.token == Lexer.Token.WHITESPACE) {
+                    currentToken = lexer.ReadToken(false);
+                }
+            }
+            if (currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
                 throw ThrowUnexpected(currentToken, "EOL || EOF");
             }
             if(trailing.Count == 0) {
@@ -159,20 +177,27 @@ namespace Kore.Kuick {
             // Make the node
             var commentNode = new CommentNode(currentToken.value);
 
-            // Get the next token
-            currentToken = lexer.ReadToken();
-
-            // If not the end of file or line
-            // Check EOL first because its more likely
-            if(currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
+            // Same-line trailing spaces only (do not use ignoreWhitespace — it skips newlines and pulls the next line's token).
+            while (true) {
+                currentToken = lexer.ReadToken(false);
+                if (currentToken.token == Lexer.Token.WHITESPACE) {
+                    continue;
+                }
+                if (currentToken.token == Lexer.Token.EOL || currentToken.token == Lexer.Token.EOF) {
+                    return ComposeInstructionArray(commentNode);
+                }
                 throw ThrowUnexpected(currentToken, "EOL || EOF");
             }
-            return ComposeInstructionArray(commentNode);
         }
 
         private static AstNode[] ParseRInstruction(Lexer.TokenData currentToken, Lexer lexer) {
             // add x1, x2, x3
             // OP  rd, rs1, rs2
+
+            // Privileged / system ops are OP_R in the lexer but have no register operands (not in TypeR).
+            if (string.Equals(currentToken.value, "WFI", StringComparison.OrdinalIgnoreCase)) {
+                return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeMisc("wfi"), lexer));
+            }
 
             var op = ParseOP<Kore.RiscMeta.Instructions.TypeR>(currentToken, lexer, Lexer.Token.OP_R);
             var rd = ParseRegister(lexer); // Get the destination register (rd)
@@ -183,7 +208,7 @@ namespace Kore.Kuick {
         }
 
 
-        private static AstNode[] ParseIInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static AstNode[] ParseIInstruction(ParserContext ctx, Lexer.TokenData currentToken, Lexer lexer) {
             // addi x1, x2, 15
             // OP  rd, rs, imm
             // OR
@@ -208,11 +233,11 @@ namespace Kore.Kuick {
                         // Reset the lexer cursor
                         lexer._cursor = originalCursor;
                         // Send to pseudo instruction parser
-                        return ParsePseudoInstruction(currentToken, lexer);
+                        return ParsePseudoInstruction(ctx, currentToken, lexer);
                     }
-                    LabeledInlineDirectiveNode<InstructionNodeTypeI> wrapper = null;
+                    RelocationInstructionNode<InstructionNodeTypeI> wrapper = null;
                     if(PeakLabelInlineDirective(lexer)){
-                        wrapper = ParseNWrapLabelInlineDirective(lexer, new InstructionNodeTypeI(op, rd, rs, 0));
+                        wrapper = ParseNWrapLabelInlineDirective(ctx, lexer, new InstructionNodeTypeI(op, rd, rs, 0));
                     } else {
                         imm = ParseImmediate(lexer); // Get the immediate value, which can be in decimal or hexadecimal format
                     }
@@ -239,14 +264,14 @@ namespace Kore.Kuick {
                 default:
                     rs = ParseRegister(lexer); // Get the source register (rs)
                     if(PeakLabelInlineDirective(lexer)) {
-                        return ComposeInstructionArray(expectReturnEOL(ParseNWrapLabelInlineDirective(lexer, new InstructionNodeTypeI(op, rd, rs, 0)), lexer));
+                        return ComposeInstructionArray(expectReturnEOL(ParseNWrapLabelInlineDirective(ctx, lexer, new InstructionNodeTypeI(op, rd, rs, 0)), lexer));
                     }
                     imm = ParseImmediate(lexer); // Get the immediate value, which can be in decimal or hexadecimal format
                     break;
             }
             return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(op, rd, rs, imm), lexer));
         }
-        private static AstNode[] ParseSInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static AstNode[] ParseSInstruction(ParserContext ctx, Lexer.TokenData currentToken, Lexer lexer) {
             var originalCursor = lexer._cursor;
 
             var op = ParseOP<Kore.RiscMeta.Instructions.TypeS>(currentToken, lexer, Lexer.Token.OP_S);
@@ -259,13 +284,17 @@ namespace Kore.Kuick {
                 // Reset the lexer cursor
                 lexer._cursor = originalCursor;
                 // Send to pseudo instruction parser
-                return ParsePseudoInstruction(currentToken, lexer);
+                return ParsePseudoInstruction(ctx, currentToken, lexer);
             }
 
-            LabeledInlineDirectiveNode<InstructionNodeTypeS> labelInlineDirective = null;
+            InlineDirectiveNode.InlineDirectiveType? relocDirective = null;
+            string relocLabel = null;
             int imm = 0;
             if(PeakLabelInlineDirective(lexer)){
-                labelInlineDirective = ParseNWrapLabelInlineDirective<InstructionNodeTypeS>(lexer, null);
+                relocDirective = ParseOP<InlineDirectiveNode.InlineDirectiveType>(lexer, Lexer.Token.INLINE_DIRECTIVE);
+                ExpectToken(lexer, Lexer.Token.PARREN_OPEN);
+                relocLabel = ExpectSymbolName(lexer).value;
+                ExpectToken(lexer, Lexer.Token.PARREN_CLOSE);
             } else {
                 imm = ParseImmediate(lexer);
             }
@@ -274,14 +303,19 @@ namespace Kore.Kuick {
             ExpectToken(lexer, Lexer.Token.PARREN_CLOSE);
             
             var node = new InstructionNodeTypeS(op, rs1, rs2, imm);
-            if(labelInlineDirective != null){
-                labelInlineDirective.WrappedInstruction = node;
-                return ComposeInstructionArray(expectReturnEOL(labelInlineDirective, lexer));
+            if(relocDirective != null){
+                var reloc = new RelocationInstructionNode<InstructionNodeTypeS> {
+                    RelocationKind = RelocationSiteMapping.ToElfRelocation(relocDirective.Value, node),
+                    SymbolName = relocLabel,
+                    WrappedInstruction = node,
+                };
+                BindRelocation(ctx, reloc);
+                return ComposeInstructionArray(expectReturnEOL(reloc, lexer));
             }
 
             return ComposeInstructionArray(expectReturnEOL(node, lexer));
         }
-        private static AstNode[] ParseBInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static AstNode[] ParseBInstruction(ParserContext ctx, Lexer.TokenData currentToken, Lexer lexer) {
             // bne x1, x2, label
             // OP  rs1, rs2, offset
 
@@ -290,7 +324,8 @@ namespace Kore.Kuick {
             var rs2 = ParseRegister(lexer); // Get the second source register (rs2)
 
             if(PeakLabelInlineDirective(lexer)){
-                return ComposeInstructionArray(expectReturnEOL(ParseNWrapLabelInlineDirective<InstructionNodeTypeBImmediate>(lexer, new InstructionNodeTypeBImmediate(op, rs1, rs2, 0)), lexer));
+                var reloc = ParseNWrapLabelInlineDirective<InstructionNodeTypeBImmediate>(ctx, lexer, new InstructionNodeTypeBImmediate(op, rs1, rs2, 0));
+                return ComposeInstructionArray(expectReturnEOL(reloc, lexer));
             }
 
             var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
@@ -302,13 +337,15 @@ namespace Kore.Kuick {
                 case Lexer.Token.NUMBER_DOUBLE: //TODO: Evaluate if we want to support doubles in another way
                     return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeBImmediate(op, rs1, rs2, ParseImmediate(lexer)), lexer));
                 case Lexer.Token.IDENTIFIER:
-                    return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeBLabel(op, rs1, rs2, lexer.ReadToken(true).value), lexer));
+                    var bLabel = new InstructionNodeTypeBLabel(op, rs1, rs2, lexer.ReadToken(true).value);
+                    BindBLabel(ctx, bLabel);
+                    return ComposeInstructionArray(expectReturnEOL(bLabel, lexer));
                 default:
                     throw ThrowUnexpected(currentToken, "Label Identifier or Number");
             }
 
         }
-        private static AstNode[] ParseJInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static AstNode[] ParseJInstruction(ParserContext ctx, Lexer.TokenData currentToken, Lexer lexer) {
             // bne x1, x2, label
             // OP  rs1, rs2, offset
 
@@ -316,7 +353,8 @@ namespace Kore.Kuick {
             var rd = ParseRegister(lexer); // Get the destination register (rd)
 
             if(PeakLabelInlineDirective(lexer)){
-                return ComposeInstructionArray(expectReturnEOL(ParseNWrapLabelInlineDirective<InstructionNodeTypeJImmediate>(lexer, new InstructionNodeTypeJImmediate(op, rd, 0)), lexer));
+                var reloc = ParseNWrapLabelInlineDirective<InstructionNodeTypeJImmediate>(ctx, lexer, new InstructionNodeTypeJImmediate(op, rd, 0));
+                return ComposeInstructionArray(expectReturnEOL(reloc, lexer));
             }
 
             var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
@@ -325,18 +363,21 @@ namespace Kore.Kuick {
                 case Lexer.Token.NUMBER_HEX:
                     return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeJImmediate(op, rd, ParseImmediate(lexer)), lexer));
                 case Lexer.Token.IDENTIFIER:
-                    return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeJLabel(op, rd, lexer.ReadToken(true).value), lexer));
+                    var jLabel = new InstructionNodeTypeJLabel(op, rd, lexer.ReadToken(true).value);
+                    BindJLabel(ctx, jLabel);
+                    return ComposeInstructionArray(expectReturnEOL(jLabel, lexer));
                 default:
                     throw ThrowUnexpected(currentToken, "Label Identifier or Number");
             }
 
         }
 
-        private static AstNode[] ParseUInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static AstNode[] ParseUInstruction(ParserContext ctx, Lexer.TokenData currentToken, Lexer lexer) {
             var op = ParseOP<RiscMeta.Instructions.TypeU>(currentToken, lexer, Lexer.Token.OP_U);
             var rd = ParseRegister(lexer);
             if(PeakLabelInlineDirective(lexer)){
-                return ComposeInstructionArray(expectReturnEOL(ParseNWrapLabelInlineDirective(lexer, new InstructionNodeTypeU(op, rd, 0)), lexer));
+                var reloc = ParseNWrapLabelInlineDirective(ctx, lexer, new InstructionNodeTypeU(op, rd, 0));
+                return ComposeInstructionArray(expectReturnEOL(reloc, lexer));
             }
             var immediate = ParseImmediate(lexer);
 
@@ -348,36 +389,38 @@ namespace Kore.Kuick {
             return token.token == Lexer.Token.INLINE_DIRECTIVE;
         }
 
-        private static LabeledInlineDirectiveNode<T> ParseNWrapLabelInlineDirective<T>(Lexer lexer, T instruction) where T : InstructionNode{
-            // var directive = ExpectToken(lexer, Lexer.Token.INLINE_DIRECTIVE);
+        private static RelocationInstructionNode<T> ParseNWrapLabelInlineDirective<T>(ParserContext ctx, Lexer lexer, T instruction) where T : InstructionNode{
             var op = ParseOP<InlineDirectiveNode.InlineDirectiveType>(lexer, Lexer.Token.INLINE_DIRECTIVE);
             ExpectToken(lexer, Lexer.Token.PARREN_OPEN); // (
-            var label = ExpectToken(lexer, Lexer.Token.IDENTIFIER);
+            var label = ExpectSymbolName(lexer);
             ExpectToken(lexer, Lexer.Token.PARREN_CLOSE); // )
-            return new LabeledInlineDirectiveNode<T>(){
-                Name = op,
-                Label = label.value,
-                WrappedInstruction = instruction};
+            var reloc = new RelocationInstructionNode<T> {
+                RelocationKind = RelocationSiteMapping.ToElfRelocation(op, instruction),
+                SymbolName = label.value,
+                WrappedInstruction = instruction,
+            };
+            BindRelocation(ctx, reloc);
+            return reloc;
         }
 
-        private static AstNode[] ParseInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static AstNode[] ParseInstruction(ParserContext ctx, Lexer.TokenData currentToken, Lexer lexer) {
             switch (currentToken.token)
             {
                 
                 case Lexer.Token.OP_B:
-                    return ParseBInstruction(currentToken, lexer);
+                    return ParseBInstruction(ctx, currentToken, lexer);
                 case Lexer.Token.OP_I:
-                    return ParseIInstruction(currentToken, lexer);
+                    return ParseIInstruction(ctx, currentToken, lexer);
                 case Lexer.Token.OP_J:
-                    return ParseJInstruction(currentToken, lexer);
+                    return ParseJInstruction(ctx, currentToken, lexer);
                 case Lexer.Token.OP_R:
                     return ParseRInstruction(currentToken, lexer);
                 case Lexer.Token.OP_S:
-                    return ParseSInstruction(currentToken, lexer);
+                    return ParseSInstruction(ctx, currentToken, lexer);
                 case Lexer.Token.OP_U:
-                    return ParseUInstruction(currentToken, lexer);
+                    return ParseUInstruction(ctx, currentToken, lexer);
                 case Lexer.Token.OP_PSEUDO:
-                    return ParsePseudoInstruction(currentToken, lexer);
+                    return ParsePseudoInstruction(ctx, currentToken, lexer);
                 default:
                     throw ThrowUnimplemented(currentToken);
             }
@@ -387,7 +430,7 @@ namespace Kore.Kuick {
             return nodes;
         }
 
-        private static AstNode[] ParsePseudoInstruction(Lexer.TokenData currentToken, Lexer lexer) {
+        private static AstNode[] ParsePseudoInstruction(ParserContext ctx, Lexer.TokenData currentToken, Lexer lexer) {
 
             switch(currentToken.value.ToUpper()){
                 case "NOP": // Pseduo instruction: NOP -> ADDI x0, x0, 0 [TYPE I]
@@ -406,17 +449,17 @@ namespace Kore.Kuick {
                     return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeR(RiscMeta.Instructions.TypeR.slt, ParseRegister(lexer), Register.x0, ParseRegister(lexer)), lexer));
                 ////////////////////////////////////////////////////////////////////////
                 case "BEQZ": // Pseduo instruction: BEQZ rs, offset/label -> BEQ rs, x0, offset/label [TYPE B]
-                    return ComposeInstructionArray(ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.beq, true, lexer));
+                    return ComposeInstructionArray(ParsePseudoInstructionBType(ctx, RiscMeta.Instructions.TypeB.beq, true, lexer));
                 case "BNEZ": // Pseduo instruction: BNEZ rs, offset/label -> BNE rs, x0, offset/label [TYPE B]
-                    return ComposeInstructionArray(ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bne, true, lexer));
+                    return ComposeInstructionArray(ParsePseudoInstructionBType(ctx, RiscMeta.Instructions.TypeB.bne, true, lexer));
                 case "BLEZ": // Pseduo instruction: BLEZ rs, offset/label -> BGE x0, rs, offset/label [TYPE B]
-                    return ComposeInstructionArray(ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bge, false, lexer));
+                    return ComposeInstructionArray(ParsePseudoInstructionBType(ctx, RiscMeta.Instructions.TypeB.bge, false, lexer));
                 case "BGEZ": // Pseduo instruction: BGEZ rs, offset/label -> BGE rs, x0, offset/label [TYPE B]
-                    return ComposeInstructionArray(ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.bge, true, lexer));
+                    return ComposeInstructionArray(ParsePseudoInstructionBType(ctx, RiscMeta.Instructions.TypeB.bge, true, lexer));
                 case "BLTZ": // Pseduo instruction: BLTZ rs, offset/label -> BLT rs, x0, offset/label [TYPE B]
-                    return ComposeInstructionArray(ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.blt, true, lexer));
+                    return ComposeInstructionArray(ParsePseudoInstructionBType(ctx, RiscMeta.Instructions.TypeB.blt, true, lexer));
                 case "BGTZ": // Pseduo instruction: BGTZ rs, offset/label -> BLT x0, rs, offset/label [TYPE B]
-                    return ComposeInstructionArray(ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB.blt, false, lexer));
+                    return ComposeInstructionArray(ParsePseudoInstructionBType(ctx, RiscMeta.Instructions.TypeB.blt, false, lexer));
                 ////////////////////////////////////////////////////////////////////////
                 case "RET": // Pseduo instruction: RET -> JALR x0, 0(x1) [TYPE I] OP rd, offset(rs1)
                     return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(RiscMeta.Instructions.TypeI.jalr, Register.x0, Register.x1, 0), lexer));
@@ -424,13 +467,16 @@ namespace Kore.Kuick {
                 case "J": // Pseduo instruction: J offset/label -> JAL x0, offset/label [TYPE J]
                 {
                     // Must consume the operand (false = not peek-only); otherwise expectReturnEOL still sees the operand token.
-                    var jTok = ExpectToken(lexer, false, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+                    var jTok = ExpectToken(lexer, false, Lexer.Token.IDENTIFIER, Lexer.Token.DIRECTIVE, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
                     switch(jTok.token) {
                         case Lexer.Token.NUMBER_INT:
                         case Lexer.Token.NUMBER_HEX:
                             return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeJImmediate(RiscMeta.Instructions.TypeJ.jal, Register.x0, ParseImmediateValue(jTok)), lexer));
                         case Lexer.Token.IDENTIFIER:
-                            return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeJLabel(RiscMeta.Instructions.TypeJ.jal, Register.x0, jTok.value), lexer));
+                        case Lexer.Token.DIRECTIVE:
+                            var jLbl = new InstructionNodeTypeJLabel(RiscMeta.Instructions.TypeJ.jal, Register.x0, jTok.value);
+                            BindJLabel(ctx, jLbl);
+                            return ComposeInstructionArray(expectReturnEOL(jLbl, lexer));
                         default:
                             throw ThrowUnexpected(jTok, "Label Identifier or Number");
                     }
@@ -439,51 +485,58 @@ namespace Kore.Kuick {
                     return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(RiscMeta.Instructions.TypeI.jalr, Register.x0, ParseRegister(lexer), 0), lexer));
                 case "LLA":
                 case "LA": // Pseduo instruction: LA rd, sym -> AUIPC rd,%pcrel_hi(sym); ADDI rd,rd,%pcrel_lo(sym)
-                    return ParsePseudoInstructionLoadAddress(lexer);
+                    return ParsePseudoInstructionLoadAddress(ctx, lexer);
+                case "LI": // Pseudo: LI rd, imm -> ADDI rd, x0, imm (12-bit immediate)
+                {
+                    var rdLi = ParseRegister(lexer);
+                    var immLi = ExpectToken(lexer, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+                    int immVal = ParseImmediateValue(immLi);
+                    return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(RiscMeta.Instructions.TypeI.addi, rdLi, Register.x0, immVal), lexer));
+                }
                 case "CALL": // Pseduo instruction: CALL sym -> AUIPC ra,%pcrel_hi(sym); JALR ra,ra,%pcrel_lo(sym)
-                    return ParsePseudoInstructionCall(lexer);
+                    return ParsePseudoInstructionCall(ctx, lexer);
                 ////////////////////////////////////////////////////////////////////////
                 case "LB":
-                    return ParsePseudoInstructionLoad(currentToken, RiscMeta.Instructions.TypeI.lb, lexer);
+                    return ParsePseudoInstructionLoad(ctx, currentToken, RiscMeta.Instructions.TypeI.lb, lexer);
                 case "LH":
-                    return ParsePseudoInstructionLoad(currentToken, RiscMeta.Instructions.TypeI.lh, lexer);
+                    return ParsePseudoInstructionLoad(ctx, currentToken, RiscMeta.Instructions.TypeI.lh, lexer);
                 case "LW":
-                    return ParsePseudoInstructionLoad(currentToken, RiscMeta.Instructions.TypeI.lw, lexer);
+                    return ParsePseudoInstructionLoad(ctx, currentToken, RiscMeta.Instructions.TypeI.lw, lexer);
                 case "LD":
-                    return ParsePseudoInstructionLoad(currentToken, RiscMeta.Instructions.TypeI.ld, lexer);
+                    return ParsePseudoInstructionLoad(ctx, currentToken, RiscMeta.Instructions.TypeI.ld, lexer);
                 ////////////////////////////////////////////////////////////////////////
                 case "SB":
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeS.sb, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeS.sb, lexer);
                 case "SH":
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeS.sh, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeS.sh, lexer);
                 case "SW":
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeS.sw, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeS.sw, lexer);
                 case "SD": 
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeS.sd, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeS.sd, lexer);
                 ////////////////////////////////////////////////////////////////////////
                 case "FLW":
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeI.flw, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeI.flw, lexer);
                 case "FLD":
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeI.fld, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeI.fld, lexer);
                 case "FSW":
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeS.fsw, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeS.fsw, lexer);
                 case "FSD":
-                    return ParsePseudoInstructionStoreAndFloats(currentToken, RiscMeta.Instructions.TypeS.fsd, lexer);
+                    return ParsePseudoInstructionStoreAndFloats(ctx, currentToken, RiscMeta.Instructions.TypeS.fsd, lexer);
                 ////////////////////////////////////////////////////////////////////////
                 case "CSRR":
-                    return ParsePseudoInstructionCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, lexer);
+                    return ParsePseudoInstructionCSRRead(ctx, currentToken, RiscMeta.Instructions.TypeI.csrrs, lexer);
                 case "CSRW":
-                    return ParsePseudoInstructionCSR(currentToken, RiscMeta.Instructions.TypeI.csrrw, lexer);
+                    return ParsePseudoInstructionCSR(ctx, currentToken, RiscMeta.Instructions.TypeI.csrrw, lexer);
                 case "CSRS":
-                    return ParsePseudoInstructionCSR(currentToken, RiscMeta.Instructions.TypeI.csrrs, lexer);
+                    return ParsePseudoInstructionCSR(ctx, currentToken, RiscMeta.Instructions.TypeI.csrrs, lexer);
                 case "CSRC":
-                    return ParsePseudoInstructionCSR(currentToken, RiscMeta.Instructions.TypeI.csrrc, lexer);
+                    return ParsePseudoInstructionCSR(ctx, currentToken, RiscMeta.Instructions.TypeI.csrrc, lexer);
                 case "CSRCI":
-                    return ParsePseudoInstructionCSRImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrci, lexer);
+                    return ParsePseudoInstructionCSRImmediate(ctx, currentToken, RiscMeta.Instructions.TypeI.csrrci, lexer);
                 case "CSRWI":
-                    return ParsePseudoInstructionCSRImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrwi, lexer);
+                    return ParsePseudoInstructionCSRImmediate(ctx, currentToken, RiscMeta.Instructions.TypeI.csrrwi, lexer);
                 case "CSRSI":
-                    return ParsePseudoInstructionCSRImmediate(currentToken, RiscMeta.Instructions.TypeI.csrrsi, lexer);
+                    return ParsePseudoInstructionCSRImmediate(ctx, currentToken, RiscMeta.Instructions.TypeI.csrrsi, lexer);
                 case "RDCYCLE": // Pseduo instruction: RDCYCLE rd -> CSRRS rd, cycle, x0 [TYPE I]
                     return ParsePseudoInstructionSpecificCSRRead(currentToken, RiscMeta.Instructions.TypeI.csrrs, "cycle", lexer);
                 case "RDCYCLEH": // Pseduo instruction: RDCYCLEH rd -> CSRRS rd, cycleh, x0 [TYPE I]
@@ -525,16 +578,16 @@ namespace Kore.Kuick {
         /// <param name="op"></param>
         /// <param name="lexer"></param>
         /// <returns></returns>
-        private static AstNode[] ParsePseudoInstructionLoad(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+        private static AstNode[] ParsePseudoInstructionLoad(ParserContext ctx, Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
             // Format Example: LB rd, symbol, rt
             var rd = ParseRegister(lexer); // Get the destination register (rd)
-            var symbol = ExpectToken(lexer, Lexer.Token.IDENTIFIER); // Get the symbol
+            var symbol = ExpectSymbolName(lexer); // Get the symbol
             // Create the instruction node for the auipc instruction
             // auipc rt, symbol[31:12]
             // auipc rt, %pcrel_hi(symbol)
-            var command1 = new LabeledInlineDirectiveNode<InstructionNodeTypeU>() {
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_HI,
-                Label = symbol.value,
+            var command1 = new RelocationInstructionNode<InstructionNodeTypeU>() {
+                RelocationKind = RiscvRelocationType.R_RISCV_PCREL_HI20,
+                SymbolName = symbol.value,
                 WrappedInstruction = new InstructionNodeTypeU(
                     RiscMeta.Instructions.TypeU.auipc,
                     rd,
@@ -545,9 +598,9 @@ namespace Kore.Kuick {
             // Create the node wrapper for the load instruction
             // op rd, symbol[11:0](rt)
             // op rd, %pcrel_lo(symbol)(rt)
-            var command2 = new LabeledInlineDirectiveNode<InstructionNodeTypeI>() {
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_LO,
-                Label = symbol.value,
+            var command2 = new RelocationInstructionNode<InstructionNodeTypeI>() {
+                RelocationKind = RiscvRelocationType.R_RISCV_PCREL_LO12_I,
+                SymbolName = symbol.value,
                 WrappedInstruction = new InstructionNodeTypeI(
                     op,
                     rd,
@@ -556,28 +609,30 @@ namespace Kore.Kuick {
                 )
             };
 
+            BindRelocation(ctx, command1);
+            BindRelocation(ctx, command2);
             return ComposeInstructionArray(command1, expectReturnEOL(command2, lexer));
         }
 
         /// <summary>
         /// Pseudo LLA/LA: auipc + addi with %pcrel_hi/%pcrel_lo relocation placeholders.
         /// </summary>
-        private static AstNode[] ParsePseudoInstructionLoadAddress(Lexer lexer) {
+        private static AstNode[] ParsePseudoInstructionLoadAddress(ParserContext ctx, Lexer lexer) {
             // Format: LA rd, symbol — same relocation pattern as pseudo LW/LD but destination is the address, not a load.
             var rd = ParseRegister(lexer);
-            var symbol = ExpectToken(lexer, Lexer.Token.IDENTIFIER);
-            var auipc = new LabeledInlineDirectiveNode<InstructionNodeTypeU>() {
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_HI,
-                Label = symbol.value,
+            var symbol = ExpectSymbolName(lexer);
+            var auipc = new RelocationInstructionNode<InstructionNodeTypeU>() {
+                RelocationKind = RiscvRelocationType.R_RISCV_PCREL_HI20,
+                SymbolName = symbol.value,
                 WrappedInstruction = new InstructionNodeTypeU(
                     RiscMeta.Instructions.TypeU.auipc,
                     rd,
                     0
                 )
             };
-            var addi = new LabeledInlineDirectiveNode<InstructionNodeTypeI>() {
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_LO,
-                Label = symbol.value,
+            var addi = new RelocationInstructionNode<InstructionNodeTypeI>() {
+                RelocationKind = RiscvRelocationType.R_RISCV_PCREL_LO12_I,
+                SymbolName = symbol.value,
                 WrappedInstruction = new InstructionNodeTypeI(
                     RiscMeta.Instructions.TypeI.addi,
                     rd,
@@ -586,27 +641,29 @@ namespace Kore.Kuick {
                 )
             };
 
+            BindRelocation(ctx, auipc);
+            BindRelocation(ctx, addi);
             return ComposeInstructionArray(auipc, expectReturnEOL(addi, lexer));
         }
 
         /// <summary>
         /// Pseudo CALL: auipc ra,%pcrel_hi(sym); jalr ra,%pcrel_lo(sym)(ra)
         /// </summary>
-        private static AstNode[] ParsePseudoInstructionCall(Lexer lexer) {
+        private static AstNode[] ParsePseudoInstructionCall(ParserContext ctx, Lexer lexer) {
             // Format: CALL symbol — fixed register ra for both AUIPC and JALR, matching common RISC-V toolchain lowering.
-            var symbol = ExpectToken(lexer, Lexer.Token.IDENTIFIER);
-            var auipc = new LabeledInlineDirectiveNode<InstructionNodeTypeU>() {
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_HI,
-                Label = symbol.value,
+            var symbol = ExpectSymbolName(lexer);
+            var auipc = new RelocationInstructionNode<InstructionNodeTypeU>() {
+                RelocationKind = RiscvRelocationType.R_RISCV_PCREL_HI20,
+                SymbolName = symbol.value,
                 WrappedInstruction = new InstructionNodeTypeU(
                     RiscMeta.Instructions.TypeU.auipc,
                     Register.ra,
                     0
                 )
             };
-            var jalr = new LabeledInlineDirectiveNode<InstructionNodeTypeI>() {
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_LO,
-                Label = symbol.value,
+            var jalr = new RelocationInstructionNode<InstructionNodeTypeI>() {
+                RelocationKind = RiscvRelocationType.R_RISCV_PCREL_LO12_I,
+                SymbolName = symbol.value,
                 WrappedInstruction = new InstructionNodeTypeI(
                     RiscMeta.Instructions.TypeI.jalr,
                     Register.ra,
@@ -615,6 +672,8 @@ namespace Kore.Kuick {
                 )
             };
 
+            BindRelocation(ctx, auipc);
+            BindRelocation(ctx, jalr);
             return ComposeInstructionArray(auipc, expectReturnEOL(jalr, lexer));
         }
 
@@ -626,7 +685,7 @@ namespace Kore.Kuick {
         /// <param name="op"></param>
         /// <param name="lexer"></param>
         /// <returns></returns>
-        private static AstNode[] ParsePseudoInstructionCSRRead(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+        private static AstNode[] ParsePseudoInstructionCSRRead(ParserContext ctx, Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
             // Parse the destination register first
             var rd = ParseRegister(lexer); // Get the destination register (rd)
             
@@ -650,7 +709,7 @@ namespace Kore.Kuick {
         /// <param name="op"></param>
         /// <param name="lexer"></param>
         /// <returns></returns>
-        private static AstNode[] ParsePseudoInstructionCSR(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+        private static AstNode[] ParsePseudoInstructionCSR(ParserContext ctx, Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
             // Parse the CSR (can be either a CSR token like "cycle" or a number like 0x7C0)
             var csrToken = ExpectToken(lexer, Lexer.Token.CSR, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
             int csrValue = 0;
@@ -680,7 +739,7 @@ namespace Kore.Kuick {
                     
                     // Parse as a normal I-type instruction
                     var fakeToken = fakeLexer.ReadToken(); // csrrs
-                    return ParseIInstruction(fakeToken, fakeLexer);
+                    return ParseIInstruction(ctx, fakeToken, fakeLexer);
                 default:
                     throw ThrowUnexpected(csrToken, "CSR name or CSR address");
             }
@@ -696,17 +755,17 @@ namespace Kore.Kuick {
             ), lexer));
         }
 
-        private static AstNode[] ParsePseudoInstructionStoreAndFloats<T>(Lexer.TokenData startToken, T op, Lexer lexer) where T : Enum{
+        private static AstNode[] ParsePseudoInstructionStoreAndFloats<T>(ParserContext ctx, Lexer.TokenData startToken, T op, Lexer lexer) where T : Enum{
             // Format Example: SB rd, symbol, rt
             var rd = ParseRegister(lexer); // Get the destination register (rd)
-            var symbol = ExpectToken(lexer, Lexer.Token.IDENTIFIER); // Get the symbol
+            var symbol = ExpectSymbolName(lexer); // Get the symbol
             var rt = ParseRegister(lexer); // Get the source register (rt)
             // Create the instruction node for the auipc instruction
             // auipc rt, symbol[31:12]
             // auipc rt, %pcrel_hi(symbol)
-            var command1 = new LabeledInlineDirectiveNode<InstructionNodeTypeU>(){ 
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_HI,
-                Label = symbol.value,
+            var command1 = new RelocationInstructionNode<InstructionNodeTypeU> {
+                RelocationKind = RiscvRelocationType.R_RISCV_PCREL_HI20,
+                SymbolName = symbol.value,
                 WrappedInstruction = new InstructionNodeTypeU(
                     RiscMeta.Instructions.TypeU.auipc, 
                     rt, 
@@ -717,9 +776,8 @@ namespace Kore.Kuick {
             // Create the node wrapper for the store instruction
             // op rd, symbol[11:0](rt)
             // op rd, %pcrel_lo(symbol)(rt)
-            var command2 = new LabeledInlineDirectiveNode<InstructionNode<T>>(){ 
-                Name = InlineDirectiveNode.InlineDirectiveType.PCREL_LO,
-                Label = symbol.value,
+            var command2 = new RelocationInstructionNode<InstructionNode> {
+                SymbolName = symbol.value,
                 WrappedInstruction = null
             };
 
@@ -749,13 +807,17 @@ namespace Kore.Kuick {
                 throw ThrowUnimplemented(startToken);
             }
 
+            command2.RelocationKind = RelocationSiteMapping.ToElfRelocation(InlineDirectiveNode.InlineDirectiveType.PCREL_LO, command2.WrappedInstruction);
+
+            BindRelocation(ctx, command1);
+            BindRelocation(ctx, command2);
             return ComposeInstructionArray( command1, expectReturnEOL(command2, lexer));
         }
 
-        private static AstNode ParsePseudoInstructionBType(RiscMeta.Instructions.TypeB op, bool firstRegister, Lexer lexer){
+        private static AstNode ParsePseudoInstructionBType(ParserContext ctx, RiscMeta.Instructions.TypeB op, bool firstRegister, Lexer lexer){
             var rs1 = ParseRegister(lexer); // Get the first source register (rs1)
             // Skip the second register because its hardcoded to x0
-            var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
+            var token = ExpectToken(lexer, true, Lexer.Token.IDENTIFIER, Lexer.Token.DIRECTIVE, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
             switch(token.token) {
                 case Lexer.Token.NUMBER_INT:
                 case Lexer.Token.NUMBER_HEX:
@@ -766,22 +828,28 @@ namespace Kore.Kuick {
                         ParseImmediate(lexer)
                     ), lexer);
                 case Lexer.Token.IDENTIFIER:
-                    return expectReturnEOL(new InstructionNodeTypeBLabel(
+                case Lexer.Token.DIRECTIVE:
+                    var bLbl = new InstructionNodeTypeBLabel(
                         op, 
                         firstRegister == true ? rs1 : Register.x0, 
                         firstRegister == false ? rs1 : Register.x0, 
                         lexer.ReadToken(true).value
-                    ), lexer);
+                    );
+                    BindBLabel(ctx, bLbl);
+                    return expectReturnEOL(bLbl, lexer);
                 default:
                     throw ThrowUnexpected(token, "Label Identifier or Offset Number");
             }
         }
-        private static SectionNode ParseNodeSection(SectionNode section, Lexer.TokenData currentToken, Lexer lexer) {
+        private static SectionNode ParseNodeSection(ParserContext ctx, SectionNode section, Lexer.TokenData currentToken, Lexer lexer) {
             // Get the next token
             //currentToken = lexer.ReadToken();// EOL
-            // Expect EOL
-            ExpectToken(lexer, Lexer.Token.EOL);
+            ExpectEndOfLineSkippingComments(lexer);
 
+            long offset = 0;
+            foreach (var existing in section.Contents) {
+                offset += GetEmittedByteSize(existing);
+            }
             while(true) {
                 // Check if the next token is a section directive without consuming it
                 var peekToken = lexer.PeakToken(true);
@@ -790,8 +858,14 @@ namespace Kore.Kuick {
                 }
                 
                 // If the next token is a section directive, don't consume it - let the main parser handle it
-                if(peekToken.token == Lexer.Token.DIRECTIVE && getSectionFromDirectiveToken(peekToken) != default(string)) {
-                    return section;
+                if (peekToken.token == Lexer.Token.DIRECTIVE) {
+                    var pv = peekToken.value.ToLowerInvariant();
+                    if (string.Equals(pv, ".section", StringComparison.OrdinalIgnoreCase)) {
+                        return section;
+                    }
+                    if (StandardSections.Contains(pv) || SpecialTextSections.Contains(pv)) {
+                        return section;
+                    }
                 }
                 
                 // Now actually consume the token since we know it's not a section directive
@@ -824,10 +898,10 @@ namespace Kore.Kuick {
                     case Lexer.Token.OP_R:
                     case Lexer.Token.OP_S:
                     case Lexer.Token.OP_U:
-                        newNodes = ParseInstruction(currentToken, lexer); // Instruction
+                        newNodes = ParseInstruction(ctx, currentToken, lexer); // Instruction
                         break;
                     case Lexer.Token.OP_PSEUDO:
-                        newNodes = ParsePseudoInstruction(currentToken, lexer);
+                        newNodes = ParsePseudoInstruction(ctx, currentToken, lexer);
                         break;
                     case Lexer.Token.COMMENT:
                         newNodes = ProcessNodeComment(currentToken, lexer); // Comment
@@ -836,6 +910,7 @@ namespace Kore.Kuick {
                         throw new SyntaxException($"Unexpected token {currentToken.token} at line {currentToken.lineNumber}, column {currentToken.columnNumber}.");
                 }
                 foreach(var instruction in newNodes) {
+                    ProcessSectionSymbolsForNode(ctx, instruction, ref offset);
                     section.Contents.Add(instruction);
                 }
                 continue;
@@ -846,40 +921,86 @@ namespace Kore.Kuick {
         }
 
         private static T expectReturnEOL<T>(T rt, Lexer lexer, bool ignoreWhitespace = true) {
-            var currentToken = lexer.ReadToken(ignoreWhitespace);
-            if(currentToken.token != Lexer.Token.EOL && currentToken.token != Lexer.Token.EOF) {
+            while (true) {
+                var currentToken = lexer.ReadToken(ignoreWhitespace);
+                if (currentToken.token == Lexer.Token.COMMENT) {
+                    continue;
+                }
+                if (currentToken.token == Lexer.Token.EOL || currentToken.token == Lexer.Token.EOF) {
+                    return rt;
+                }
                 throw ThrowUnexpected(currentToken, "EOL || EOF");
             }
-            return rt;
         }
 
-        private static string getSectionFromDirectiveToken(Lexer.TokenData currentToken) {
-            var directiveValue = currentToken.value.ToLower();
-            if(directiveValue.StartsWith(".section")) return directiveValue.Substring(9);
-            if(StandardSections.Contains(directiveValue) || SpecialTextSections.Contains(directiveValue)) return directiveValue;
+        /// <summary>Consumes optional COMMENT tokens then EOL/EOF (start of section body or after section directive line).</summary>
+        private static void ExpectEndOfLineSkippingComments(Lexer lexer) {
+            while (true) {
+                var t = lexer.ReadToken(true);
+                if (t.token == Lexer.Token.COMMENT) continue;
+                if (t.token == Lexer.Token.EOL || t.token == Lexer.Token.EOF) return;
+                throw ThrowUnexpected(t, "EOL || EOF");
+            }
+        }
+
+        /// <summary>Section name for a DIRECTIVE token; for <c>.section name</c> reads the following token (e.g. <c>.rodata</c>).</summary>
+        private static string ReadSectionDirectiveName(Lexer.TokenData directiveToken, Lexer lexer) {
+            if (directiveToken.token != Lexer.Token.DIRECTIVE) {
+                return default(string);
+            }
+            var lower = directiveToken.value.ToLowerInvariant();
+            if (lower == ".section") {
+                var next = lexer.ReadToken(true);
+                if (next.token == Lexer.Token.EOF) {
+                    throw new SyntaxException("Expected section name after .section directive.");
+                }
+                // Names like `.text.init` lex as multiple DIRECTIVE tokens (`.text`, `.init`). Glue them into one section name.
+                if (next.token == Lexer.Token.DIRECTIVE && next.value.StartsWith(".", StringComparison.Ordinal)) {
+                    var sb = new StringBuilder(next.value);
+                    while (true) {
+                        var peek = lexer.PeakToken(true);
+                        if (peek.token != Lexer.Token.DIRECTIVE || !peek.value.StartsWith(".", StringComparison.Ordinal)) {
+                            break;
+                        }
+
+                        sb.Append(lexer.ReadToken(true).value);
+                    }
+
+                    return sb.ToString();
+                }
+
+                return next.value;
+            }
+            if (lower.StartsWith(".section", StringComparison.Ordinal) && lower.Length > 8) {
+                return lower.Substring(8).TrimStart();
+            }
+            if (StandardSections.Contains(lower) || SpecialTextSections.Contains(lower)) {
+                return lower;
+            }
             return default(string);
         }
 
-        private static SectionNode CreateSectionNode(string section, Lexer.TokenData currentToken, Lexer lexer) {
-            return ParseNodeSection(new SectionNode(section), currentToken, lexer);
-        }
-
         private static readonly string[] StandardSections = new string[] { ".text", ".data", ".rodata", ".bss", ".comment", ".debug" };
-        private static readonly string[] SpecialTextSections = new string[] { ".text.startup", ".text.exit", ".text.hot", ".text.unlikely", ".text.cold" };
+        private static readonly string[] SpecialTextSections = new string[] { ".text.startup", ".text.exit", ".text.hot", ".text.unlikely", ".text.cold", ".text.init" };
 
         private static AstNode[] ParseNodeDirective(Lexer.TokenData currentToken, Lexer lexer) {
             var name = currentToken.value;
             currentToken = lexer.ReadToken(true); // Skip whitespace when reading the next token
 
-            // Handle symbol directives (.global and .local)
-            if (name == ".global" || name == ".local") {
+            // Handle symbol directives (.global / GNU alias .globl, and .local)
+            if (name == ".global" || name == ".globl" || name == ".local") {
                 if (currentToken.token == Lexer.Token.IDENTIFIER) {
                     var symbolName = currentToken.value;
-                    var directiveType = name == ".global" ? 
-                        SymbolDirectiveNode.DirectiveType.Global : 
+                    bool isGlobal = name == ".global" || name == ".globl";
+                    var directiveType = isGlobal ?
+                        SymbolDirectiveNode.DirectiveType.Global :
                         SymbolDirectiveNode.DirectiveType.Local;
-                    
-                    return ComposeInstructionArray(expectReturnEOL(new SymbolDirectiveNode(directiveType, symbolName), lexer));
+
+                    var symDir = new SymbolDirectiveNode(directiveType, symbolName);
+                    if (name == ".globl") {
+                        symDir.Name = ".globl";
+                    }
+                    return ComposeInstructionArray(expectReturnEOL(symDir, lexer));
                 } else {
                     throw new SyntaxException($"Expected symbol name after {name} directive");
                 }
@@ -917,13 +1038,20 @@ namespace Kore.Kuick {
                 }
             }
 
+            if (string.Equals(name, ".dword", StringComparison.OrdinalIgnoreCase)) {
+                if (currentToken.token != Lexer.Token.NUMBER_INT && currentToken.token != Lexer.Token.NUMBER_HEX) {
+                    throw ThrowUnexpected(currentToken, "NUMBER_INT or NUMBER_HEX");
+                }
+                return ComposeInstructionArray(expectReturnEOL(new StringDirectiveNode { Name = ".dword", Value = currentToken.value }, lexer));
+            }
+
             if(currentToken.token == Lexer.Token.STRING || currentToken.token == Lexer.Token.IDENTIFIER) {
                 return ComposeInstructionArray(expectReturnEOL(new StringDirectiveNode { Name = name, Value = currentToken.value }, lexer));
             } else if(currentToken.token == Lexer.Token.NUMBER_INT) {
                 var value = int.Parse(currentToken.value);
                 return ComposeInstructionArray(expectReturnEOL(new IntDirectiveNode { Name = name, Value = value }, lexer));
             } else if(currentToken.token == Lexer.Token.NUMBER_HEX) {
-                var value = int.Parse(currentToken.value, System.Globalization.NumberStyles.HexNumber);
+                var value = Convert.ToInt32(currentToken.value, 16);
                 return ComposeInstructionArray(expectReturnEOL(new IntDirectiveNode { Name = name, Value = value }, lexer));
             } else {
 
@@ -939,7 +1067,7 @@ namespace Kore.Kuick {
         /// <param name="op"></param>
         /// <param name="lexer"></param>
         /// <returns></returns>
-        private static AstNode[] ParsePseudoInstructionCSRImmediate(Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
+        private static AstNode[] ParsePseudoInstructionCSRImmediate(ParserContext ctx, Lexer.TokenData startToken, RiscMeta.Instructions.TypeI op, Lexer lexer) {
             // Parse the CSR (can be either a CSR token like "cycle" or a number like 0x7C0)
             var csrToken = ExpectToken(lexer, Lexer.Token.CSR, Lexer.Token.IDENTIFIER, Lexer.Token.NUMBER_INT, Lexer.Token.NUMBER_HEX);
             
@@ -964,7 +1092,7 @@ namespace Kore.Kuick {
             
             // Parse as a normal I-type instruction
             var fakeToken = fakeLexer.ReadToken(); // csrrwi/csrrsi/csrrci
-            return ParseIInstruction(fakeToken, fakeLexer);
+            return ParseIInstruction(ctx, fakeToken, fakeLexer);
         }
 
         private static AstNode[] ParsePseudoInstructionSpecificCSRRead(Lexer.TokenData currentToken, RiscMeta.Instructions.TypeI op, string csrName, Lexer lexer) {
@@ -1031,71 +1159,97 @@ namespace Kore.Kuick {
             }
         }
 
-        public static ProgramNode Parse(Lexer lexer) {
-            var programNode = new ProgramNode();
-            var currentSection = ".text"; // Default section
+        /// <summary>Returns the index of an existing <see cref="SectionNode"/> with <paramref name="sectionName"/>, or appends a new section and returns its index.</summary>
+        private static int EnsureSection(ParserContext ctx, string sectionName) {
+            for (int i = 0; i < ctx.Program.Sections.Count; i++) {
+                if (ctx.Program.Sections[i].Name == sectionName) {
+                    ctx.Program.Sections[i].SectionIndex = i;
+                    return i;
+                }
+            }
+            int idx = ctx.Program.Sections.Count;
+            var node = new SectionNode(sectionName) { SectionIndex = idx };
+            ctx.Program.Sections.Add(node);
+            return idx;
+        }
 
+        private static void ParseInternal(ParserContext ctx, Lexer lexer) {
             Lexer.TokenData currentToken = default(Lexer.TokenData);
             while(currentToken.token != Lexer.Token.EOF) {
-                // Get Next Token
                 currentToken = lexer.ReadToken(true);
 
                 if(currentToken.token == Lexer.Token.EOL || currentToken.token == Lexer.Token.EOF) continue;
 
-                // Get section
-                var directiveValue = getSectionFromDirectiveToken(currentToken);
-                if(directiveValue != default(string)) {
-                    currentSection = directiveValue; // Update current section
-                    var sectionNode = CreateSectionNode(directiveValue, currentToken, lexer);
-                    programNode.Sections.Add(sectionNode);
+                var sectionName = currentToken.token == Lexer.Token.DIRECTIVE
+                    ? ReadSectionDirectiveName(currentToken, lexer)
+                    : default(string);
+
+                if(sectionName != default(string)) {
+                    ctx.HaveOpenedAnySection = true;
+                    int idx = EnsureSection(ctx, sectionName);
+                    ctx.CurrentSectionIndex = idx;
+                    var sectionNode = ctx.Program.Sections[idx];
+                    ParseNodeSection(ctx, sectionNode, currentToken, lexer);
                     continue;
                 }
 
-                throw ThrowUnexpected(currentToken, "Section");
+                if (!ctx.HaveOpenedAnySection) {
+                    if (currentToken.token == Lexer.Token.COMMENT) {
+                        foreach (var node in ProcessNodeComment(currentToken, lexer)) {
+                            ctx.Program.Preamble.Add(node);
+                        }
+                        continue;
+                    }
+                    if (currentToken.token == Lexer.Token.DIRECTIVE) {
+                        long preambleOffset = 0;
+                        foreach (var node in ParseNodeDirective(currentToken, lexer)) {
+                            ProcessSectionSymbolsForNode(ctx, node, ref preambleOffset);
+                            ctx.Program.Preamble.Add(node);
+                        }
+                        continue;
+                    }
+                }
+
+                throw ThrowUnexpected(currentToken, "Section or file-level comment/directive");
             }
-
-            // Post-process: directives, label defs/refs, and per-section offsets (fixed 4-byte RVI units for now).
-            ProcessAssemblySymbols(programNode);
-
-            return programNode;
         }
 
         /// <summary>Rough code size for PC tracking: one RVI slot per instruction; labeled inline emits one slot per wrapped instruction.</summary>
         private static int GetEmittedByteSize(AstNode node) => node.GetTotalByteSize();
 
-        /// <summary>
-        /// Integrates symbol directives, defines labels at the current PC, and registers all label references.
-        /// </summary>
-        private static void ProcessAssemblySymbols(ProgramNode program) {
-            foreach (var section in program.Sections) {
-                long offset = 0;
-                foreach (var node in section.Contents) {
-                    if (node is LabelNode labelNode) {
-                        program.DefineLabel(labelNode.Name, labelNode.lineNumber, section.Name, offset);
-                    }
-                    else if (node is SymbolDirectiveNode symbolDirective) {
-                        if (symbolDirective.Type == SymbolDirectiveNode.DirectiveType.Global) {
-                            var processedDirective = program.ProcessGlobalDirective(symbolDirective.SymbolName);
-                            symbolDirective.Symbol = processedDirective.Symbol;
-                        }
-                        else if (symbolDirective.Type == SymbolDirectiveNode.DirectiveType.Local) {
-                            var processedDirective = program.ProcessLocalDirective(symbolDirective.SymbolName);
-                            symbolDirective.Symbol = processedDirective.Symbol;
-                        }
-                    }
-                    else if (node is InstructionNodeTypeJLabel jLabelInstruction) {
-                        program.SymbolTable.GetLabelRef(jLabelInstruction.label, jLabelInstruction);
-                    }
-                    else if (node is InstructionNodeTypeBLabel bLabelInstruction) {
-                        program.SymbolTable.GetLabelRef(bLabelInstruction.label, bLabelInstruction);
-                    }
-                    else if (node is LabeledInlineDirectiveNode labeledInline) {
-                        program.SymbolTable.GetLabelRef(labeledInline.Label, labeledInline);
-                    }
-
-                    offset += GetEmittedByteSize(node);
+        /// <summary>Defines labels at the current PC and attaches directive metadata; label uses are bound during instruction parse via <see cref="BindRelocation"/> / <see cref="BindJLabel"/> / <see cref="BindBLabel"/>.</summary>
+        private static void ProcessSectionSymbolsForNode(ParserContext ctx, AstNode node, ref long offset) {
+            if (node is LabelNode labelNode) {
+                ctx.Program.DefineLabel(labelNode.Name, labelNode.lineNumber, ctx.CurrentSectionIndex, offset);
+            }
+            else if (node is SymbolDirectiveNode symbolDirective) {
+                if (symbolDirective.Type == SymbolDirectiveNode.DirectiveType.Global) {
+                    var processedDirective = ctx.Program.ProcessGlobalDirective(symbolDirective.SymbolName);
+                    symbolDirective.Symbol = processedDirective.Symbol;
+                }
+                else if (symbolDirective.Type == SymbolDirectiveNode.DirectiveType.Local) {
+                    var processedDirective = ctx.Program.ProcessLocalDirective(symbolDirective.SymbolName);
+                    symbolDirective.Symbol = processedDirective.Symbol;
                 }
             }
+            offset += GetEmittedByteSize(node);
+        }
+
+        private static void BindRelocation(ParserContext ctx, RelocationInstructionNode reloc) {
+            var sym = ctx.Program.SymbolTable.GetLabelRef(reloc.SymbolName, reloc);
+            reloc.SymbolId = sym.Id;
+            if (!string.IsNullOrEmpty(reloc.RelatedSymbol)) {
+                var relatedSym = ctx.Program.SymbolTable.GetLabelRef(reloc.RelatedSymbol, reloc);
+                reloc.RelatedSymbolId = relatedSym.Id;
+            }
+        }
+
+        private static void BindJLabel(ParserContext ctx, InstructionNodeTypeJLabel n) {
+            ctx.Program.SymbolTable.GetLabelRef(n.label, n);
+        }
+
+        private static void BindBLabel(ParserContext ctx, InstructionNodeTypeBLabel n) {
+            ctx.Program.SymbolTable.GetLabelRef(n.label, n);
         }
     }
 }

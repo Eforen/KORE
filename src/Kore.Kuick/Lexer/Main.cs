@@ -24,16 +24,22 @@ namespace Kore.Kuick
             new TokenFinder(@"^\/\/.*", Token.COMMENT), // Throw away // comments
             new TokenFinder(@"^#.*", Token.COMMENT), // Throw away # comments
             new TokenFinder(@"^\/\*[\s\S]*?\*\/", Token.COMMENT), // Throw away /* {ANY} */ comments
+            new TokenFinder(@"^0x[\da-fA-F]+", Token.NUMBER_HEX), // before int — 0x…
+            new TokenFinder(@"^0b[01]+", Token.NUMBER_BIN), // before GAS locals — 0b101 must not split as 0b + 101
+            // GAS numeric local labels (1f, 2b, 0b); after NUMBER_BIN / before float so 1f is not NUMBER_FLOAT
+            new TokenFinder(@"^[1-9][0-9]*[fb]|^0[fb]", Token.IDENTIFIER),
             new TokenFinder(@"^-?\d+\.?\d*[fF]", Token.NUMBER_FLOAT), // NUMBER_FLOAT 0.1f || 15f
             new TokenFinder(@"^-?\d+\.?\d*[dD]", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412D || 1245D
             new TokenFinder(@"^-?\d+\.\d+", Token.NUMBER_DOUBLE), // NUMBER_DOUBLE 0.12412 this finder is for when its a decimal with no marker
-            new TokenFinder(@"^0x[\da-fA-F]+", Token.NUMBER_HEX), // NUMBER_HEX 0x1244
-            new TokenFinder(@"^0b[01]+", Token.NUMBER_BIN), // NUMBER_BIN 0b101010
+            // GAS numeric local labels `0:`, `1:` (must precede NUMBER_INT)
+            new TokenFinder(@"^[0-9]+:", Token.LABEL),
             new TokenFinder(@"^-?\d+", Token.NUMBER_INT), // NUMBER_INT 12578
             new TokenFinder(@"^""[^""]*""", Token.STRING), // " String //TODO: Make this allow escapes
             new TokenFinder(@"^'[^']*'", Token.STRING), // ' String //TODO: Make this allow escapes
-            // GAS directives may contain digits after the first letter (e.g. `.p2align`, `.balign`).
-            new TokenFinder(@"^\.[a-zA-Z][a-zA-Z0-9]*", Token.DIRECTIVE),
+            // Local / dotted labels (e.g. `.Lloop:`) must be matched before generic directives (`.Lloop` alone is a symbol).
+            new TokenFinder(@"^\.[a-zA-Z_][a-zA-Z0-9_]*:", Token.LABEL),
+            // GAS directives may contain digits and underscores after the first letter (e.g. `.p2align`, `.Llocal_buffer` as operand).
+            new TokenFinder(@"^\.[a-zA-Z_][a-zA-Z0-9_]*", Token.DIRECTIVE),
             new TokenFinder(@"^[a-zA-Z_][a-zA-Z0-9_]*:", Token.LABEL), // Label - updated to include underscores and digits
             new TokenFinder(@"^[\w\[\]\._]+", Token.IDENTIFIER), // Identifier
             new TokenFinder(@"^\(", Token.PARREN_OPEN), // Open Parren (

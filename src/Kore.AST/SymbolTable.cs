@@ -68,9 +68,9 @@ namespace Kore.AST {
         public SymbolType Type { get; set; }
 
         /// <summary>
-        /// The section where this symbol is defined (if applicable).
+        /// Index into the program <c>Sections</c> list where this symbol is defined, or <c>-1</c> if unknown.
         /// </summary>
-        public string Section { get; set; }
+        public int SectionIndex { get; set; }
 
         /// <summary>
         /// The line number where this symbol is defined (-1 if not yet defined).
@@ -78,7 +78,7 @@ namespace Kore.AST {
         public int LineNumber { get; set; }
 
         /// <summary>
-        /// The address/offset of this symbol (calculated during assembly).
+        /// Byte offset within the section (PC at this label).
         /// </summary>
         public long Address { get; set; }
 
@@ -102,7 +102,7 @@ namespace Kore.AST {
             Name = name;
             Scope = scope;
             Type = type;
-            Section = null;
+            SectionIndex = -1;
             LineNumber = -1;
             Address = 0;
             IsDefined = false;
@@ -111,15 +111,24 @@ namespace Kore.AST {
         }
 
         /// <summary>
-        /// Marks this symbol as defined at the specified line number.
+        /// Marks this symbol as defined at the given line with section index and offset within that section.
         /// </summary>
-        public void Define(int lineNumber, string section = null) {
+        public void Define(int lineNumber, int sectionIndex, long offset) {
             IsDefined = true;
             LineNumber = lineNumber;
-            if (section != null) {
-                Section = section;
+            SectionIndex = sectionIndex;
+            Address = offset;
+            if (Scope == SymbolScope.Unknown) {
+                Scope = SymbolScope.Local;
             }
-            // If this was an unknown symbol, promote it to local by default
+        }
+
+        /// <summary>
+        /// Marks defined at a line number only (e.g. tests); section index remains unknown.
+        /// </summary>
+        public void Define(int lineNumber) {
+            IsDefined = true;
+            LineNumber = lineNumber;
             if (Scope == SymbolScope.Unknown) {
                 Scope = SymbolScope.Local;
             }
@@ -137,10 +146,10 @@ namespace Kore.AST {
         /// <summary>Single-line format used by <see cref="ProgramNode.getDebugText"/> for the symbol table block.</summary>
         public string FormatSymbolTableDebugLine() {
             string scopeUpper = Scope.ToString().ToUpperInvariant();
-            string sectionDisplay = IsDefined && !string.IsNullOrEmpty(Section) ? Section : "UNKNOWN";
+            string sectionDisplay = IsDefined && SectionIndex >= 0 ? SectionIndex.ToString() : "UNKNOWN";
             string offsetDisplay = IsDefined ? Address.ToString() : "UNKNOWN";
             string typeDisplay = !IsDefined ? "UNKNOWN" : FormatTypeForDebug(Type);
-            return $"Symbol[{Id}]: {scopeUpper} {Name}, SECTION: {sectionDisplay}, OFFSET: {offsetDisplay}, TYPE: {typeDisplay}, REF_COUNT: {References.Count}";
+            return $"Symbol[{Id}]: {scopeUpper} {Name}, SECTION[{sectionDisplay}], OFFSET: {offsetDisplay}, TYPE: {typeDisplay}, REF_COUNT: {References.Count}";
         }
 
         private static string FormatTypeForDebug(SymbolType type) {
@@ -224,17 +233,16 @@ namespace Kore.AST {
         }
 
         /// <summary>
-        /// Defines a label at the given section/offset. Global basenames (from <c>.global</c>) may only be defined once.
+        /// Defines a label at the given section index and byte offset. Global basenames (from <c>.global</c>) may only be defined once.
         /// Repeated local basenames mint storage names <c>1Lfoo</c>, <c>2Lfoo</c>, … while keeping the same basename for lookup via <see cref="GetLabelRef"/>.
         /// </summary>
-        public Symbol DefineLabelRef(string basename, int lineNumber, string section, long address) {
+        public Symbol DefineLabelRef(string basename, int lineNumber, int section, long offset) {
             var primary = GetSymbol(basename);
             if (primary != null && primary.Scope == SymbolScope.Global) {
                 if (primary.IsDefined) {
                     throw new InvalidOperationException($"Duplicate definition of global label '{basename}'.");
                 }
-                primary.Define(lineNumber, section);
-                primary.Address = address;
+                primary.Define(lineNumber, section, offset);
                 _activeLabelByBasename[basename] = primary;
                 return primary;
             }
@@ -254,8 +262,7 @@ namespace Kore.AST {
                 throw new InvalidOperationException($"Label '{storageName}' is already defined.");
             }
 
-            sym.Define(lineNumber, section);
-            sym.Address = address;
+            sym.Define(lineNumber, section, offset);
             _activeLabelByBasename[basename] = sym;
             return sym;
         }
@@ -296,11 +303,15 @@ namespace Kore.AST {
         }
 
         /// <summary>
-        /// Defines a symbol at the specified line number and section.
+        /// Defines a symbol at the specified line number, section index, and offset.
         /// </summary>
-        public Symbol DefineSymbol(string name, int lineNumber, string section = null, SymbolScope scope = SymbolScope.Local, SymbolType type = SymbolType.Label) {
+        public Symbol DefineSymbol(string name, int lineNumber, int sectionIndex = -1, long offset = 0, SymbolScope scope = SymbolScope.Local, SymbolType type = SymbolType.Label) {
             var symbol = GetOrCreateSymbol(name, scope, type);
-            symbol.Define(lineNumber, section);
+            if (sectionIndex >= 0) {
+                symbol.Define(lineNumber, sectionIndex, offset);
+            } else {
+                symbol.Define(lineNumber);
+            }
             return symbol;
         }
 
@@ -319,15 +330,41 @@ namespace Kore.AST {
         /// </summary>
         private void PromoteSymbolScope(Symbol symbol, SymbolScope newScope) {
             if (symbol.Scope == newScope) return;
+            SetSymbolScope(symbol, newScope);
+        }
 
-            // Remove from old scope list
+        /// <summary>
+        /// Moves <paramref name="symbol"/> to <paramref name="newScope"/> in the scope index lists.
+        /// </summary>
+        private void SetSymbolScope(Symbol symbol, SymbolScope newScope) {
+            if (symbol.Scope == newScope) return;
             _symbolsByScope[symbol.Scope].Remove(symbol);
-            
-            // Update scope
             symbol.Scope = newScope;
-            
-            // Add to new scope list
             _symbolsByScope[newScope].Add(symbol);
+        }
+
+        /// <summary>
+        /// Ensures <paramref name="name"/> exists and is marked <see cref="SymbolScope.Global"/>.
+        /// If the symbol does not exist, creates it as an undefined label with global scope; otherwise updates scope.
+        /// </summary>
+        public Symbol MakeGlobal(string name) {
+            if (!_symbols.TryGetValue(name, out var sym)) {
+                return GetOrCreateSymbol(name, SymbolScope.Global, SymbolType.Label);
+            }
+            SetSymbolScope(sym, SymbolScope.Global);
+            return sym;
+        }
+
+        /// <summary>
+        /// Ensures <paramref name="name"/> exists and is marked <see cref="SymbolScope.Local"/>.
+        /// If the symbol does not exist, creates it as an undefined label with local scope; otherwise updates scope.
+        /// </summary>
+        public Symbol MakeLocal(string name) {
+            if (!_symbols.TryGetValue(name, out var sym)) {
+                return GetOrCreateSymbol(name, SymbolScope.Local, SymbolType.Label);
+            }
+            SetSymbolScope(sym, SymbolScope.Local);
+            return sym;
         }
 
         /// <summary>
@@ -394,7 +431,7 @@ namespace Kore.AST {
                     Id = symbol.Id,
                     Scope = symbol.Scope.ToString(),
                     Type = symbol.Type.ToString(),
-                    Section = symbol.Section,
+                    SectionIndex = symbol.SectionIndex,
                     LineNumber = symbol.LineNumber,
                     Address = symbol.Address,
                     IsDefined = symbol.IsDefined,

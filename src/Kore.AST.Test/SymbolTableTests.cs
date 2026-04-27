@@ -46,12 +46,11 @@ namespace Kore.AST.Test {
             Assert.IsFalse(symbol.IsDefined);
             Assert.AreEqual(SymbolScope.Unknown, symbol.Scope);
             
-            // Define the symbol
-            symbol.Define(42, ".text");
+            symbol.Define(42, 0, 0);
             
             Assert.IsTrue(symbol.IsDefined);
             Assert.AreEqual(42, symbol.LineNumber);
-            Assert.AreEqual(".text", symbol.Section);
+            Assert.AreEqual(0, symbol.SectionIndex);
             Assert.AreEqual(SymbolScope.Local, symbol.Scope); // Should be promoted from Unknown to Local
         }
 
@@ -97,7 +96,7 @@ namespace Kore.AST.Test {
 
         [Test]
         public void TestUndefinedSymbols() {
-            var defined = symbolTable.DefineSymbol("defined_label", 10, ".text");
+            var defined = symbolTable.DefineSymbol("defined_label", 10, 0, 0);
             var undefined = symbolTable.GetOrCreateSymbol("undefined_label");
             
             var undefinedSymbols = symbolTable.GetUndefinedSymbols().ToList();
@@ -142,7 +141,7 @@ namespace Kore.AST.Test {
             Assert.AreEqual(0, program.SymbolTable.Count);
             
             // Test extension methods
-            var labelSymbol = program.DefineLabel("main", 1, ".text");
+            var labelSymbol = program.DefineLabel("main", 1, 0, 0);
             Assert.AreEqual(1, program.SymbolTable.Count);
             Assert.AreEqual("main", labelSymbol.Name);
             Assert.IsTrue(labelSymbol.IsDefined);
@@ -164,7 +163,7 @@ namespace Kore.AST.Test {
 
         [Test]
         public void TestSymbolStatistics() {
-            program.DefineLabel("label1", 1, ".text");
+            program.DefineLabel("label1", 1, 0, 0);
             program.ProcessGlobalDirective("global_symbol");
             program.CreateSymbolReference("undefined_ref", null);
             
@@ -178,7 +177,7 @@ namespace Kore.AST.Test {
 
         [Test]
         public void TestSymbolExport() {
-            var symbol = symbolTable.DefineSymbol("exported", 42, ".data", SymbolScope.Global);
+            var symbol = symbolTable.DefineSymbol("exported", 42, 1, 0, SymbolScope.Global);
             symbol.Address = 0x2000;
             
             var exportInfo = symbolTable.ExportSymbolInfo();
@@ -201,15 +200,15 @@ namespace Kore.AST.Test {
             Assert.IsFalse(forwardRef.IsDefined);
             
             // 2. Define some local labels
-            var loopStart = symbolTable.DefineSymbol("loop_start", 10, ".text");
-            var dataLabel = symbolTable.DefineSymbol("my_data", 50, ".data");
+            var loopStart = symbolTable.DefineSymbol("loop_start", 10, 0, 0);
+            var dataLabel = symbolTable.DefineSymbol("my_data", 50, 1, 0);
             
             // 3. Mark a symbol as global
             var globalFunc = symbolTable.GetOrCreateSymbol("main", SymbolScope.Global);
-            symbolTable.DefineSymbol("main", 1, ".text", SymbolScope.Global);
+            symbolTable.DefineSymbol("main", 1, 0, 0, SymbolScope.Global);
             
             // 4. Finally define the forward reference
-            symbolTable.DefineSymbol("end_loop", 20, ".text");
+            symbolTable.DefineSymbol("end_loop", 20, 0, 0);
             
             // Verify the state
             Assert.AreEqual(4, symbolTable.Count);
@@ -248,12 +247,12 @@ namespace Kore.AST.Test {
             Assert.IsFalse(symbol.IsDefined); // Not defined yet, just declared as local
             
             // Now define the symbol (like when we encounter the actual label)
-            program.DefineLabel("helper_function", 42, ".text");
+            program.DefineLabel("helper_function", 42, 0, 0);
             
             // Verify it's now defined but still local scope
             Assert.IsTrue(symbol.IsDefined);
             Assert.AreEqual(42, symbol.LineNumber);
-            Assert.AreEqual(".text", symbol.Section);
+            Assert.AreEqual(0, symbol.SectionIndex);
             Assert.AreEqual(SymbolScope.Local, symbol.Scope); // Should remain local
         }
 
@@ -312,7 +311,7 @@ namespace Kore.AST.Test {
         public void TestSymbolAddressResolution() {
             // Arrange
             var program = new ProgramNode();
-            var targetSymbol = program.SymbolTable.DefineSymbol("target", 0x2000, ".text");
+            var targetSymbol = program.SymbolTable.DefineSymbol("target", 10, 0, 0);
             var referenceSymbol = program.SymbolTable.ReferenceSymbol("target", null);
             
             // Act - simulate address assignment

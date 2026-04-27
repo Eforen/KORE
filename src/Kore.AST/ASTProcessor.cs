@@ -20,5 +20,6 @@ namespace Kore.AST {
         AstNode ProcessASTNode(CommentNode node);
         AstNode ProcessASTNode(SymbolReferenceNode node);
         AstNode ProcessASTNode(AlignmentNode node);
+        AstNode ProcessASTNode(RelocationInstructionNode node);
     }
 }

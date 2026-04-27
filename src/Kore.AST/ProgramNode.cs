@@ -13,12 +13,19 @@ namespace Kore.AST {
         public List<SectionNode> Sections { get; }
 
         /// <summary>
+        /// File-level nodes that appear before the first section: comments, <c>.file</c>, <c>.global</c>/<c>.globl</c>, <c>.local</c>, etc.
+        /// Not part of <see cref="Sections"/>; kept in source order.
+        /// </summary>
+        public List<AstNode> Preamble { get; }
+
+        /// <summary>
         /// The symbol table that maintains all symbols (labels, globals, locals) with their scopes.
         /// </summary>
         public SymbolTable SymbolTable { get; }
 
         public ProgramNode() {
             Sections = new List<SectionNode>();
+            Preamble = new List<AstNode>();
             SymbolTable = new SymbolTable();
         }
         public override AstNode CallProcessor(ASTProcessor processor) {
@@ -33,6 +40,11 @@ namespace Kore.AST {
             ProgramNode node = obj as ProgramNode;
 
             if(Sections.Count != node.Sections.Count) return false;
+            if(Preamble.Count != node.Preamble.Count) return false;
+
+            for(int i = 0; i < Preamble.Count; i++) {
+                if(!Preamble[i].Equals(node.Preamble[i])) return false;
+            }
 
             foreach(SectionNode section in Sections) {
                 string name = section.Name;
@@ -52,12 +64,20 @@ namespace Kore.AST {
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
             addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"PROGRAM [{Sections.Count}] Symbols:[{SymbolTable.Count}]{{");
-            
+
             // Add symbol table debug info
             if (SymbolTable.Count > 0) {
                 addDebugTextHeader(false, -1, indentLevel + 1, builder).AppendLine("SYMBOL TABLE {");
                 foreach (var symbol in SymbolTable.GetAllSymbols().OrderBy(s => s.Id)) {
                     addDebugTextHeader(false, -1, indentLevel + 2, builder).AppendLine(symbol.FormatSymbolTableDebugLine());
+                }
+                addDebugTextHeader(false, -1, indentLevel + 1, builder).AppendLine("}");
+            }
+
+            if (Preamble.Count > 0) {
+                addDebugTextHeader(false, -1, indentLevel + 1, builder).AppendLine("PREAMBLE {");
+                foreach (var n in Preamble) {
+                    n.getDebugText(indentLevel + 2, builder);
                 }
                 addDebugTextHeader(false, -1, indentLevel + 1, builder).AppendLine("}");
             }
@@ -76,8 +96,7 @@ namespace Kore.AST {
         public SymbolDirectiveNode ProcessLocalDirective(string symbolName) {
             var directive = new SymbolDirectiveNode(SymbolDirectiveNode.DirectiveType.Local, symbolName);
             
-            // Add the symbol to the symbol table with local scope
-            var symbol = SymbolTable.GetOrCreateSymbol(symbolName, SymbolScope.Local);
+            var symbol = SymbolTable.MakeLocal(symbolName);
             directive.Symbol = symbol; // Link the symbol to the directive
             
             return directive;
@@ -91,8 +110,7 @@ namespace Kore.AST {
         public SymbolDirectiveNode ProcessGlobalDirective(string symbolName) {
             var directive = new SymbolDirectiveNode(SymbolDirectiveNode.DirectiveType.Global, symbolName);
             
-            // Add the symbol to the symbol table with global scope
-            var symbol = SymbolTable.GetOrCreateSymbol(symbolName, SymbolScope.Global);
+            var symbol = SymbolTable.MakeGlobal(symbolName);
             directive.Symbol = symbol; // Link the symbol to the directive
             
             return directive;
@@ -103,11 +121,11 @@ namespace Kore.AST {
         /// </summary>
         /// <param name="labelName">The name of the label</param>
         /// <param name="lineNumber">The line number where the label is defined</param>
-        /// <param name="section">The section where the label is defined</param>
-        /// <param name="address">Byte offset within the section (PC at this label).</param>
+        /// <param name="sectionIndex">Index into <see cref="Sections"/> for this label.</param>
+        /// <param name="offset">Byte offset within the section (PC at this label).</param>
         /// <returns>The defined symbol</returns>
-        public Symbol DefineLabel(string labelName, int lineNumber, string section, long address = 0) {
-            return SymbolTable.DefineLabelRef(labelName, lineNumber, section, address);
+        public Symbol DefineLabel(string labelName, int lineNumber, int sectionIndex, long offset = 0) {
+            return SymbolTable.DefineLabelRef(labelName, lineNumber, sectionIndex, offset);
         }
     }
 }

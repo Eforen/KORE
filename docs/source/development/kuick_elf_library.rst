@@ -9,6 +9,7 @@ The **Kuick.Elf** assembly is a .NET library for **reading and writing** RISC-V 
    :class: tip
 
    * **Concepts** — what ELF is, what ``.o`` files are, and how RISC-V fits in: :doc:`../architecture/elf_format`.
+   * **Relocations** — RISC-V ``r_type`` formulas and KORE helpers: :doc:`../architecture/riscv_elf_relocations`.
    * **This page** — namespaces, main types, and how to reference the library from C#.
    * **Command-line** — :doc:`../cli/binutils` and :doc:`../cli/readelf` (the readelf tool is built on Kuick.Elf).
 

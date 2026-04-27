@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +17,11 @@ namespace Kore.AST {
         /// The list of instructions or directives that make up the section.
         /// </summary>
         public List<AstNode> Contents { get; }
+
+        /// <summary>
+        /// Index of this section in <see cref="ProgramNode.Sections"/> (set by the parser). Used for <see cref="getDebugText"/> alignment with symbol table lines.
+        /// </summary>
+        public int SectionIndex { get; set; } = -1;
 
         public SectionNode(string name) {
             Name = name;
@@ -57,7 +62,8 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"SECTION {Name} [{Contents.Count}]{{");
+            string indexDisplay = SectionIndex >= 0 ? SectionIndex.ToString() : "UNKNOWN";
+            addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"SECTION[{indexDisplay}] {Name} [{Contents.Count}]{{");
             foreach(var node in Contents) {
                 node.getDebugText(indentLevel + 1, builder);
             }

@@ -24,8 +24,8 @@ namespace Kore.AST {
         /// Helper method to define a label symbol during parsing.
         /// This would be called when a LabelNode is encountered.
         /// </summary>
-        public static Symbol DefineLabel(this ProgramNode program, string labelName, int lineNumber, string currentSection, long address = 0) {
-            return program.SymbolTable.DefineLabelRef(labelName, lineNumber, currentSection, address);
+        public static Symbol DefineLabel(this ProgramNode program, string labelName, int lineNumber, int sectionIndex, long offset = 0) {
+            return program.SymbolTable.DefineLabelRef(labelName, lineNumber, sectionIndex, offset);
         }
 
         /// <summary>
@@ -130,9 +130,8 @@ namespace Kore.AST {
         /// <summary>
         /// Example of how label definition would be handled in the new system.
         /// </summary>
-        public static AstNode[] ParseLabelWithSymbols(ProgramNode program, string labelName, int lineNumber, string currentSection) {
-            // Define the symbol in the symbol table
-            var symbol = program.DefineLabel(labelName, lineNumber, currentSection, 0);
+        public static AstNode[] ParseLabelWithSymbols(ProgramNode program, string labelName, int lineNumber, int sectionIndex) {
+            var symbol = program.DefineLabel(labelName, lineNumber, sectionIndex, 0);
             
             // Create the label node (this could be enhanced to reference the symbol)
             var labelNode = new LabelNode(labelName) {
