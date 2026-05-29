@@ -23,20 +23,20 @@ PROGRAM [4] Symbols:[8]{
         LABEL main
         COMMENT # Global function
         RELOC R_RISCV_PCREL_HI20 symbol[2]:my_global_data {
-            TypeB auipc RD:x5 IMM:0
+            TypeU auipc RD:x5 IMM:0
         }
         RELOC R_RISCV_PCREL_LO12_I symbol[2]:my_global_data {
             TypeI addi RD:x5 RS:x5 IMM:0
         }
         TypeI lw RD:x6 RS:x5 IMM:0
         RELOC R_RISCV_PCREL_HI20 symbol[3]:.Llocal_buffer {
-            TypeB auipc RD:x7 IMM:0
+            TypeU auipc RD:x7 IMM:0
         }
         RELOC R_RISCV_PCREL_LO12_I symbol[3]:.Llocal_buffer {
             TypeI addi RD:x7 RS:x7 IMM:0
         }
         RELOC R_RISCV_PCREL_HI20 symbol[4]:my_function {
-            TypeB auipc RD:x1 IMM:0
+            TypeU auipc RD:x1 IMM:0
         }
         RELOC R_RISCV_PCREL_LO12_I symbol[4]:my_function {
             TypeI jalr RD:x1 RS:x1 IMM:0

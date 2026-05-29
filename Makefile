@@ -4,7 +4,7 @@
 .PHONY: all build build-solution build-docs test clean setup help debug release \
 	build-tools build-tools-binutils build-tools-binutils-readelf \
 	version-inc-readelf-major version-inc-readelf-minor version-inc-readelf-patch \
-	ast-dump
+	ast-dump verify-ast-fixture-specs
 
 # Default configuration
 CONFIGURATION ?= Debug
@@ -104,6 +104,12 @@ ast-dump:
 	@test -n "$(FILE)" || (echo "Usage: make ast-dump FILE=src/path/to/file.S"; exit 1)
 	@dotnet run --project src/Kore.Kuick.AstDump/Kore.Kuick.AstDump.csproj --configuration $(CONFIGURATION) -- "$(FILE)"
 
+# Drift detector: AstDump output must match Parser/AstFixtures/*.spec (after human semantic sign-off).
+verify-ast-fixture-specs:
+	@echo "Verifying AstFixtures .spec drift ($(CONFIGURATION))..."
+	@dotnet build src/Kore.Kuick.AstDump/Kore.Kuick.AstDump.csproj --configuration $(CONFIGURATION) --verbosity quiet
+	@CONFIGURATION=$(CONFIGURATION) bash src/Kore.Kuick.Tests/Parser/verify_fixture_specs.sh
+
 # Clean build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
@@ -156,6 +162,7 @@ help:
 	@echo "  make test-ast      - Run AST tests only"
 	@echo "  make test-kuick    - Run Kuick tests only"
 	@echo "  make ast-dump FILE=src/path/to/file.S - Print AST getDebugText() for one .S file"
+	@echo "  make verify-ast-fixture-specs - AstDump drift check vs Parser/AstFixtures/*.spec"
 	@echo "  make clean         - Clean build artifacts"
 	@echo "  make clean-builds  - Comprehensive build cleanup"
 	@echo "  make setup         - Setup development environment"

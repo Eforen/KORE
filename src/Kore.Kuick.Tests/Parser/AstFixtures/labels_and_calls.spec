@@ -9,13 +9,13 @@ PROGRAM [1] Symbols:[4]{
         LABEL main
         COMMENT # ← label
         RELOC R_RISCV_PCREL_HI20 symbol[2]:some_data {
-            TypeB auipc RD:x5 IMM:0
+            TypeU auipc RD:x5 IMM:0
         }
         RELOC R_RISCV_PCREL_LO12_I symbol[2]:some_data {
             TypeI addi RD:x5 RS:x5 IMM:0
         }
         RELOC R_RISCV_PCREL_HI20 symbol[3]:my_function {
-            TypeB auipc RD:x1 IMM:0
+            TypeU auipc RD:x1 IMM:0
         }
         RELOC R_RISCV_PCREL_LO12_I symbol[3]:my_function {
             TypeI jalr RD:x1 RS:x1 IMM:0

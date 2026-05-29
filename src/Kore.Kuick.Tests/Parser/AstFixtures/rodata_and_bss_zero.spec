@@ -4,7 +4,7 @@ PROGRAM [4] Symbols:[1]{
     }
     SECTION[0] .text [2]{
         RELOC R_RISCV_PCREL_HI20 symbol[1]:msg {
-            TypeB auipc RD:x5 IMM:0
+            TypeU auipc RD:x5 IMM:0
         }
         RELOC R_RISCV_PCREL_LO12_I symbol[1]:msg {
             TypeI addi RD:x5 RS:x5 IMM:0

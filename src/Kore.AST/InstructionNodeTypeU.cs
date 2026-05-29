@@ -47,7 +47,7 @@ namespace Kore.AST {
         }
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
-            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeB {op} RD:{rd.ToDebugString()} IMM:{imm}");
+            return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeU {op} RD:{rd.ToDebugString()} IMM:{imm}");
         }
     }
 }
