@@ -14,7 +14,7 @@
   - [Done 2025/06/20](#done-20250620)
   - [Done 2025/06/21](#done-20250621)
   - [Done 2025/06/21](#done-20250621-1)
-  - [Done 2025/06/26](#done-20250626)
+  - [Done 2025/07/09](#done-20250709)
     - [Next Commit (Eforen)](#next-commit-eforen-1)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
@@ -138,9 +138,9 @@
 * [KUICK][PARSER] Implement Directive `.local` `(symbol_name)` should emit symbol_name to symbol table (scope LOCAL) [Symbol Table Foundation Complete]
 * [KUICK][PARSER] Implement Directive `.globl` `(symbol_name)` should emit symbol_name to symbol table (scope GLOBAL) [Symbol Table Foundation Complete]
 
-## Done 2025/06/26
-
+## Done 2025/07/09
 ### Next Commit (Eforen)
+
 # Working On
 ## Working on (Eforen)
 * [KIUCK][PARSER] Implement Pseudo Instructions
@@ -148,9 +148,10 @@
 * Confirm that all the tests for the previous Pseudo Instruction implementations exist (Rushed atm)
 
 * Refactor KUICK into its own library
+* [KUICK][ASSEMBLER] Impliment Directive `.org imm` address location set
 * [KUICK][ASSEMBLER] Rewrite tests to take in AST and output binary
 * [KUICK][ASSEMBLER] Write Tests for every Token
-
+* [KUICK][PARSER] Implement imm jumps `jal rd, imm`
 
 # Todos
 ## Todo

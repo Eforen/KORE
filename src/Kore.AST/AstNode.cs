@@ -5,6 +5,7 @@ namespace Kore.AST {
         public const int DEBUG_INDENT_COUNT = 4;
         public const int DEBUG_LINE_NUMBER_LEN = 5;
         public int lineNumber = -1;
+        public int byteAddress = -1;  // Memory address for this node
         public abstract AstNode CallProcessor(ASTProcessor processor);
 
         public override bool Equals(object obj) {

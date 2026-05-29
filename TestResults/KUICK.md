@@ -4,17 +4,17 @@
 
 | Metric | Count | Status |
 |--------|-------|--------|
-| Total Tests | 892 | ℹ️ |
-| Executed | 868 | ▶️ |
-| Passed | 823 | ✅ |
-| Failed | 45 | ❌ |
+| Total Tests | 907 | ℹ️ |
+| Executed | 883 | ▶️ |
+| Passed | 836 | ✅ |
+| Failed | 47 | ❌ |
 | Ignored | 24 | ⭕ |
 
 ## Test Method Breakdown
 
 | Status | Details | Test Method |
 |--------|---------|-------------|
-| ✅ | 106 passed | `PseudoInstructions` |
+| ✅ | 109 passed | `PseudoInstructions` |
 | ❌ | 11 failed | `sanityCheckOps` |
 | ✅ | 14 passed | `TestParseBLabelInstruction` |
 | ✅ | 174 passed | `readToken` |
@@ -22,11 +22,20 @@
 | ✅ | 1 passed | `DebugDataTokenization` |
 | ❌ | 1 failed | `MachineCode` |
 | ✅ | 1 passed | `TestBranchWithLabels` |
+| ✅ | 1 passed | `TestCacheMissTracking` |
 | ✅ | 1 passed | `TestForwardReferenceNoDefinition` |
 | ✅ | 1 passed | `TestForwardReferenceThenDefinition` |
+| ✅ | 1 passed | `TestJALLabelResolutionAST` |
+| ❌ | 1 failed | `TestLabelCacheMissResolution` |
 | ✅ | 1 passed | `TestLabelParsing` |
 | ✅ | 1 passed | `TestMixedDirectivesAndLabels` |
+| ✅ | 1 passed | `TestMultipleForwardReferences` |
 | ✅ | 1 passed | `TestMultipleSections` |
+| ❌ | 1 failed | `TestOrgDirectiveBackwardsJump` |
+| ❌ | 1 failed | `TestOrgDirectiveBasic` |
+| ✅ | 1 passed | `TestOrgDirectiveInvalidAddress` |
+| ❌ | 1 failed | `TestOrgDirectiveMultiple` |
+| ❌ | 1 failed | `TestOrgDirectiveWithLabels` |
 | ✅ | 1 passed | `TestParseAddAndSubInstructions` |
 | ✅ | 1 passed | `TestParseAddiMultiInstruction` |
 | ✅ | 1 passed | `TestParseAddInstruction` |
@@ -34,14 +43,20 @@
 | ✅ | 1 passed | `TestParseShInstruction` |
 | ✅ | 1 passed | `TestParseSubInstruction` |
 | ✅ | 1 passed | `TestParseSwInstruction` |
+| ✅ | 1 passed | `TestSymbolCacheMissException` |
+| ✅ | 1 passed | `TestSymbolMissResolutionSystem` |
+| ✅ | 1 passed | `TestSymbolScopePromotion` |
+| ✅ | 1 passed | `TestSymbolTableValidation_AllDefined` |
+| ✅ | 1 passed | `TestSymbolTableValidation_MixedSymbols` |
+| ✅ | 1 passed | `TestSymbolTableValidation_UndefinedSymbols` |
 | ✅ | 1 passed | `TestTrulyUndefinedReference` |
 | ✅ | 1 passed | `TestUndefinedReferences` |
 | ✅ | 1 passed | `tokenPositions` |
 | ⭕ | 24 ignored | `sanityCheckOps` |
 | ✅ | 2 passed | `InlineDirectives` |
 | ✅ | 2 passed | `noWhiteSpaceReadTokens` |
+| ❌ | 30 failed | `PseudoInstructions` |
 | ✅ | 32 passed | `TestParseAddiInstruction` |
-| ❌ | 33 failed | `PseudoInstructions` |
 | ✅ | 3 passed | `TestParseBImmInstruction` |
 | ✅ | 3 passed | `TestParseJTypeLabelInstruction` |
 | ✅ | 435 passed | `sanityCheckOps` |
@@ -144,8 +159,8 @@
 | ❌ | Test failed - see full XML for details | `PseudoInstructions("fsw f3, myVar152","auipc x3, %pcrel_hi(myVar152)\nfsw f3, %pcrel_lo(myVar152)(x3)","Store word")` |
 | ✅ | N/A | `PseudoInstructions("j 0x16","jal x0, 0x16","Jump 16 bytes")` |
 | ✅ | N/A | `PseudoInstructions("j 0x8","jal x0, 0x8","Jump 8 bytes")` |
-| ❌ | Test failed - see full XML for details | `PseudoInstructions("jr x1","jalr x0, 0(x1)","Jump register")` |
-| ❌ | Test failed - see full XML for details | `PseudoInstructions("jr x7","jalr x0, 0(x7)","Jump register")` |
+| ✅ | N/A | `PseudoInstructions("jr x1","jalr x0, 0(x1)","Jump register")` |
+| ✅ | N/A | `PseudoInstructions("jr x7","jalr x0, 0(x7)","Jump register")` |
 | ❌ | Test failed - see full XML for details | `PseudoInstructions("la x1, myVar","auipc x1, %pcrel_hi(myVar)\n   addi x1, x1, %pcrel_lo(myVar)","Load address into x1")` |
 | ❌ | Test failed - see full XML for details | `PseudoInstructions("la x2, myVar1","auipc x2, %pcrel_hi(myVar1)\n  addi x2, x2, %pcrel_lo(myVar1)","Load address into x2")` |
 | ❌ | Test failed - see full XML for details | `PseudoInstructions("la x3, myVar152","auipc x3, %pcrel_hi(myVar152)\naddi x3, x3, %pcrel_lo(myVar152)","Load address into x3")` |
@@ -189,7 +204,7 @@
 | ✅ | N/A | `PseudoInstructions("rdtime x1","csrrs x1, time, x0","Read time")` |
 | ✅ | N/A | `PseudoInstructions("rdtime x2","csrrs x2, time, x0","Read time")` |
 | ✅ | N/A | `PseudoInstructions("rdtime x3","csrrs x3, time, x0","Read time")` |
-| ❌ | Test failed - see full XML for details | `PseudoInstructions("ret","jalr x0, 0(x1)","Return from subroutine")` |
+| ✅ | N/A | `PseudoInstructions("ret","jalr x0, 0(x1)","Return from subroutine")` |
 | ✅ | N/A | `PseudoInstructions("sb x1, myVar, t1","auipc t1, %pcrel_hi(myVar)\n   sb x1, %pcrel_lo(myVar)(t1)","Store byte")` |
 | ✅ | N/A | `PseudoInstructions("sb x2, myVar1, t2","auipc t2, %pcrel_hi(myVar1)\n  sb x2, %pcrel_lo(myVar1)(t2)","Store byte")` |
 | ✅ | N/A | `PseudoInstructions("sb x3, myVar152, t3","auipc t3, %pcrel_hi(myVar152)\nsb x3, %pcrel_lo(myVar152)(t3)","Store byte")` |
@@ -861,11 +876,20 @@
 | ✅ | N/A | `],["SH", "x2", "0x10", "(", "x1", ...])` |
 | ✅ | N/A | `],["SH", "x2", "0", "(", "x1", ...])` |
 | ✅ | N/A | `TestBranchWithLabels` |
+| ✅ | N/A | `TestCacheMissTracking` |
 | ✅ | N/A | `TestForwardReferenceNoDefinition` |
 | ✅ | N/A | `TestForwardReferenceThenDefinition` |
+| ✅ | N/A | `TestJALLabelResolutionAST` |
+| ❌ | Test failed - see full XML for details | `TestLabelCacheMissResolution` |
 | ✅ | N/A | `TestLabelParsing` |
 | ✅ | N/A | `TestMixedDirectivesAndLabels` |
+| ✅ | N/A | `TestMultipleForwardReferences` |
 | ✅ | N/A | `TestMultipleSections` |
+| ❌ | Test failed - see full XML for details | `TestOrgDirectiveBackwardsJump` |
+| ❌ | Test failed - see full XML for details | `TestOrgDirectiveBasic` |
+| ✅ | N/A | `TestOrgDirectiveInvalidAddress` |
+| ❌ | Test failed - see full XML for details | `TestOrgDirectiveMultiple` |
+| ❌ | Test failed - see full XML for details | `TestOrgDirectiveWithLabels` |
 | ✅ | N/A | `TestParseAddAndSubInstructions` |
 | ✅ | N/A | `TestParseAddiInstruction(addi,".text\naddi x1, x0, 0",x1,zero,0)` |
 | ✅ | N/A | `TestParseAddiInstruction(addi,".text\naddi x1, x0, 1",x1,zero,1)` |
@@ -933,10 +957,16 @@
 | ✅ | N/A | `TestParseUTypeInstruction(auipc,".text\nauipc x1, 0x52345",x1,336709)` |
 | ✅ | N/A | `TestParseUTypeInstruction(lui,".text\nlui x1, 0",x1,0)` |
 | ✅ | N/A | `TestParseUTypeInstruction(lui,".text\nlui x1, 0x12345",x1,74565)` |
+| ✅ | N/A | `TestSymbolCacheMissException` |
 | ✅ | N/A | `TestSymbolDirectiveParsing(".global main",Global,"main")` |
 | ✅ | N/A | `TestSymbolDirectiveParsing(".global _start",Global,"_start")` |
 | ✅ | N/A | `TestSymbolDirectiveParsing(".local helper_function",Local,"helper_function")` |
 | ✅ | N/A | `TestSymbolDirectiveParsing(".local _private_func",Local,"_private_func")` |
+| ✅ | N/A | `TestSymbolMissResolutionSystem` |
+| ✅ | N/A | `TestSymbolScopePromotion` |
+| ✅ | N/A | `TestSymbolTableValidation_AllDefined` |
+| ✅ | N/A | `TestSymbolTableValidation_MixedSymbols` |
+| ✅ | N/A | `TestSymbolTableValidation_UndefinedSymbols` |
 | ✅ | N/A | `TestTrulyUndefinedReference` |
 | ✅ | N/A | `TestUndefinedReferences` |
 | ✅ | N/A | `text\nld x1, 0(x0)",x1,zero,0)` |
@@ -947,6 +977,6 @@
 | ✅ | N/A | `tokenPositions(".option push\n.option nopic",[DIRECTIVE, WHITESPACE, IDENTIFIER, EOL, DIRECTIVE, ...],[0, 0, 0, 0, 1, ...],[0, 7, 8, 12, 0, ...],[".option", " ", "push", "\n", ".option", ...])` |
 
 ---
-*Generated on Thu Jun 26 07:10:12 PM CDT 2025*
+*Generated on Wed Jul  9 06:29:32 PM CDT 2025*
 
 📁 **Full results**: [Kuick.xml](Kuick.xml)

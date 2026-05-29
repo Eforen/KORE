@@ -67,7 +67,6 @@ namespace Kore.Kuick.Tests.Parser {
             Assert.AreEqual(expectedImmediate, instruction.immediate);
         }
 
-
         [Test]
         public void TestParseAddiMultiInstruction() {
             string input =

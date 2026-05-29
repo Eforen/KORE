@@ -167,6 +167,8 @@ namespace Kore.Kuick {
             // OP  rd, rs, imm
             // OR
             // LX rd, imm(rs)
+            // OR
+            // jalr rd, offset(rs1)
             var originalCursor = lexer._cursor;
 
             var op = ParseOP<Kore.RiscMeta.Instructions.TypeI>(currentToken, lexer, Lexer.Token.OP_I);
@@ -174,6 +176,22 @@ namespace Kore.Kuick {
             Register rs = Register.x0; // Storage Point for later use
             int imm = 0; // Storage Point for later use
             switch(op) {
+                case RiscMeta.Instructions.TypeI.jalr:
+                    // jalr rd, offset(rs1)
+                    LabeledInlineDirectiveNode<InstructionNodeTypeI> jalrWrapper = null;
+                    if(PeakLabelInlineDirective(lexer)){
+                        jalrWrapper = ParseNWrapLabelInlineDirective(lexer, new InstructionNodeTypeI(op, rd, rs, 0));
+                    } else {
+                        imm = ParseImmediate(lexer); // Get the immediate value, which can be in decimal or hexadecimal format
+                    }
+                    ExpectToken(lexer, Lexer.Token.PARREN_OPEN);
+                    var jalrRs1 = ParseRegister(lexer);
+                    ExpectToken(lexer, Lexer.Token.PARREN_CLOSE);
+                    if(jalrWrapper != null){
+                        (jalrWrapper.WrappedInstruction as InstructionNodeTypeI).rs = jalrRs1;
+                        return ComposeInstructionArray(expectReturnEOL(jalrWrapper, lexer));
+                    }
+                    return ComposeInstructionArray(expectReturnEOL(new InstructionNodeTypeI(op, rd, jalrRs1, imm), lexer));
                 case RiscMeta.Instructions.TypeI.lb:
                 case RiscMeta.Instructions.TypeI.lbu:
                 case RiscMeta.Instructions.TypeI.ld:
@@ -563,7 +581,11 @@ namespace Kore.Kuick {
                     csrValue = Convert.ToInt32(csrToken.value, 10);
                     break;
                 case Lexer.Token.NUMBER_HEX:
-                    csrValue = Convert.ToInt32(csrToken.value, 16);
+                    // Remove the "0x" prefix before parsing with NumberStyles.HexNumber
+                    var hexValue = csrToken.value.StartsWith("0x", StringComparison.OrdinalIgnoreCase) 
+                        ? csrToken.value.Substring(2) 
+                        : csrToken.value;
+                    csrValue = Convert.ToInt32(hexValue, 16);
                     break;
                 case Lexer.Token.CSR:
                 case Lexer.Token.IDENTIFIER:
@@ -784,15 +806,36 @@ namespace Kore.Kuick {
                 }
             }
 
-            if(currentToken.token == Lexer.Token.STRING || currentToken.token == Lexer.Token.IDENTIFIER) {
+            if (currentToken.token == Lexer.Token.STRING || currentToken.token == Lexer.Token.IDENTIFIER)
+            {
                 return ComposeInstructionArray(expectReturnEOL(new StringDirectiveNode { Name = name, Value = currentToken.value }, lexer));
-            } else if(currentToken.token == Lexer.Token.NUMBER_INT) {
+            }
+            else if (currentToken.token == Lexer.Token.NUMBER_INT)
+            {
                 var value = int.Parse(currentToken.value);
+                // Validate .org directive at parse time
+                if (name == ".org" && value < 0)
+                {
+                    throw new SyntaxException($".org directive cannot have negative address: {value}");
+                }
                 return ComposeInstructionArray(expectReturnEOL(new IntDirectiveNode { Name = name, Value = value }, lexer));
-            } else if(currentToken.token == Lexer.Token.NUMBER_HEX) {
-                var value = int.Parse(currentToken.value, System.Globalization.NumberStyles.HexNumber);
+            }
+            else if (currentToken.token == Lexer.Token.NUMBER_HEX)
+            {
+                // Remove the "0x" prefix before parsing with NumberStyles.HexNumber
+                var hexValue = currentToken.value.StartsWith("0x", StringComparison.OrdinalIgnoreCase) 
+                    ? currentToken.value.Substring(2) 
+                    : currentToken.value;
+                var value = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
+                // Validate .org directive at parse time
+                if (name == ".org" && value < 0)
+                {
+                    throw new SyntaxException($".org directive cannot have negative address: {value}");
+                }
                 return ComposeInstructionArray(expectReturnEOL(new IntDirectiveNode { Name = name, Value = value }, lexer));
-            } else {
+            }
+            else
+            {
 
                 return ComposeInstructionArray(expectReturnEOL(new DirectiveNode { Name = name }, lexer));
             }
