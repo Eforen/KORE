@@ -98,7 +98,61 @@ namespace Kore.RiscMeta.Instructions {
         bltu,
         bgeu
     }
-    public enum TypeI {
+    
+    public enum TypeIOpcode : uint
+    {
+        /// <summary> jalr rd, offset(rs1) </summary>
+        jalr = 0b1100111,
+
+        // Integer Loads - LOAD opcode
+        lb = 0b0000011,
+        lbu = 0b0000011,
+        lh = 0b0000011,
+        lw = 0b0000011,
+        lwu = 0b0000011,
+        ld = 0b0000011,
+        lhu = 0b0000011,
+
+        // OP-IMM
+        addi = 0b0010011,
+        slti = 0b0010011,
+        sltiu = 0b0010011,
+        xori = 0b0010011,
+        ori = 0b0010011,
+        andi = 0b0010011,
+
+        // Shifts are also OP-IMM (funct3 differs)
+        slli = 0b0010011,
+        srli = 0b0010011,
+        srai = 0b0010011,
+
+        // RV64I word ops
+        addiw = 0b0011011,
+        slliw = 0b0011011,
+        srliw = 0b0011011,
+        sraiw = 0b0011011,
+
+        // Memory ordering
+        fence = 0b0001111,
+        fence_i = 0b0001111,
+
+        // System / CSR / Environment - SYSTEM opcode
+        ecall = 0b1110011,
+        ebreak = 0b1110011,
+        csrrw = 0b1110011,
+        csrrs = 0b1110011,
+        csrrc = 0b1110011,
+        csrrwi = 0b1110011,
+        csrrsi = 0b1110011,
+        csrrci = 0b1110011,
+
+        // Floating-point loads - LOAD-FP opcode
+        flw = 0b0000111,
+        fld = 0b0000111,
+    }
+
+    public enum TypeI
+    {
         /// <summary> jalr rd, offset(rs1) # Jump and Link</summary>
         jalr,
         lb,
@@ -121,11 +175,11 @@ namespace Kore.RiscMeta.Instructions {
         slliw,
         srliw,
         sraiw,
-        sltiw,
-        sltiuw,
-        xoriw,
-        oriw,
-        andiw,
+        // sltiw,
+        // sltiuw,
+        // xoriw,
+        // oriw,
+        // andiw,
         fence,
         fence_i,
         ecall,
@@ -166,6 +220,24 @@ namespace Kore.RiscMeta.Instructions {
 
     public static class InstructionHelper
     {
+        public static uint GetFunct3(TypeI op)
+        {
+            switch (op)
+            {
+                case TypeI.addi:
+                    return 0b000;
+                case TypeI.slti:
+                    return 0b010;
+                case TypeI.xori:
+                    return 0b100;
+                case TypeI.ori:
+                    return 0b110;
+                case TypeI.andi:
+                    return 0b111;
+                default:
+                    throw new Exception($"Invalid instruction type: {op}");
+            }
+        }
         public static uint GetFunct3(TypeR op)
         {
             switch (op)
@@ -194,6 +266,18 @@ namespace Kore.RiscMeta.Instructions {
                     throw new Exception($"Invalid instruction type: {op}");
             }
         }
+        public static uint GetFunct7(TypeI op)
+        {
+            switch (op)
+            {
+                case TypeI.slli:
+                    return 0b0000000;
+                case TypeI.srai:
+                    return 0b0100000;
+                default:
+                    return 0b0000000;
+            }
+        }
         public static uint GetFunct7(TypeR op)
         {
             switch (op)
@@ -204,9 +288,77 @@ namespace Kore.RiscMeta.Instructions {
                     return 0b0000000;
             }
         }
+        
+        public static uint GetOpcode(TypeI op)
+        {
+            switch (op)
+            {
+                case TypeI.addi:
+                    return (uint)TypeIOpcode.addi;
+                case TypeI.slti:
+                    return (uint)TypeIOpcode.slti;
+                case TypeI.xori:
+                    return (uint)TypeIOpcode.xori;
+                case TypeI.ori:
+                    return (uint)TypeIOpcode.ori;
+                case TypeI.andi:
+                    return (uint)TypeIOpcode.andi;
+                case TypeI.jalr:
+                    return (uint)TypeIOpcode.jalr;
+                case TypeI.lb:
+                    return (uint)TypeIOpcode.lb;
+                case TypeI.lbu:
+                    return (uint)TypeIOpcode.lbu;
+                case TypeI.lh:
+                    return (uint)TypeIOpcode.lh;
+                case TypeI.lw:
+                    return (uint)TypeIOpcode.lw;
+                case TypeI.lwu:
+                    return (uint)TypeIOpcode.lwu;
+                case TypeI.ld:
+                    return (uint)TypeIOpcode.ld;
+                case TypeI.lhu:
+                    return (uint)TypeIOpcode.lhu;
+                case TypeI.addiw:
+                    return (uint)TypeIOpcode.addiw;
+                case TypeI.slliw:
+                    return (uint)TypeIOpcode.slliw;
+                case TypeI.srliw:
+                    return (uint)TypeIOpcode.srliw;
+                case TypeI.sraiw:
+                    return (uint)TypeIOpcode.sraiw;
+                case TypeI.fence:
+                    return (uint)TypeIOpcode.fence;
+                case TypeI.fence_i:
+                    return (uint)TypeIOpcode.fence_i;
+                case TypeI.ecall:
+                    return (uint)TypeIOpcode.ecall;
+                case TypeI.ebreak:
+                    return (uint)TypeIOpcode.ebreak;
+                case TypeI.csrrw:
+                    return (uint)TypeIOpcode.csrrw;
+                case TypeI.csrrs:
+                    return (uint)TypeIOpcode.csrrs;
+                case TypeI.csrrc:
+                    return (uint)TypeIOpcode.csrrc;
+                case TypeI.csrrwi:
+                    return (uint)TypeIOpcode.csrrwi;
+                case TypeI.csrrsi:
+                    return (uint)TypeIOpcode.csrrsi;
+                case TypeI.csrrci:
+                    return (uint)TypeIOpcode.csrrci;
+                case TypeI.flw:
+                    return (uint)TypeIOpcode.flw;
+                case TypeI.fld:
+                    return (uint)TypeIOpcode.fld;
+                default:
+                    throw new Exception($"Invalid instruction type: {op}");
+            }
+        }
         public static uint GetOpcode(TypeR op)
         {
-            switch (op) {
+            switch (op)
+            {
                 case TypeR.add:
                     return (uint)TypeROpcode.add;
                 case TypeR.sub:

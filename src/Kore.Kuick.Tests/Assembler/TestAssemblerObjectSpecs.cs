@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Kore.AST;
 using NUnit.Framework;
@@ -28,41 +27,37 @@ namespace Kore.Kuick.Tests.Assembler {
         private static string AssemblyFixturesDir =>
             Path.Combine(TestContext.CurrentContext.TestDirectory, "Assembler", "AssemblyFixtures");
 
-        [Test]
-        public void AllSpecFilesMatchAssembledObject() {
-            Assert.That(Directory.Exists(AssemblyFixturesDir), Is.True,
-                $"Missing fixtures directory: {AssemblyFixturesDir}");
+        // One [TestCase] per fixture base-name. Each value names the pair of files the test
+        // will load: <name>.S and <name>.spec, both under Assembler/AssemblyFixtures/.
+        // The case label also becomes the test name in the explorer (SpecFileMatchesAssembledObject(...)).
+        [TestCase("add_basic")]
+        [TestCase("addi_basic")]
+        [TestCase("add_then_addi")]
+        public void SpecFileMatchesAssembledObject(string fixtureName) {
+            var sPath    = Path.Combine(AssemblyFixturesDir, fixtureName + ".S");
+            var specPath = Path.Combine(AssemblyFixturesDir, fixtureName + ".spec");
 
-            var assemblyFiles = Directory.GetFiles(AssemblyFixturesDir, "*.S", SearchOption.AllDirectories);
-            Assert.That(assemblyFiles.Length, Is.GreaterThan(0),
-                "Expected at least one .S file under Assembler/AssemblyFixtures");
+            Assert.That(File.Exists(sPath), Is.True,
+                $"Missing assembly fixture: {sPath}");
+            Assert.That(File.Exists(specPath), Is.True,
+                $"Missing spec for fixture '{fixtureName}': expected {specPath}");
 
-            // Stable order so failures are deterministic when multiple fixtures exist.
-            foreach (var sPath in assemblyFiles.OrderBy(p => p, StringComparer.Ordinal)) {
-                var dir = Path.GetDirectoryName(sPath)!;
-                var baseName = Path.GetFileNameWithoutExtension(sPath);
-                var specPath = Path.Combine(dir, baseName + ".spec");
+            var source = File.ReadAllText(sPath);
+            var expected = NormalizeNewlines(File.ReadAllText(specPath));
 
-                Assert.That(File.Exists(specPath), Is.True,
-                    $"Missing spec for {sPath}: expected {specPath}");
+            var lexer = new Lexer();
+            lexer.Load(source);
+            var ast = (ProgramNode)Kore.Kuick.Parser.Parse(lexer);
 
-                var source = File.ReadAllText(sPath);
-                var expected = NormalizeNewlines(File.ReadAllText(specPath));
+            // Same-instance pattern: AssemblerContext is mutated in-place by Assemble(),
+            // so we can read it back through the same reference we passed in.
+            var ctx = new Kore.Kuick.Assembler.AssemblerContext();
+            var asm = new Kore.Kuick.Assembler.Assembler(ctx, ast);
+            asm.Assemble();
 
-                var lexer = new Lexer();
-                lexer.Load(source);
-                var ast = (ProgramNode)Kore.Kuick.Parser.Parse(lexer);
-
-                // Same-instance pattern: AssemblerContext is mutated in-place by Assemble(),
-                // so we can read it back through the same reference we passed in.
-                var ctx = new Kore.Kuick.Assembler.AssemblerContext();
-                var asm = new Kore.Kuick.Assembler.Assembler(ctx, ast);
-                asm.Assemble();
-
-                var actual = NormalizeNewlines(RenderObject(ctx));
-                Assert.That(actual, Is.EqualTo(expected),
-                    $"Assembled object spec mismatch for {Path.GetFileName(sPath)}");
-            }
+            var actual = NormalizeNewlines(RenderObject(ctx));
+            Assert.That(actual, Is.EqualTo(expected),
+                $"Assembled object spec mismatch for {fixtureName}.S");
         }
 
         /// <summary>

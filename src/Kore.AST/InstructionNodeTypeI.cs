@@ -59,7 +59,13 @@ namespace Kore.AST {
         }
 
         public override uint GetMachineCode() {
-            return Kore.RiscMeta.Encoding.EncodeIType(rd, rs, (uint)immediate, (Funct3)0, (Opcode)0);
+            return Kore.RiscMeta.Encoding.EncodeIType(
+                rd,
+                rs,
+                (uint)immediate,
+                Kore.RiscMeta.Instructions.InstructionHelper.GetFunct3(this.op),
+                Kore.RiscMeta.Instructions.InstructionHelper.GetOpcode(this.op)
+            );
         }
     }
 }
