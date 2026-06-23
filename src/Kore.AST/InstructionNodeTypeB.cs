@@ -5,7 +5,8 @@ namespace Kore.AST {
     /// <summary>
     /// Represents a B-Type RISC-V instruction.
     /// </summary>
-    public class InstructionNodeTypeBImmediate : InstructionNode<Kore.RiscMeta.Instructions.TypeB> {
+    public class InstructionNodeTypeBImmediate : InstructionNode<Kore.RiscMeta.Instructions.TypeB>
+    {
         /// <summary>
         /// The first source register for the instruction.
         /// </summary>
@@ -22,17 +23,20 @@ namespace Kore.AST {
         public int imm { get; set; }
 
         public InstructionNodeTypeBImmediate(Kore.RiscMeta.Instructions.TypeB op, Register rs1, Register rs2, int immediate)
-            : base(op) {
+            : base(op)
+        {
             this.rs1 = rs1;
             this.rs2 = rs2;
             this.imm = immediate;
         }
 
-        public override AstNode CallProcessor(ASTProcessor processor) {
+        public override AstNode CallProcessor(ASTProcessor processor)
+        {
             return processor.ProcessASTNode(this);
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
@@ -40,8 +44,10 @@ namespace Kore.AST {
             return base.Equals(other) && rs1 == other.rs1 && rs2 == other.rs2 && imm == other.imm;
         }
 
-        public override int GetHashCode() {
-            unchecked {
+        public override int GetHashCode()
+        {
+            unchecked
+            {
                 int hash = base.GetHashCode();
                 hash = (hash * 397) ^ rs1.GetHashCode();
                 hash = (hash * 397) ^ rs2.GetHashCode();
@@ -50,8 +56,14 @@ namespace Kore.AST {
             }
         }
 
-        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder)
+        {
             return addDebugTextHeader(false, -1, indentLevel, builder).Append($"TypeB {op} RS1:{rs1.ToDebugString()} RS2:{rs2.ToDebugString()} IMM:{imm}");
+        }
+
+        public override uint GetMachineCode()
+        {
+            return Kore.RiscMeta.Encoding.EncodeBType(rs1, rs2, (uint)imm, (Funct3)0, (Opcode)0);
         }
     }
     /// <summary>
@@ -105,6 +117,11 @@ namespace Kore.AST {
 
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
             return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeB {op} RS1:{rs1.ToDebugString()} RS2:{rs2.ToDebugString()} LABEL:{label}");
+        }
+
+        public override uint GetMachineCode()
+        {
+            return Kore.RiscMeta.Encoding.EncodeBType(rs1, rs2, 0, (Funct3)0, (Opcode)0); // We do 0 because the label will have a reloc at this point
         }
     }
 }

@@ -47,6 +47,10 @@ The lowest priority tasks are at the bottom of the list.
 
 # Table of Contents
 
+- [How to use KANBAN.md](#how-to-use-kanbanmd)
+  - [Working On Stuff](#working-on-stuff)
+  - [Todos Priority](#todos-priority)
+- [Table of Contents](#table-of-contents)
 - [Done](#done)
   - [Done 10/18/2021](#done-10182021)
   - [Done 10/21/2021](#done-10212021)
@@ -62,9 +66,12 @@ The lowest priority tasks are at the bottom of the list.
   - [Done 2025/06/20](#done-20250620)
   - [Done 2025/06/21](#done-20250621)
   - [Done 2026/03/31](#done-20260331)
+  - [Done 2026/04/06](#done-20260406)
+  - [Done 2026/05/29](#done-20260529)
     - [Next Commit (Eforen)](#next-commit-eforen)
 - [Working On](#working-on)
   - [Working on (Eforen)](#working-on-eforen)
+  - [Set aside (Eforen)](#set-aside-eforen)
 - [Todos](#todos)
   - [Todo](#todo)
   - [Planned for some time later](#planned-for-some-time-later)
@@ -221,8 +228,9 @@ The lowest priority tasks are at the bottom of the list.
 
 ## Done 2026/04/06
 * [KUICK][PARSER] Implement Alignment ASTNode with tests
-### Next Commit (Eforen)
 * [KUICK][PARSER] Implement the Relocation type wrapper for label usage
+## Done 2026/05/29
+### Next Commit (Eforen)
 
 # Working On
 ## Working on (Eforen)

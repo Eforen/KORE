@@ -57,5 +57,9 @@ namespace Kore.AST {
         public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
             return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeI {op} RD:{rd.ToDebugString()} RS:{rs.ToDebugString()} IMM:{immediate}");
         }
+
+        public override uint GetMachineCode() {
+            return Kore.RiscMeta.Encoding.EncodeIType(rd, rs, (uint)immediate, (Funct3)0, (Opcode)0);
+        }
     }
 }

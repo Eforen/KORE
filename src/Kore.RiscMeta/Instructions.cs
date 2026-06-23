@@ -89,7 +89,8 @@ namespace Kore.RiscMeta.Instructions {
         wfi = (byte)INST_TYPE.PRType
     }
 
-    public enum TypeB {
+    public enum TypeB
+    {
         beq,
         bne,
         blt,
@@ -146,7 +147,94 @@ namespace Kore.RiscMeta.Instructions {
         fsw,
         fsd
     }
-    public enum TypeR {
+    public enum TypeSOpcode {
+        sb = 0b0100011,
+        sh = 0b0100011,
+        sw = 0b0100011,
+        sd = 0b0100011,
+        fsw = 0b0100011,
+        fsd = 0b0100011,
+    }
+    public enum TypeSFunct3 {
+        sb = 0b000,
+        sh = 0b001,
+        sw = 0b010,
+        sd = 0b011,
+        fsw = 0b010,
+        fsd = 0b011
+    }
+
+    public static class InstructionHelper
+    {
+        public static uint GetFunct3(TypeR op)
+        {
+            switch (op)
+            {
+                case TypeR.add:
+                    return 0b000;
+                case TypeR.sub:
+                    return 0b001;
+                case TypeR.sll:
+                    return 0b010;
+                case TypeR.slt:
+                    return 0b011;
+                case TypeR.sltu:
+                    return 0b100;
+                case TypeR.xor:
+                    return 0b101;
+                case TypeR.srl:
+                    return 0b110;
+                case TypeR.sra:
+                    return 0b111;
+                case TypeR.or:
+                    return 0b100;
+                case TypeR.and:
+                    return 0b101;
+                default:
+                    throw new Exception($"Invalid instruction type: {op}");
+            }
+        }
+        public static uint GetFunct7(TypeR op)
+        {
+            switch (op)
+            {
+                case TypeR.sub:
+                    return 0b0100000;
+                default:
+                    return 0b0000000;
+            }
+        }
+        public static uint GetOpcode(TypeR op)
+        {
+            switch (op) {
+                case TypeR.add:
+                    return (uint)TypeROpcode.add;
+                case TypeR.sub:
+                    return (uint)TypeROpcode.sub;
+                case TypeR.sll:
+                    return (uint)TypeROpcode.sll;
+                case TypeR.slt:
+                    return (uint)TypeROpcode.slt;
+                case TypeR.sltu:
+                    return (uint)TypeROpcode.sltu;
+                case TypeR.xor:
+                    return (uint)TypeROpcode.xor;
+                case TypeR.srl:
+                    return (uint)TypeROpcode.srl;
+                case TypeR.sra:
+                    return (uint)TypeROpcode.sra;
+                case TypeR.or:
+                    return (uint)TypeROpcode.or;
+                case TypeR.and:
+                    return (uint)TypeROpcode.and;
+                default:
+                    throw new Exception($"Invalid instruction type: {op}");
+            }
+        }
+    }
+
+    public enum TypeR
+    {
         add,
         sub,
         sll,
@@ -158,7 +246,23 @@ namespace Kore.RiscMeta.Instructions {
         or,
         and
     }
-    public enum TypeU {
+    
+    public enum TypeROpcode: uint
+    {
+        add = 0b0110011,
+        sub = 0b0110011,
+        sll = 0b0110011,
+        slt = 0b0110011,
+        sltu = 0b0110011,
+        xor = 0b0110011,
+        srl = 0b0110011,
+        sra = 0b0110011,
+        or = 0b0110011,
+        and = 0b0110011,
+    }
+
+    public enum TypeU
+    {
         auipc,
         lui
     }

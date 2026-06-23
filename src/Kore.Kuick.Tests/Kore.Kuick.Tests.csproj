@@ -24,4 +24,9 @@
     <None Include="Parser\AstFixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- Assembler/AssemblyFixtures: .S sources and .spec goldens (object-byte specs) copied next to the test assembly at build time. -->
+  <ItemGroup>
+    <None Include="Assembler\AssemblyFixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

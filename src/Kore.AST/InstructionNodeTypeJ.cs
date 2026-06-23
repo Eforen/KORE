@@ -5,7 +5,8 @@ namespace Kore.AST {
     /// <summary>
     /// Represents a J-type instruction in the RISC-V assembly language.
     /// </summary>
-    public class InstructionNodeTypeJImmediate : InstructionNode<Kore.RiscMeta.Instructions.TypeJ> {
+    public class InstructionNodeTypeJImmediate : InstructionNode<Kore.RiscMeta.Instructions.TypeJ>
+    {
         /// <summary>
         /// The destination register for the result of the instruction.
         /// </summary>
@@ -16,16 +17,19 @@ namespace Kore.AST {
         /// </summary>
         public int imm { get; set; }
 
-        public InstructionNodeTypeJImmediate(Kore.RiscMeta.Instructions.TypeJ op, Register rd, int immediate) : base(op) {
+        public InstructionNodeTypeJImmediate(Kore.RiscMeta.Instructions.TypeJ op, Register rd, int immediate) : base(op)
+        {
             this.rd = rd;
             this.imm = immediate;
         }
 
-        public override AstNode CallProcessor(ASTProcessor processor) {
+        public override AstNode CallProcessor(ASTProcessor processor)
+        {
             return processor.ProcessASTNode(this);
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
@@ -33,8 +37,10 @@ namespace Kore.AST {
             return base.Equals(other) && rd == other.rd && imm == other.imm;
         }
 
-        public override int GetHashCode() {
-            unchecked {
+        public override int GetHashCode()
+        {
+            unchecked
+            {
                 int hash = base.GetHashCode();
                 hash = (hash * 397) ^ rd.GetHashCode();
                 hash = (hash * 397) ^ imm.GetHashCode();
@@ -42,15 +48,21 @@ namespace Kore.AST {
             }
         }
 
-        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder)
+        {
             return addDebugTextHeader(false, -1, indentLevel, builder).Append($"TypeJ {op} RD:{rd.ToDebugString()} IMM:{imm}");
+        }
+        
+        public override uint GetMachineCode() {
+            return Kore.RiscMeta.Encoding.EncodeUJType(rd, (uint)imm, (Opcode)0);
         }
     }
     /// <summary>
     /// Represents a J-type instruction in the RISC-V assembly language.
     /// TODO: This should likely be changed to the wrapper type of instruction so that we don't have this redundency
     /// </summary>
-    public class InstructionNodeTypeJLabel : InstructionNode<Kore.RiscMeta.Instructions.TypeJ> {
+    public class InstructionNodeTypeJLabel : InstructionNode<Kore.RiscMeta.Instructions.TypeJ>
+    {
         /// <summary>
         /// The destination register for the result of the instruction.
         /// </summary>
@@ -61,16 +73,19 @@ namespace Kore.AST {
         /// </summary>
         public string label { get; set; }
 
-        public InstructionNodeTypeJLabel(Kore.RiscMeta.Instructions.TypeJ op, Register rd, string label) : base(op) {
+        public InstructionNodeTypeJLabel(Kore.RiscMeta.Instructions.TypeJ op, Register rd, string label) : base(op)
+        {
             this.rd = rd;
             this.label = label;
         }
 
-        public override AstNode CallProcessor(ASTProcessor processor) {
+        public override AstNode CallProcessor(ASTProcessor processor)
+        {
             return processor.ProcessASTNode(this);
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
@@ -78,8 +93,10 @@ namespace Kore.AST {
             return base.Equals(other) && rd == other.rd && label == other.label;
         }
 
-        public override int GetHashCode() {
-            unchecked {
+        public override int GetHashCode()
+        {
+            unchecked
+            {
                 int hash = base.GetHashCode();
                 hash = (hash * 397) ^ rd.GetHashCode();
                 hash = (hash * 397) ^ label.GetHashCode();
@@ -87,8 +104,13 @@ namespace Kore.AST {
             }
         }
 
-        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder)
+        {
             return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeJ {op} RD:{rd.ToDebugString()} LABEL:{label}");
+        }
+        
+        public override uint GetMachineCode() {
+            return Kore.RiscMeta.Encoding.EncodeUJType(rd, 0, (Opcode)0); // We do 0 because the label will have a reloc at this point
         }
     }
 }

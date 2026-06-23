@@ -34,17 +34,20 @@ namespace Kore.AST {
     /// source registers, immediate values, and the format of the instruction.
     /// </summary>
     // where T is Kore.RiscMeta.Instructions.TypeB or Kore.RiscMeta.Instructions.TypeI or Kore.RiscMeta.Instructions.TypeR or Kore.RiscMeta.Instructions.TypeS or Kore.RiscMeta.Instructions.TypeU
-    public abstract class InstructionNode<T> : InstructionNode {
+    public abstract class InstructionNode<T> : InstructionNode
+    {
         /// <summary>
         /// The type of the instruction.
         /// </summary>
         public T op { get; set; }
 
-        public InstructionNode(T op) {
+        public InstructionNode(T op)
+        {
             this.op = op;
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
@@ -52,12 +55,16 @@ namespace Kore.AST {
             return op.Equals(other.op);
         }
 
-        public override int GetHashCode() {
-            unchecked {
+        public override int GetHashCode()
+        {
+            unchecked
+            {
                 int hash = base.GetHashCode();
                 hash = (hash * 397) ^ op.GetHashCode();
                 return hash;
             }
         }
+
+        public abstract uint GetMachineCode();
     }
 }

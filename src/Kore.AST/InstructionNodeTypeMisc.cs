@@ -4,14 +4,17 @@ namespace Kore.AST {
     /// <summary>
     /// Represents a miscellaneous instruction in the RISC-V assembly language.
     /// </summary>
-    public class InstructionNodeTypeMisc : InstructionNode<string> {
+    public class InstructionNodeTypeMisc : InstructionNode<string>
+    {
         public InstructionNodeTypeMisc(string name) : base(name) { }
 
-        public override AstNode CallProcessor(ASTProcessor processor) {
+        public override AstNode CallProcessor(ASTProcessor processor)
+        {
             return processor.ProcessASTNode(this);
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
@@ -19,12 +22,18 @@ namespace Kore.AST {
             return op == other.op;
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             return op.GetHashCode();
         }
 
-        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder)
+        {
             return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeMisc {op}");
+        }
+
+        public override uint GetMachineCode() {
+            return 0;
         }
     }
 }

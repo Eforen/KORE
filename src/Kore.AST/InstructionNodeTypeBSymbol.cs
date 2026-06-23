@@ -59,6 +59,10 @@ namespace Kore.AST {
             }
             return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine("}");
         }
+
+        public override uint GetMachineCode() {
+            return Kore.RiscMeta.Encoding.EncodeBType(rs1, rs2, (uint)SymbolReference.SymbolId, (Funct3)0, (Opcode)0);
+        }
     }
 
     /// <summary>
@@ -110,6 +114,10 @@ namespace Kore.AST {
                 SymbolReference.getDebugText(indentLevel + 1, builder);
             }
             return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine("}");
+        }
+
+        public override uint GetMachineCode() {
+            return Kore.RiscMeta.Encoding.EncodeUJType(rd, (uint)SymbolReference.SymbolId, (Opcode)0);
         }
     }
 } 

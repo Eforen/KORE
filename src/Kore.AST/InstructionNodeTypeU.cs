@@ -9,7 +9,8 @@ namespace Kore.AST {
     /// <summary>
     /// Represents a U-Type RISC-V instruction.
     /// </summary>
-    public class InstructionNodeTypeU : InstructionNode<Kore.RiscMeta.Instructions.TypeU> {
+    public class InstructionNodeTypeU : InstructionNode<Kore.RiscMeta.Instructions.TypeU>
+    {
         /// <summary>
         /// The destination register for the instruction.
         /// </summary>
@@ -20,16 +21,19 @@ namespace Kore.AST {
         /// </summary>
         public int imm { get; set; }
 
-        public InstructionNodeTypeU(Kore.RiscMeta.Instructions.TypeU op, Register rd, int immediate): base(op) {
+        public InstructionNodeTypeU(Kore.RiscMeta.Instructions.TypeU op, Register rd, int immediate) : base(op)
+        {
             this.rd = rd;
             this.imm = immediate;
         }
 
-        public override AstNode CallProcessor(ASTProcessor processor) {
+        public override AstNode CallProcessor(ASTProcessor processor)
+        {
             return processor.ProcessASTNode(this);
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
@@ -37,8 +41,10 @@ namespace Kore.AST {
             return base.Equals(other) && rd == other.rd && imm == other.imm;
         }
 
-        public override int GetHashCode() {
-            unchecked {
+        public override int GetHashCode()
+        {
+            unchecked
+            {
                 int hash = base.GetHashCode();
                 hash = (hash * 397) ^ rd.GetHashCode();
                 hash = (hash * 397) ^ imm.GetHashCode();
@@ -46,8 +52,13 @@ namespace Kore.AST {
             }
         }
 
-        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder) {
+        public override StringBuilder getDebugText(int indentLevel, StringBuilder builder)
+        {
             return addDebugTextHeader(false, -1, indentLevel, builder).AppendLine($"TypeU {op} RD:{rd.ToDebugString()} IMM:{imm}");
+        }
+        
+        public override uint GetMachineCode() {
+            return Kore.RiscMeta.Encoding.EncodeUType(rd, (uint)imm, (Opcode)0);
         }
     }
 }
